@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.0)
+set(EXECUTABLE_NAME "testmode")
+find_package(BISON)
+find_package(FLEX)
+BISON_TARGET(parser testmode.y ${CMAKE_CURRENT_BINARY_DIR}/testmode.c)
+FLEX_TARGET(scanner testlex.l ${CMAKE_CURRENT_BINARY_DIR}/testlex.c)
+ADD_FLEX_BISON_DEPENDENCY(scanner parser)
+
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+add_executable(${EXECUTABLE_NAME} ${BISON_parser_OUTPUTS} ${FLEX_scanner_OUTPUTS})
+INSTALL(TARGETS ${EXECUTABLE_NAME} DESTINATION epri)
