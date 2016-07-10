@@ -52,13 +52,21 @@ void simple(uint8_t cmd)
     send(buffer, 2);
 }
 
+void help(void)
+{
+    fprintf(stderr, "Usage: testmode > /dev/ttyUSB0\n\n"
+        "Accepted commands:\n"
+        "fchan nn\nphy nn\ntr51cf\nlbr\nnlbr\nstate\ndiag\ngetzz\nping\nrestart\n"
+        "help\n\n"
+    );
+}
 
 %}
 
 %union {
     int val;
 }
-%token FCHAN TR51CF PHY LBR NLBR STATE DIAG GETZZ PING RESTART 
+%token FCHAN TR51CF PHY LBR NLBR STATE DIAG GETZZ PING RESTART HELP
 %token <val> HEXBYTE
 
 %%
@@ -76,6 +84,7 @@ command:    FCHAN HEXBYTE   { compound(0x01, $2); }
     |       GETZZ           { simple(0x2F); }
     |       PING            { simple(0x30); }
     |       RESTART         { send("\xff", 1); }
+    |       HELP            { help(); }
     ;
 
 %%

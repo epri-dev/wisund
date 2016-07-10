@@ -23,6 +23,7 @@ diag        { return DIAG; }
 getzz       { return GETZZ; }
 ping        { return PING; }
 restart     { return RESTART; }
+help        { return HELP; }
 
 [ \t\n]+    { } /* ignore whitespace */
 .           { return yytext[0]; }
