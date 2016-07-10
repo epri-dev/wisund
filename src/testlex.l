@@ -6,7 +6,7 @@
 %{
 #include "testmode.h"
 %}
-%option noyywrap nounput noinput
+%option noyywrap nounput noinput nounistd
 
 XDIGIT  [0-9a-fA-F]
 ID      [a-z][a-z0-9]*
