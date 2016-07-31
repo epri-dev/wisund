@@ -1,39 +1,17 @@
 %{
-#include <stdio.h>
-#include <stdint.h>
+#include <cstdint>
+#include <iostream>
+#include <iomanip>
+#include "slip.h"
 
 extern int yylex(void);
 
 void yyerror (char const *s)
 {
-    fprintf(stderr, "%s\n", s);
+    std::cerr << s << '\n';
 }
 
-void emit(uint8_t byte)
-{
-    fprintf(stderr, "%2.2x ", byte);
-    putchar(byte);
-}
-
-void send(const uint8_t *ptr, unsigned len) {
-    // wrap the payload inside 0xC0 ... 0xC0 
-    emit('\xC0');
-    for (  ; len; ++ptr, --len) {
-        switch(*ptr) {
-            case 0xC0:
-                emit(0xDB);
-                emit(0xDC);
-                break;
-            case 0xDB:
-                emit(0xDB);
-                emit(0xDD);
-                break;
-            default:
-                emit(*ptr);
-        }
-    }
-    emit('\xC0');
-}
+constexpr uint8_t RestartCmd[]{"\xff"};
 
 void compound(uint8_t cmd, uint8_t data) 
 {
@@ -52,13 +30,17 @@ void simple(uint8_t cmd)
     send(buffer, 2);
 }
 
+void errortxt(void)
+{
+    std::cerr << "syntax error\n";
+}
+
 void help(void)
 {
-    fprintf(stderr, "Usage: testmode > /dev/ttyUSB0\n\n"
+    std::cerr << "Usage: testmode > /dev/ttyUSB0\n\n"
         "Accepted commands:\n"
         "fchan nn\nphy nn\ntr51cf\nlbr\nnlbr\nstate\ndiag\ngetzz\nping\nrestart\n"
-        "help\n\n"
-    );
+        "help\n\n";
 }
 
 %}
@@ -71,7 +53,7 @@ void help(void)
 
 %%
 script:     /* empty */
-    |   script command
+    |   script command '\n'
     ;
 
 command:    FCHAN HEXBYTE   { compound(0x01, $2); }
@@ -83,8 +65,13 @@ command:    FCHAN HEXBYTE   { compound(0x01, $2); }
     |       DIAG            { simple(0x21); }
     |       GETZZ           { simple(0x2F); }
     |       PING            { simple(0x30); }
-    |       RESTART         { send("\xff", 1); }
+    |       RESTART         { send(RestartCmd, 1); }
     |       HELP            { help(); }
+    |       errors          { errortxt(); }
+    ;
+
+errors:     error
+    |   errors error
     ;
 
 %%
