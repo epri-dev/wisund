@@ -8,5 +8,5 @@ ADD_FLEX_BISON_DEPENDENCY(scanner parser)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-add_executable(${EXECUTABLE_NAME} ${BISON_parser_OUTPUTS} ${FLEX_scanner_OUTPUTS})
+add_executable(${EXECUTABLE_NAME} ${BISON_parser_OUTPUTS} ${FLEX_scanner_OUTPUTS} slip.c)
 INSTALL(TARGETS ${EXECUTABLE_NAME} DESTINATION bin)

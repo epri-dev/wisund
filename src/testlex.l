@@ -1,6 +1,7 @@
 %top{
-#define _POSIX_C_SOURCE 1
+#define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
+#include <unistd.h>
 }
 
 %{
@@ -25,6 +26,7 @@ ping        { return PING; }
 restart     { return RESTART; }
 help        { return HELP; }
 
-[ \t\n]+    { } /* ignore whitespace */
+[ \t]+      { } /* ignore whitespace */
+\n          { return yytext[0]; }
 .           { return yytext[0]; }
 %%

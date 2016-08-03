@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 #include <stdint.h>
+#include "slip.h"
 
 extern int yylex(void);
 
@@ -9,30 +10,9 @@ void yyerror (char const *s)
     fprintf(stderr, "%s\n", s);
 }
 
-void emit(uint8_t byte)
+void errortxt(void)
 {
-    fprintf(stderr, "%2.2x ", byte);
-    putchar(byte);
-}
-
-void send(const uint8_t *ptr, unsigned len) {
-    // wrap the payload inside 0xC0 ... 0xC0 
-    emit('\xC0');
-    for (  ; len; ++ptr, --len) {
-        switch(*ptr) {
-            case 0xC0:
-                emit(0xDB);
-                emit(0xDC);
-                break;
-            case 0xDB:
-                emit(0xDB);
-                emit(0xDD);
-                break;
-            default:
-                emit(*ptr);
-        }
-    }
-    emit('\xC0');
+    fprintf(stderr, "syntax error\n");
 }
 
 void compound(uint8_t cmd, uint8_t data) 
@@ -51,6 +31,8 @@ void simple(uint8_t cmd)
     buffer[1] = cmd;
     send(buffer, 2);
 }
+
+static uint8_t ResetCmd[] = { 0xFF };
 
 void help(void)
 {
@@ -71,7 +53,11 @@ void help(void)
 
 %%
 script:     /* empty */
-    |   script command
+    |   script command '\n'
+    ;
+
+errors:     error
+    |       errors error
     ;
 
 command:    FCHAN HEXBYTE   { compound(0x01, $2); }
@@ -83,8 +69,9 @@ command:    FCHAN HEXBYTE   { compound(0x01, $2); }
     |       DIAG            { simple(0x21); }
     |       GETZZ           { simple(0x2F); }
     |       PING            { simple(0x30); }
-    |       RESTART         { send("\xff", 1); }
+    |       RESTART         { send(ResetCmd, sizeof(ResetCmd)); }
     |       HELP            { help(); }
+    |       errors          { errortxt(); }
     ;
 
 %%
