@@ -25,6 +25,7 @@ getzz       { return GETZZ; }
 ping        { return PING; }
 restart     { return RESTART; }
 help        { return HELP; }
+slip        { return SLIP; }
 
 [ \t]+      { } /* ignore whitespace */
 \n          { return yytext[0]; }

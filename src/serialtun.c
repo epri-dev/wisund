@@ -13,6 +13,8 @@
 #include <arpa/inet.h>
 #include <linux/if.h>
 #include <linux/if_tun.h>
+#include "slip.h"
+#include "serialtun.h"
 
 #define max(a,b) ((a)>(b) ? (a):(b))
 
@@ -68,7 +70,7 @@ int serial_open(char *ttyname)
     return fd;
 }
 
-int alt_main()
+void transcomm(bool do_slip)
 {
     const int buflen = 1600;
     const int mtu = 1500;
@@ -76,18 +78,22 @@ int alt_main()
     char buf2[buflen];
     char *curr = buf2;
     char *end = &buf2[buflen];
-    int f1, f2, l, fm;
+    int f1, f2, fin, l, fm;
     fd_set fds;
 
     f1 = tun_open("tun0");
     f2 = serial_open("/dev/ttyAMA0");
+    fin = STDIN_FILENO;
 
+    // note that f1 and f2 are both
+    // guaranteed to be greater than STDIN_FILENO
     fm = max(f1, f2) + 1;
 
     ioctl(f1, TUNSETNOCSUM, 1);
 
     while (1) {
         FD_ZERO(&fds);
+        FD_SET(fin, &fds);
         FD_SET(f1, &fds);
         FD_SET(f2, &fds);
 
@@ -95,10 +101,18 @@ int alt_main()
 
         if (FD_ISSET(f1, &fds)) {
             l = read(f1, buf1, sizeof(buf1));
-            write(f2, buf1, l);
+            if (do_slip) { 
+                slipsend(f2, buf1, l);
+            } else {
+                write(f2, buf1, l);
+            }
         }
         if (FD_ISSET(f2, &fds)) {
-            l = read(f2, curr, end - curr);
+            if (do_slip) {
+                l = slipread(f2, curr, end - curr);
+            } else {
+                l = read(f2, curr, end - curr);
+            }
             curr += l;
             int ethertype = ntohs(*(uint16_t *) (&buf2[2]));
             int len = curr - buf2;
@@ -115,5 +129,13 @@ int alt_main()
                 }
             }
         }
+        if (FD_ISSET(fin, &fds)) {
+            close(f1);
+            close(f2);
+            return;
+        }
     }
+    close(f1);
+    close(f2);
+    return;
 }

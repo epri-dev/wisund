@@ -2,6 +2,6 @@
 #define SLIP_H
 #include <stdint.h>
 
-void emit(uint8_t byte);
-void send(const uint8_t *ptr, unsigned len);
+ssize_t slipsend(int fd, const void *ptr, size_t len);
+ssize_t slipread(int fd, void *ptr, size_t len);
 #endif // SLIP_H
