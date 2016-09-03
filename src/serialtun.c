@@ -44,7 +44,7 @@ int tun_open(char *devname)
     return fd;
 }
 
-int serial_open(char *ttyname)
+int serial_open(const char *ttyname)
 {
     int fd = open(ttyname, O_RDWR);
     if (fd == -1) {
@@ -70,7 +70,7 @@ int serial_open(char *ttyname)
     return fd;
 }
 
-void transcomm(bool do_slip)
+void transcomm(bool do_slip, const char *serialdev)
 {
     const int buflen = 1600;
     const int mtu = 1500;
@@ -82,7 +82,7 @@ void transcomm(bool do_slip)
     fd_set fds;
 
     f1 = tun_open("tun0");
-    f2 = serial_open("/dev/ttyAMA0");
+    f2 = serial_open(serialdev);
     fin = STDIN_FILENO;
 
     // note that f1 and f2 are both

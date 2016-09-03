@@ -10,7 +10,7 @@
 
 extern int yylex(void);
 extern int opterr, optopt;
-
+const char *serialdev = "/dev/ttyAMA0";
 
 static uint8_t ResetCmd[] = { 0xFF };
 static bool do_slip = false;
@@ -80,7 +80,7 @@ command:    FCHAN HEXBYTE   { compound(0x01, $2); }
     |       PING            { simple(0x30); }
     |       RESTART         { slipsend(STDOUT_FILENO, ResetCmd, sizeof(ResetCmd)); }
     |       HELP            { help(); }
-    |       SLIP            { transcomm(do_slip); }
+    |       SLIP            { transcomm(do_slip, serialdev); }
     |       errors          { errortxt(); }
     ;
 
