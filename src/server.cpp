@@ -5,6 +5,10 @@ extern "C" {
 }
 #include <iostream>
 #include <cstring>
+#include <atomic>
+#include <thread>
+
+static std::atomic_int done{false};
 
 class WebServer 
 {
@@ -37,18 +41,29 @@ public:
         s_http_server_opts.enable_directory_listing = "no";
     }
     void run() {
-        printf("Starting web server on port %s\n", s_http_port);
-        for (;;) {
+        std::cout << "Starting web server on port " << s_http_port << "\n";
+        while (!done) { 
             mg_mgr_poll(&mgr, 1000);
         }
     }
-    ~WebServer() {
+    virtual ~WebServer() {
         mg_mgr_free(&mgr);
     }
 };
 
-int main(void) {
+void serve(void) {
     WebServer server;
     server.run();
 }
     
+int main() {
+    std::thread web{serve};
+    std::string command;
+    std::cout << "Enter the word \"quit\" to exit the program and shut down the server\n";
+    while (!done && std::cin >> command) {
+        if (command == "quit") {
+            done = true;
+        }
+    }
+    web.join();
+}
