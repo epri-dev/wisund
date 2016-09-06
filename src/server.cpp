@@ -4,6 +4,7 @@ extern "C" {
 #include "mongoose.h"
 }
 #include <iostream>
+#include <string>
 #include <cstring>
 #include <atomic>
 #include <thread>
