@@ -35,6 +35,19 @@ body {
     min-height: 100%;
 }
 
+#nav td {
+    font-weight: bold;
+    height: 2em;
+    padding: 10px;
+    width: 20em;
+    border: 1px blue solid;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.selected {
+    background-color: aliceblue;
+}
 .grid-container::before, .clearfix::before, .grid-container::after, .clearfix::after {
     content: ".";
     display: block;
