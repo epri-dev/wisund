@@ -46,7 +46,7 @@ body {
 }
 
 .selected {
-    background-color: aliceblue;
+    background-color: powderblue;
 }
 .grid-container::before, .clearfix::before, .grid-container::after, .clearfix::after {
     content: ".";
