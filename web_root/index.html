@@ -2,36 +2,12 @@
 <html>
 <head>
 <title>EPRI Wi-SUN Diagnostics</title>
-<script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="d3.v4.min.js"></script>
 <link rel="stylesheet" type="text/css" href="default.css" />
 </head>
-<body>
-<div id="main" class="grid-container">
-				<header id="page-header" class="grid-100 tablet-grid-100 mobile-grid-100" role="banner">
-					<h1><img src="epri-logo.jpg" width="255" height="48" alt="EPRI: Electric Power Research Institute"></h1>
-				</header>
-                                <div id="nav" class="nav">
-                                    <table><tbody><tr>
-                                    <td class="selected">One</td>
-                                    <td onclick="location.href='page2.html'">Two</td>
-                                    <td onclick="location.href='page3.html'">Three</td>
-                                    </tr></tbody></table>
-                                </div>
-<div class="grid-65 tablet-grid-65 mobile-grid-100">
-	<div class="box grid-container grid-parent">
-<h2>Interface Data</h2>
-<h3>eth0</h3>
-<table>
-<thead>
-<tr><th>Statistics</th><th>Configuration</th></tr>
-</thead>
-<tbody>
-<tr><td style="padding:30px" id="viz"></td><td id="config"></td></tr>
-</tbody>
-</table>
-<script type="text/javascript">
 
+<body>
+<script>
 function tableize(selector, hdr, dat) {
     var rxtxTable = d3.select(selector)
         .append("table")
@@ -66,6 +42,34 @@ function tableize(selector, hdr, dat) {
         .style("align", "right")
         .style("font-size", "12px");
 }
+</script>
+<div id="main" class="grid-container">
+				<header id="page-header" class="grid-100 tablet-grid-100 mobile-grid-100" role="banner">
+					<h1><img src="epri-logo.jpg" width="255" height="48" alt="EPRI: Electric Power Research Institute"></h1>
+				</header>
+<div class="grid-65 tablet-grid-65 mobile-grid-100">
+	<div class="box grid-container grid-parent">
+
+<ul class="tab">
+  <li><a href="#" class="tablinks" onclick="openTab(event, 'eth0')">eth0</a></li>
+  <li><a href="#" class="tablinks" onclick="openTab(event, 'Wi-SUN')">Wi-SUN</a></li>
+  <li><a href="#" class="tablinks" onclick="openTab(event, 'Unused')">Unused</a></li>
+</ul>
+
+
+<div id="eth0" class="tabcontent">
+<h2>Interface Data</h2>
+<h3>eth0</h3>
+<table>
+	<thead>
+	<tr><th>Statistics</th><th>Configuration</th></tr>
+	</thead>
+	<tbody>
+	<tr><td style="padding:30px" id="viz"></td><td id="config"></td></tr>
+	</tbody>
+</table>
+
+<script type="text/javascript">
 
 var headers = [["name", "RX", "TX"]];
 var json_data = [["packets", "95235", "32351"],
@@ -73,6 +77,7 @@ var json_data = [["packets", "95235", "32351"],
                 ["errors", "0", "0"],
                 ["dropped", "0", "0"],
                 ["overruns", "0", "0"]];
+
 tableize("#viz", headers, json_data);
 
 var headers = [["name", "value"]];
@@ -81,25 +86,35 @@ var configdata = [
     ["mtu","1500"],
     ["txqueuelen", "1000"],
 ];
+
 tableize("#config", headers, configdata);
 
 </script>
+</div>
+
+
+<div id="Wi-SUN" class="tabcontent">
+<h2>Interface Data</h2>
 <h3>Wi-SUN</h3>
+
 <table>
-<thead>
-<tr><th>Statistics</th><th>Configuration</th></tr>
-</thead>
-<tbody>
-<tr><td style="padding:30px" id="viz2"></td><td id="config2"></td></tr>
-</tbody>
+	<thead>
+	<tr><th>Statistics</th><th>Configuration</th></tr>
+	</thead>
+	<tbody>
+	<tr><td style="padding:30px" id="viz2"></td><td id="config2"></td></tr>
+	</tbody>
 </table>
+
 <script type="text/javascript">
+			
 var headers = [["name", "RX", "TX"]];
 var json_data = [["packets", "1680", "1130"],
                 ["bytes", "215040", "144640"],
                 ["errors", "3", "5"],
                 ["dropped", "1", "0"],
                 ["overruns", "0", "1"]];
+
 tableize("#viz2", headers, json_data);
 
 var headers = [["name", "value"]];
@@ -111,8 +126,38 @@ var configdata = [
     ["Channel Spacing", "200 kHz"],
     ["Num Channels", "129"],
 ];
-
 tableize("#config2", headers, configdata);
+
+</script>
+</div>
+
+<div id="Unused" class="tabcontent">
+  <h3>Unused</h3>
+  <p>Available for future content.</p>
+</div>
+
+<script>
+
+function openTab(evt, tabName) {
+    // Declare all variables
+    var i, tabcontent, tablinks;
+
+    // Get all elements with class="tabcontent" and hide them
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+
+    // Get all elements with class="tablinks" and remove the class "active"
+     tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+    // Show the current tab, and add an "active" class to the link that opened the tab
+     document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
 </script>
 
 </div>
@@ -120,8 +165,9 @@ tableize("#config2", headers, configdata);
 	<div id="faux-footer">
     </div>
 	</div>
+
 			<footer id="page-footer" class="grid-container" role="contentinfo">
-				<div class="grid-100 tablet-grid-100 mobile-grid-100">
+			<div class="grid-100 tablet-grid-100 mobile-grid-100">
 			    <address>
 				    EPRI 3420 Hillview Avenue, Palo Alto, California 94304
 			    </address>
@@ -131,7 +177,6 @@ tableize("#config2", headers, configdata);
 			    </div>
 		    </div>
 			</footer>
-
 
 </body>
 </html>
