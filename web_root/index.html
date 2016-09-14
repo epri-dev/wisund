@@ -1,9 +1,17 @@
 <!DOCTYPE html>
 <html>
+<meta charset="utf-8"/>
 <head>
 <title>EPRI Wi-SUN Diagnostics</title>
 <script src="d3.v4.min.js"></script>
 <link rel="stylesheet" type="text/css" href="default.css" />
+<style>
+.line {
+  fill: none;
+  stroke: green;
+  stroke-width: 1.5px;
+}
+</style>
 </head>
 
 <body>
@@ -53,7 +61,8 @@ function tableize(selector, hdr, dat) {
 <ul class="tab">
   <li><a href="#" class="tablinks" onclick="openTab(event, 'eth0')">eth0</a></li>
   <li><a href="#" class="tablinks" onclick="openTab(event, 'Wi-SUN')">Wi-SUN</a></li>
-  <li><a href="#" class="tablinks" onclick="openTab(event, 'Unused')">Unused</a></li>
+  <li><a href="#" class="tablinks" onclick="openTab(event, 'RandomGraph')">RandomGraph</a></li>
+  <li><a href="#" class="tablinks" onclick="openTab(event, 'WebSocket')">WebSocket</a></li>
 </ul>
 
 
@@ -131,9 +140,189 @@ tableize("#config2", headers, configdata);
 </script>
 </div>
 
-<div id="Unused" class="tabcontent">
-  <h3>Unused</h3>
-  <p>Available for future content.</p>
+<div id="RandomGraph" class="tabcontent">
+  <h3>Test Graph</h3>
+  <p>This graph is simply plotting randomly generated data.</p>
+<script>(function() {
+
+var n = 243,
+    duration = 1000,
+    now = new Date(Date.now() - duration),
+    count = 0,
+    data = d3.range(n).map(function() { return 0; });
+
+var margin = {top: 6, right: 0, bottom: 20, left: 40},
+    width = 960 - margin.right,
+    height = 120 - margin.top - margin.bottom;
+
+var x = d3.scaleTime()
+    .domain([now - (n - 2) * duration, now - duration])
+    .range([0, width]);
+
+var y = d3.scaleLinear()
+    .range([height, 0]);
+
+var line = d3.line()
+    .x(function(d, i) { return x(now - (n - 1 - i) * duration); })
+    .y(function(d, i) { return y(d); });
+
+var svg = d3.select("#RandomGraph").append("p").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .style("margin-left", -margin.left + "px")
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+svg.append("defs").append("clipPath")
+    .attr("id", "clip")
+  .append("rect")
+    .attr("width", width)
+    .attr("height", height);
+
+var axis = svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(x.axis = d3.axisBottom(x));
+
+var path = svg.append("g")
+    .attr("clip-path", "url(#clip)")
+  .append("path")
+    .datum(data)
+    .attr("class", "line");
+
+var transition = d3.select({})
+    .transition()
+    .duration(1000)
+    .ease(d3.easeLinear);
+
+var updateGraph = function(newdata) {
+    // update the domains
+    now = new Date();
+    x.domain([now - (n - 2) * duration, now - duration]);
+    y.domain([0, d3.max(data)]);
+
+    // push the value on the stack
+    data.push(newdata);
+
+    // redraw the line
+    svg.select(".line")
+        .attr("d", line)
+        .attr("transform", null);
+
+    // slide the x-axis left
+    axis.call(x.axis);
+
+    // slide the line left
+    path.transition()
+        .attr("transform", "translate(" + x(now - (n - 1) * duration) + ")");
+
+    // pop the old data point off the front
+    data.shift();
+
+};
+
+var get_cpu_usage = function() {
+    d3.json('/get_cpu_usage', function(error, data) {
+        updateGraph(data.result);
+    });
+};
+
+d3.interval(get_cpu_usage, 1000);
+
+})()</script>
+</div>
+
+<div id="WebSocket" class="tabcontent">
+  <h3>Test Graph</h3>
+  <p>This graph is simply plotting randomly generated data.</p>
+<script>(function() {
+
+var n = 243,
+    duration = 750,
+    now = new Date(Date.now() - duration),
+    count = 0,
+    data = d3.range(n).map(function() { return 0; });
+
+var margin = {top: 6, right: 0, bottom: 20, left: 40},
+    width = 960 - margin.right,
+    height = 120 - margin.top - margin.bottom;
+
+var x = d3.scaleTime()
+    .domain([now - (n - 2) * duration, now - duration])
+    .range([0, width]);
+
+var y = d3.scaleLinear()
+    .range([height, 0]);
+
+var line = d3.line()
+    .x(function(d, i) { return x(now - (n - 1 - i) * duration); })
+    .y(function(d, i) { return y(d); });
+
+var svg = d3.select("#WebSocket").append("p").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .style("margin-left", -margin.left + "px")
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+svg.append("defs").append("clipPath")
+    .attr("id", "clip")
+  .append("rect")
+    .attr("width", width)
+    .attr("height", height);
+
+var axis = svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(x.axis = d3.axisBottom(x));
+
+var path = svg.append("g")
+    .attr("clip-path", "url(#clip)")
+  .append("path")
+    .datum(data)
+    .attr("class", "line");
+
+var transition = d3.select({})
+    .transition()
+    .duration(750)
+    .ease(d3.easeLinear);
+
+var updateGraph = function(newdata) {
+    // update the domains
+    now = new Date();
+    x.domain([now - (n - 2) * duration, now - duration]);
+    y.domain([0, d3.max(data)]);
+
+    // push the value on the stack
+    data.push(newdata);
+
+    // redraw the line
+    svg.select(".line")
+        .attr("d", line)
+        .attr("transform", null);
+
+    // slide the x-axis left
+    axis.call(x.axis);
+
+    // slide the line left
+    path.transition()
+        .attr("transform", "translate(" + x(now - (n - 1) * duration) + ")");
+
+    // pop the old data point off the front
+    data.shift();
+
+};
+
+// Create Websocket connection. For simplicity, no reconnect logic is here.
+var ws = new WebSocket('ws://' + location.host);
+    ws.onmessage = function(ev) {
+    d3.select("#log").text(ev.data);
+    updateGraph(ev.data);
+};
+
+})()</script>
+<p id="log">
+</p>
 </div>
 
 <script>

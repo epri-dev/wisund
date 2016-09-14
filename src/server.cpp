@@ -11,6 +11,47 @@ extern "C" {
 
 static std::atomic_int done{false};
 
+struct device_settings {
+  char setting1[100];
+  char setting2[100];
+};
+
+static struct device_settings s_settings{"value1", "value2"};
+
+static void handle_save(struct mg_connection *nc, struct http_message *hm) {
+  // Get form variables and store settings values
+  mg_get_http_var(&hm->body, "setting1", s_settings.setting1,
+                  sizeof(s_settings.setting1));
+  mg_get_http_var(&hm->body, "setting2", s_settings.setting2,
+                  sizeof(s_settings.setting2));
+
+  // Send response
+  mg_printf(nc, "%s", "HTTP/1.1 302 OK\r\nLocation: /\r\n\r\n");
+}
+
+static void handle_get_cpu_usage(struct mg_connection *nc) {
+  // Generate random value, as an example of changing CPU usage
+  // Getting real CPU usage depends on the OS.
+  int cpu_usage = (double) rand() / RAND_MAX * 100.0;
+
+  // Use chunked encoding in order to avoid calculating Content-Length
+  mg_printf(nc, "%s", "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n");
+
+  // Output JSON object which holds CPU usage data
+  mg_printf_http_chunk(nc, "{ \"result\": %d }", cpu_usage);
+
+  // Send empty chunk, the end of response
+  mg_send_http_chunk(nc, "", 0);
+}
+
+static void handle_ssi_call(struct mg_connection *nc, const char *param) {
+  if (strcmp(param, "setting1") == 0) {
+    mg_printf_html_escape(nc, "%s", s_settings.setting1);
+  } else if (strcmp(param, "setting2") == 0) {
+    mg_printf_html_escape(nc, "%s", s_settings.setting2);
+  }
+}
+
 class WebServer 
 {
     const char *s_http_port;
@@ -18,9 +59,24 @@ class WebServer
     struct mg_connection *nc;
     struct mg_serve_http_opts s_http_server_opts;
 
-    static void ev_handler(struct mg_connection *nc, int ev, void *p) {
-        if (ev == MG_EV_HTTP_REQUEST) {
-            mg_serve_http(nc, (struct http_message *) p, *(mg_serve_http_opts *)nc->user_data);
+    static void ev_handler(mg_connection *nc, int ev, void *p) {
+        http_message *hm = (http_message *)p;
+        switch (ev) {
+            case MG_EV_HTTP_REQUEST:
+                if (mg_vcmp(&hm->uri, "/save") == 0) {
+                    handle_save(nc, hm);
+                } else if (mg_vcmp(&hm->uri, "/get_cpu_usage") == 0) {
+                    handle_get_cpu_usage(nc);
+                } else {
+                    // serve static content 
+                    mg_serve_http(nc, hm, *(mg_serve_http_opts *)nc->user_data);
+                }
+                break;
+            case MG_EV_SSI_CALL:
+                handle_ssi_call(nc, (const char *)p);
+                break;
+            default:
+                break;
         }
     }
 
@@ -44,9 +100,32 @@ public:
     void run() {
         std::cout << "Starting web server on port " << s_http_port << "\n";
         while (!done) { 
+            static time_t last_time;
+            time_t now = time(NULL);
             mg_mgr_poll(&mgr, 1000);
+            if (now - last_time > 0) {
+                push_data_to_all_websocket_connections(&mgr);
+                last_time = now;
+            }
         }
     }
+
+    static void push_data_to_all_websocket_connections(struct mg_mgr *m) {
+        struct mg_connection *c;
+        static int memory_usage = 17; // (double) rand() / RAND_MAX * 100.0;
+        if (memory_usage >= 51) {
+            memory_usage = 17;
+        } else {
+            ++memory_usage;
+        }
+
+        for (c = mg_next(m, NULL); c != NULL; c = mg_next(m, c)) {
+            if (c->flags & MG_F_IS_WEBSOCKET) {
+                mg_printf_websocket_frame(c, WEBSOCKET_OP_TEXT, "%d", memory_usage);
+            }
+        }
+    }
+
     virtual ~WebServer() {
         mg_mgr_free(&mgr);
     }

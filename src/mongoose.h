@@ -306,7 +306,9 @@ typedef struct _stati64 cs_stat_t;
  * implement a shim.
  */
 #if !(defined(__DARWIN_C_LEVEL) && __DARWIN_C_LEVEL >= 200809L)
+#if 0
 long long strtoll(const char *, char **, int);
+#endif
 #endif
 
 typedef int sock_t;
