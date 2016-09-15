@@ -81,7 +81,7 @@ class WebServer
     }
 
 public:
-    WebServer(const char *port = "8000") 
+    WebServer(const char *webroot, const char *port = "8000") 
         : s_http_port{port}
     {
         std::memset(&s_http_server_opts, 0, sizeof(s_http_server_opts));
@@ -93,7 +93,7 @@ public:
 
         // Set up HTTP server parameters
         mg_set_protocol_http_websocket(nc);
-        s_http_server_opts.document_root = "../web_root";   // Serve web_root dir 
+        s_http_server_opts.document_root = webroot;   // Serve web_root dir 
         s_http_server_opts.dav_document_root = ".";         // Allow access via WebDav
         s_http_server_opts.enable_directory_listing = "no";
     }
@@ -131,13 +131,17 @@ public:
     }
 };
 
-void serve(void) {
-    WebServer server;
+void serve(const char *webroot) {
+    WebServer server(webroot);
     server.run();
 }
     
-int main() {
-    std::thread web{serve};
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        std::cout << "Usage: web_server web_root_dir\n";
+        return 1;
+    }
+    std::thread web{serve, argv[1]};
     std::string command;
     std::cout << "Enter the word \"quit\" to exit the program and shut down the server\n";
     while (!done && std::cin >> command) {
