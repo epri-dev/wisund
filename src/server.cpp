@@ -8,6 +8,7 @@ extern "C" {
 #include <cstring>
 #include <atomic>
 #include <thread>
+#include <fstream>
 
 static std::atomic_int done{false};
 
@@ -15,6 +16,8 @@ struct device_settings {
   char setting1[100];
   char setting2[100];
 };
+
+static std::fstream diag("moocow");
 
 static struct device_settings s_settings{"value1", "value2"};
 
@@ -65,7 +68,7 @@ class WebServer
             case MG_EV_HTTP_REQUEST:
                 if (mg_vcmp(&hm->uri, "/save") == 0) {
                     handle_save(nc, hm);
-                } else if (mg_vcmp(&hm->uri, "/get_cpu_usage") == 0) {
+                } else if (mg_vcmp(&hm->uri, "/get_diag") == 0) {
                     handle_get_cpu_usage(nc);
                 } else {
                     // serve static content 
@@ -112,22 +115,19 @@ public:
 
     static void push_data_to_all_websocket_connections(struct mg_mgr *m) {
         struct mg_connection *c;
-        static int memory_usage = 17; // (double) rand() / RAND_MAX * 100.0;
-        if (memory_usage >= 51) {
-            memory_usage = 17;
-        } else {
-            ++memory_usage;
-        }
-
+        std::string line;
+        std::getline(diag, line);
+        std::cout << "Got: " << line << "\n";
         for (c = mg_next(m, NULL); c != NULL; c = mg_next(m, c)) {
             if (c->flags & MG_F_IS_WEBSOCKET) {
-                mg_printf_websocket_frame(c, WEBSOCKET_OP_TEXT, "%d", memory_usage);
+                mg_printf_websocket_frame(c, WEBSOCKET_OP_TEXT, "%s", line.c_str());
             }
         }
     }
 
     virtual ~WebServer() {
         mg_mgr_free(&mgr);
+        diag.close();
     }
 };
 

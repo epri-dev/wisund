@@ -2,7 +2,9 @@
 #include <cstdint>
 #include <iostream>
 #include <iomanip>
-#include "slip.h"
+#include "diag.h"
+#include "Message.h"
+
 
 extern int yylex(void);
 
@@ -11,23 +13,16 @@ void yyerror (char const *s)
     std::cerr << s << '\n';
 }
 
-constexpr uint8_t RestartCmd[]{"\xff"};
+static const Message RestartCmd{0xff};
 
 void compound(uint8_t cmd, uint8_t data) 
 {
-    uint8_t buffer[3];
-    buffer[0] = 0x6;
-    buffer[1] = cmd;
-    buffer[2] = data;
-    send(buffer, 3);
+    Message{0x6, cmd, data}.send();
 }
 
 void simple(uint8_t cmd)
 {
-    uint8_t buffer[2];
-    buffer[0] = 0x6;
-    buffer[1] = cmd;
-    send(buffer, 2);
+    Message{0x6, cmd}.send();
 }
 
 void errortxt(void)
@@ -62,10 +57,10 @@ command:    FCHAN HEXBYTE   { compound(0x01, $2); }
     |       LBR             { simple(0x10); }
     |       NLBR            { simple(0x11); }
     |       STATE           { simple(0x20); }
-    |       DIAG            { simple(0x21); }
+    |       DIAG HEXBYTE    { diag(0x21, $2); }
     |       GETZZ           { simple(0x2F); }
     |       PING            { simple(0x30); }
-    |       RESTART         { send(RestartCmd, 1); }
+    |       RESTART         { RestartCmd.send(); }
     |       HELP            { help(); }
     |       errors          { errortxt(); }
     ;
