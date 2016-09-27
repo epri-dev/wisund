@@ -1,6 +1,6 @@
 %top{
-#define _POSIX_C_SOURCE 200809L
-#include <stdio.h>
+#define _POSIX_C_SOURCE 1
+#include <cstdlib>
 #include <unistd.h>
 }
 
@@ -13,7 +13,7 @@ XDIGIT  [0-9a-fA-F]
 ID      [a-z][a-z0-9]*
 %%
 
-{XDIGIT}+   { yylval.val = strtol(yytext, (char **)NULL, 16); return HEXBYTE; }
+{XDIGIT}+   { yylval.val = std::strtol(yytext, nullptr, 16); return HEXBYTE; }
 fchan       { return FCHAN; }
 tr51cf      { return TR51CF; }
 phy         { return PHY; }
@@ -25,9 +25,8 @@ getzz       { return GETZZ; }
 ping        { return PING; }
 restart     { return RESTART; }
 help        { return HELP; }
-slip        { return SLIP; }
 
 [ \t]+      { } /* ignore whitespace */
-\n          { return yytext[0]; }
+\n          { return '\n'; }
 .           { return yytext[0]; }
 %%

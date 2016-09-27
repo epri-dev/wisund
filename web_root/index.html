@@ -59,16 +59,100 @@ function tableize(selector, hdr, dat) {
 	<div class="box grid-container grid-parent">
 
 <ul class="tab">
-  <li><a href="#" class="tablinks" onclick="openTab(event, 'eth0')">eth0</a></li>
-  <li><a href="#" class="tablinks" onclick="openTab(event, 'Wi-SUN')">Wi-SUN</a></li>
-  <li><a href="#" class="tablinks" onclick="openTab(event, 'RandomGraph')">RandomGraph</a></li>
-  <li><a href="#" class="tablinks" onclick="openTab(event, 'WebSocket')">WebSocket</a></li>
+  <li><a href="#" class="tablinks" onclick="openTab(event, 'L1_L2')">L1_L2</a></li>
+  <li><a href="#" class="tablinks" onclick="openTab(event, 'L3_L4')">L3/L4</a></li>
+  <li><a href="#" class="tablinks" onclick="openTab(event, 'Confign')">Configuration</a></li>
+  <li><a href="#" class="tablinks" onclick="openTab(event, 'ConnMap')">Connectivity Map</a></li>
+  <li><a href="#" class="tablinks" onclick="openTab(event, 'WebSocket')">Graphs</a></li>
+  <li><a href="#" class="tablinks" onclick="openTab(event, 'Controls')">Controls</a></li>
 </ul>
+
+<div id="L1_L2" class="tabcontent">
+<br>
+
+<div id="table1" style="position:relative; top: 0px;">
+<table>
+	<thead>
+	<tr><th> Address Information</th></tr>
+	</thead>
+	<tbody>
+	<tr><td style="padding:30px" id="AddInf"></td></tr>
+	</tbody>
+</table>
+</div>
+
+<div id="table2" style="position:relative; left: 350px; top: -430px;">
+<table>
+	<thead>
+	<tr><th>IE Counters</th></tr>
+	</thead>
+	<tbody>
+	<tr><td style="padding:30px"  id="IEcount"></td></tr>
+	</tbody>
+</table>
+</div>
+
+<div id="table3" style="position:relative; left: 60px; top: -670px;">
+<table>
+	<thead>
+	<tr><th>IE Information</th></tr>
+	</thead>
+	<tbody>
+	<tr><td style="padding:30px" id="IEinfo"></td></tr>
+	</tbody>
+</table>
+</div>
+
+<script type="text/javascript">
+
+var headers = [["Name", "Value"]];
+var configdata = [
+    ["Updated Time", "2016-01-01"],
+    ["Frame Accept Count","1500"],
+    ["Address Reject Count", "1000"],
+	["Received MHR", "1000"],
+	["Last Received Dest PAN ID", "1000"],
+	["Last Received Source PAN ID", "1000"],
+	["Last Reject Address", "1000"],
+	["Last Received Address", "1000"],
+];
+tableize("#AddInf", headers, configdata);
+
+var headers = [["Name", "Description", "Value"]];
+var configdata = [
+    ["FCIE", "Flow Control", "1000"],
+    ["UTTIE", "Unicast Timing and Frame Type", "1500"],
+    ["RSLIE", "Received Signal Level", "1000"],
+	["BTIE", "Broadcast Timing", "1000"],
+	["USIE", "Unicast Schedule", "1000"],
+	["BSIE", "Broadcast Schedule", "1000"],
+	["PANIE", "PAN", "1000"],
+	["NETNAMEIE", "Netork Name", "1000"],
+	["PANVERIE", "Pan Version", "1000"],
+	["GTKHASHIE", "GTK Hash", "1000"],
+	["MPIE", "Multiplexed Protocol", "1000"],
+	["MHDSIE", "Multi-Hop Deliver Service", "1000"],
+	["VHIE", "Vendor-Specific Header", "1000"],
+	["VPIE", "Vendor-Specific Payload", "1000"],
+];
+tableize("#IEcount", headers, configdata);
+
+var headers = [["Name", "Value"]];
+var configdata = [
+    ["Count", "1000"],
+    ["Header Ring","1500"],
+    ["Ring Index", "1000"],
+];
+tableize("#IEinfo", headers, configdata);
+
+
+</script>
+</div>
 
 
 <div id="eth0" class="tabcontent">
 <h2>Interface Data</h2>
-<h3>eth0</h3>
+<h3></h3>
 <table>
 	<thead>
 	<tr><th>Statistics</th><th>Configuration</th></tr>
@@ -101,32 +185,46 @@ tableize("#config", headers, configdata);
 </script>
 </div>
 
-
-<div id="Wi-SUN" class="tabcontent">
-<h2>Interface Data</h2>
-<h3>Wi-SUN</h3>
+<div id="L3_L4" class="tabcontent">
+<h2>L3/L4 Data</h2>
 
 <table>
 	<thead>
-	<tr><th>Statistics</th><th>Configuration</th></tr>
+	<tr><th>Statistics</th></tr>
 	</thead>
 	<tbody>
-	<tr><td style="padding:30px" id="viz2"></td><td id="config2"></td></tr>
+	<tr><td style="padding:30px" id="viz1"></td></tr>
 	</tbody>
 </table>
+<div id="chartdiv5"  style="position:relative; top: -270px; left: 280px; width:450px; height:250px; border-style:ridge">
+</div>
+<script type="text/javascript">		
+var headers = [["Name", "RX", "TX"]];
+var json_data = [["packets", "95235", "32351"],
+                ["bytes", "99676652", "5531142"],
+                ["errors", "0", "0"],
+                ["dropped", "0", "0"],
+                ["overruns", "0", "0"]];
 
+tableize("#viz1", headers, json_data);
+
+</script>
+</div>
+
+<div id="Confign" class="tabcontent">
+  <h2>Configuration Data</h2>
+<table>
+	<thead>
+	<tr><th>L1/L2</th><th>L3/L4</th></tr>
+	</thead>
+	<tbody>
+	<tr><td style="padding:30px"  id="config1"></td> <td id="config2"></td></tr>
+	</tbody>
+</table>  
+  
 <script type="text/javascript">
-			
-var headers = [["name", "RX", "TX"]];
-var json_data = [["packets", "1680", "1130"],
-                ["bytes", "215040", "144640"],
-                ["errors", "3", "5"],
-                ["dropped", "1", "0"],
-                ["overruns", "0", "1"]];
 
-tableize("#viz2", headers, json_data);
-
-var headers = [["name", "value"]];
+var headers = [["Name", "Value"]];
 var configdata = [
     ["MACaddr", "00:19:59:FF:FE:0F:FF:01"],
     ["Bcast", "FF:FF:FF:FF:FF:FF:FF:FF"],
@@ -135,14 +233,62 @@ var configdata = [
     ["Channel Spacing", "200 kHz"],
     ["Num Channels", "129"],
 ];
-tableize("#config2", headers, configdata);
+tableize("#config1", headers, configdata);
 
+var headers = [["name", "value"]];
+var configdata = [
+    ["inet6", "2016:bd8:0:f101::102/64"],
+    ["mtu","1500"],
+    ["txqueuelen", "1000"],
+];
+tableize("#config2", headers, configdata);
 </script>
 </div>
 
+<div id="ConnMap" class="tabcontent">
+  <h2>Connectivity Map</h2>
+  <h1><img src="network.png"  width="538" height="418" alt="EPRI: Electric Power Research Institute"></h1>
+</div>
+
+<div id="Controls" class="tabcontent">
+  <h2>Recording Controls</h2>
+  <p>Use these controls to log all streaming data into a CSV file.</p>
+  <br>
+
+  <input type="file" id="myFile">
+  <p> </p>
+  <br>
+  <button id="startRec" onclick="startRec()">Record</button>
+  <button id="stopRec" onclick="stopRec()">Stop</button>
+  <p id="recording" style:="color:gray"> </p>
+
+  <script>
+  function startRec() {
+    var x = document.getElementById("startRec");
+    x.disabled = true;
+	var x = document.getElementById("stopRec");
+    x.disabled = false;
+	var x = document.getElementById("recording");
+    x.style = "color:red";
+	x.innerHTML = "Recording...";
+  }
+  function stopRec() {
+    var x = document.getElementById("stopRec");
+    x.disabled = true;
+	var x = document.getElementById("startRec");
+    x.disabled = false;
+	var x = document.getElementById("recording");
+    x.style = "color:gray";
+	x.innerHTML = "Stopped";
+  }
+  </script>
+
+
+</div>
+
 <div id="RandomGraph" class="tabcontent">
-  <h3>Test Graph</h3>
-  <p>This graph is simply plotting randomly generated data.</p>
+  <h3>Data Length</h3>
+  <p>This graph shows the data length.</p>
 <script>(function() {
 
 var n = 243,
@@ -222,6 +368,8 @@ var updateGraph = function(newdata) {
 };
 
 var get_cpu_usage = function() {
+};
+var noodle = function() {
     d3.json('/get_cpu_usage', function(error, data) {
         updateGraph(data.result);
     });
@@ -233,8 +381,8 @@ d3.interval(get_cpu_usage, 1000);
 </div>
 
 <div id="WebSocket" class="tabcontent">
-  <h3>Test Graph</h3>
-  <p>This graph is simply plotting randomly generated data.</p>
+  <h3>Graph</h3>
+  <p>This graph shows the count of Multiplexed Protocol Information Elements (MPIEs) received
 <script>(function() {
 
 var n = 243,
@@ -316,8 +464,10 @@ var updateGraph = function(newdata) {
 // Create Websocket connection. For simplicity, no reconnect logic is here.
 var ws = new WebSocket('ws://' + location.host);
     ws.onmessage = function(ev) {
-    d3.select("#log").text(ev.data);
-    updateGraph(ev.data);
+    xxy = ev.data;
+    val=JSON.parse(xxy).addrinfo.time;
+    d3.select("#log").text(val);
+    updateGraph(val);
 };
 
 })()</script>
