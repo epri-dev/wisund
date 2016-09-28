@@ -2,5 +2,6 @@
 #define DIAG_H
 #include <cstdint>
 #include <string>
-std::string diag(uint8_t cmd, uint8_t data);
+#include "Serial.h"
+std::string diag(uint8_t cmd, uint8_t data, Serial &serial);
 #endif /// DIAG_H

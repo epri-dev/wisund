@@ -2,9 +2,9 @@
 #include <iomanip>
 #include <fstream>
 #include <vector>
-#include <asio.hpp>
 #include <sstream>
 #include "Message.h"
+#include "Serial.h"
 
 enum {
     DIAG_ID_ADDRESS_INFO=1,
@@ -44,102 +44,6 @@ private:
     uint8_t lastRecvdAddr[8];
 };
 
-#if 0
-std::string diag(uint8_t cmd, uint8_t data) 
-{
-    std::string resp;
-    Message{0x6, 0x21, data}.send();
-    // only a few cases send back data
-    switch(data) {
-        // TODO: take explicit care of endian-ness conversions
-        case DIAG_ID_ADDRESS_INFO:
-            Message m{0x78, 0x56, 0x34, 0x12,   // time
-                      0xef, 0xcd, 0xab, 0x89,   // accepted
-                      0xad, 0xde,               // rejected
-                      0xef, 0xbe,               // rcvdMHR
-                      0x34, 0x12,               // last dst PANID
-                      0x56, 0x34,               // last src PANID
-                      0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01,
-                      0xa8, 0xa7, 0xa6, 0xa5, 0xa4, 0xa3, 0xa2, 0xa1
-            };
-            resp = std::string{"this is an answer\n"}; 
-            break;
-        case DIAG_ID_IE_COUNTS:
-            Message reply();
-            reply.receive();
-            break;
-        case DIAG_ID_IE_UNKNOWN:
-            Message reply();
-            reply.receive();
-            break;
-        case DIAG_RADIO_STATS:
-            Message reply();
-            reply.receive();
-            break;
-        default:
-            // no reply
-            break;
-    }
-    return resp;
-}
-#endif
-
-class Serial {
-public:
-    Serial(const char *port, unsigned baud) 
-        : m_io(), 
-          m_port(m_io, port)
-    {
-        m_port.set_option(asio::serial_port_base::baud_rate(baud));
-    }
-    ~Serial() {
-        m_port.close();
-    }
-    size_t receive(void *data, size_t length) {
-        return m_port.read_some(asio::buffer(data, length));
-    }
-    size_t send(void *data, size_t length) {
-        return m_port.write_some(asio::buffer(data, length));
-    }
-    size_t send(Message &msg) {
-        return m_port.write_some(asio::buffer(msg.data(), msg.size()));
-    }
-    Message receive() {
-        asio::streambuf buff;
-        asio::streambuf::mutable_buffers_type mutableBuffer = buff.prepare(1024);
-        std::vector<uint8_t> msg;
-        size_t size = 0;
-        bool started = false;
-        bool ended = false;
-        while (!ended) {
-            size = m_port.read_some(mutableBuffer);
-            std::vector<uint8_t> temp2;
-            uint8_t *p1 = asio::buffer_cast<uint8_t *>(mutableBuffer);
-            for (  ; size; --size) {
-                temp2.push_back(*p1++);
-            }
-            for (auto byte : temp2) {
-                if (started) {
-                    if (byte == 0xc0) {
-                        msg.push_back(byte); 
-                        started = true;
-                    }
-                } else {
-                    if (byte == 0xc0) {
-                        ended = true;
-                    }
-                    msg.push_back(byte); 
-                }
-            }
-        }
-        return Message{msg};
-    }
-private:
-    uint8_t read_msg_[1024];
-    asio::io_service m_io;
-    asio::serial_port m_port;
-};
-
 class IECounters {
 public:
     static std::string json(Message &msg) {
@@ -158,8 +62,6 @@ public:
             }
             ret << val;
         }
-
-
         return ret.str();
     }
 };
@@ -191,18 +93,15 @@ private:
 int main(int argc, char *argv[]) 
 {
     if (argc != 3) {
-        std::cout << "Usage: toy namedpipe serialport\n";
+        std::cout << "Usage: wisun-cli serialport\n";
         return 1;
     }
-    Diagnostics diags;
-    std::cout << "Opening port " << argv[2] << "\n";
-    Serial serial{argv[2], 115200};
+    std::cout << "Opening port " << argv[1] << "\n";
+    Serial serial{argv[1], 115200};
     Message msg = Message{0x6, 0x21, 0x2}.encode();
     Message msg2 = Message{0x6, 0x21, 0x1}.encode();
-    std::cout << "Opening pipe " << argv[1] << "\n";
-    std::fstream pipe(argv[1]);
 
-    while (pipe) {
+    while (std::cin) {
         serial.send(msg);
         Message rawreply{serial.receive()};
         Message reply = rawreply.decode();
@@ -214,7 +113,7 @@ int main(int argc, char *argv[])
         AddrInfo ai;
         std::string json2 = ai.json(reply2);
 
-        pipe << "{" << json << "," << json2 << "}" << std::endl;
+        std::cout << "{" << json << "," << json2 << "}" << std::endl;
         sleep(1);
     }
 }

@@ -14,6 +14,5 @@ public:
     Message encode() const;
     Message decode() const;
     friend std::ostream& operator<<(std::ostream &out, const Message &msg);
-friend std::ostream& operator<<(std::ostream &out, const Message &msg); 
 };
 #endif // MESSAGE_H
