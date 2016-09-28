@@ -1,7 +1,9 @@
 %top{
 #define _POSIX_C_SOURCE 1
 #include <cstdlib>
+#ifdef __linux__
 #include <unistd.h>
+#endif
 }
 
 %{

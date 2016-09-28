@@ -1,11 +1,12 @@
 #include "Message.h"
 #include <iostream>
 #include <iomanip>
+#include <initializer_list>
 
 #include <utility> 
 
 Message::Message(std::initializer_list<uint8_t> b) 
-    : std::vector<uint8_t>{b}
+    : std::vector<uint8_t>(b)
 {}
 Message::Message(uint8_t *msg, size_t size) 
     : std::vector<uint8_t>(size,0) 
