@@ -35,7 +35,7 @@ void help(void)
 {
     std::cerr << "Usage: testmode /dev/ttyUSB0\n\n"
         "Accepted commands:\n"
-        "fchan nn\nphy nn\ntr51cf\nlbr\nnlbr\nstate\ndiag\ngetzz\nping\nrestart\n"
+        "fchan nn\nphy nn\ntr51cf\nlbr\nnlbr\nstate\ndiag nn\ngetzz\nping\nrestart\n"
         "help\n\n";
 }
 
@@ -77,6 +77,7 @@ int main(int argc, char *argv[])
         std::cout << "Usage: " << argv[0] << " serialport\n";
         return 1;
     }
+    yydebug = 7;
     std::cout << "Opening port " << argv[1] << "\n";
     Serial s{argv[1], 115200};
     serial = &s;
