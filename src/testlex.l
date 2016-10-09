@@ -7,7 +7,7 @@
 }
 
 %{
-#include "testmode.h"
+#include "testmode.hpp"
 %}
 %option noyywrap nounput noinput nounistd
 
