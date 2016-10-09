@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
         std::cout << "Usage: " << argv[0] << " serialport\n";
         return 1;
     }
-    yydebug = 7;
+    yydebug = 0;
     std::cout << "Opening port " << argv[1] << "\n";
     Serial s{argv[1], 115200};
     serial = &s;
