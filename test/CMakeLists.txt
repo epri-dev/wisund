@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.0)
+set(EXECUTABLE_NAME "messagetest")
+include_directories( ${CMAKE_HOME_DIRECTORY}/src )
+message(STATUS "Home directory is: ${CMAKE_HOME_DIRECTORY}")
+add_executable(${EXECUTABLE_NAME} main.cpp)
+add_test(MessageTest ${EXECUTABLE_NAME})
+target_link_libraries(${EXECUTABLE_NAME} Message cppunit)
