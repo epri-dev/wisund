@@ -75,9 +75,7 @@ command:    FCHAN HEXBYTE   { console.compound(0x01, $2); }
     |       LBR             { console.simple(0x10); }
     |       NLBR            { console.simple(0x11); }
     |       STATE           { console.simple(0x20); }
-    |       DIAG HEXBYTE    { std::cout << "should have run diagnostic " << $2 << " here\n"; 
-                                // diag(0x21, $2, *serial); 
-                            }
+    |       DIAG HEXBYTE    { console.compound(0x21, $2); }
     |       BUILDID         { console.simple(0x22); }
     |       GETZZ HEXBYTE   { console.compound(0x2F, $2); }
     |       PING HEXBYTE    { console.compound(0x30, $2); }

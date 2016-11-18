@@ -16,8 +16,8 @@ There are essentially four interfaces that the program must handle:
 ## Class design
 The [original prototype](#original-prototype) was written in C and largely procedural.  The new version is written in C++ and incorporates the C++ `asio` library for both the serial port and for socket access.  This aids with both portability and structure.
 
-### MessageQueue
-Actually a deque, handles the sequential processing and routing of messages.  Must be accessible by multiple threads.  Each interface has its own inbound queue; routing is done by the outbound message handler associated with the device.
+### SafeQueue
+Functioning as a message queue, but implemented as a queue, this class handles the sequential storage of messages.  It is "safe" because it is designed to be accessible by multiple threads.  
 
 ### Device
 Each device has two interfaces; one is the external facing interface that defines it (e.g. serial port, console or tun) and the internal interface which looks the same for all devices.  The internal device interface is a receive message queue.  
@@ -33,6 +33,9 @@ Translates text commands recieved via console into messages that are sent to Rou
 
 ### TunHandler
 Anything received via tun is sent directly to Router; anything received on internal port is assumed to an outbound message and is sent.
+
+## Threads
+The program is multithreaded and includes three threads.  One is the main thread that has both the user interface (`std::cin` and `std::cout`) as well as the `SafeDeque` message queue.  The second thread handles the serial port, and the third thread handles the `tun` device.
 
 ## Message types
 The message types are summarized below:

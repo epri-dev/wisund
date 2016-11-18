@@ -13,7 +13,13 @@ Console::~Console() = default;
 int Console::run() {
     Scanner scanner;
     yy::Parser parser(scanner, *this);
+    parser.set_debug_level(trace_parsing);
+    return parser.parse();
+}
 
+int Console::run(std::istream *in) {
+    Scanner scanner(in);
+    yy::Parser parser(scanner, *this);
     parser.set_debug_level(trace_parsing);
     return parser.parse();
 }

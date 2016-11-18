@@ -10,6 +10,7 @@
 class Scanner : public yyFlexLexer {
 public:
     Scanner() : yyFlexLexer() {}
+    Scanner(std::istream *in) : yyFlexLexer(in) {}
     using FlexLexer::yylex;
     virtual int yylex(yy::Parser::semantic_type *lval);
 private:

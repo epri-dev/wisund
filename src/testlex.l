@@ -2,6 +2,7 @@
 }
 
 %{
+#include <cstdlib>
 #include "Console.h"
 #include "testmode.hpp"
 #include "scanner.h"
@@ -19,8 +20,10 @@ ID      [a-z][a-z0-9]*
         yylval = lval;
 %}
 
-{XDIGIT}+   { long val = std::strtol(yytext, nullptr, 16); 
-                return yylval->build(val); }
+{XDIGIT}+   { int val = std::atoi(yytext);
+                yylval->build(val); 
+                return token::HEXBYTE;
+            }
 fchan       { return token::FCHAN; }
 tr51cf      { return token::TR51CF; }
 phy         { return token::PHY; }

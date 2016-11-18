@@ -16,6 +16,7 @@ public:
     void compound(uint8_t cmd, uint8_t data);
     void simple(uint8_t cmd);
     int run();
+    int run(std::istream *in);
 
 private:
     bool trace_scanning;

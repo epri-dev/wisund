@@ -1,12 +1,14 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <sstream>
 #include <cppunit/TestRunner.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/ui/text/TextTestRunner.h>
 #include "Message.h"
+#include "Console.h"
 
 class MessageTest : public CppUnit::TestFixture {
     CPPUNIT_TEST_SUITE(MessageTest);
@@ -26,7 +28,45 @@ private:
 	Message m1{0x05, 0x7f, 0x32};
 };
 
+class ConsoleTest : public CppUnit::TestFixture {
+    CPPUNIT_TEST_SUITE(ConsoleTest);
+    CPPUNIT_TEST(testBasic);
+    CPPUNIT_TEST_SUITE_END();
+public:
+    void testBasic() {
+        std::stringstream cmds{"help\ndiag 2\nstate\nphy 3\nrestart\n"};
+        CPPUNIT_ASSERT(con != nullptr);
+        CPPUNIT_ASSERT(con->run(&cmds) == 0);
+        Message m{0};
+        CPPUNIT_ASSERT(output.try_pop(m));
+        Message diag2{0x06, 0x21, 0x02};
+        CPPUNIT_ASSERT(m == diag2);
+        CPPUNIT_ASSERT(output.try_pop(m));
+        Message state{0x06, 0x20};
+        CPPUNIT_ASSERT(m == state);
+        CPPUNIT_ASSERT(output.try_pop(m));
+        Message phy3{0x06, 0x04, 0x03};
+        CPPUNIT_ASSERT(m == phy3);
+        CPPUNIT_ASSERT(output.try_pop(m));
+        Message restart{0xff};
+        CPPUNIT_ASSERT(m == restart);
+        for (Message m{0}; output.try_pop(m); ) {
+            std::cout << "msg: " << m << '\n';
+        }
+    }
+    void setUp() {
+        con = new Console(input, output);
+    }
+    void tearDown() {
+        delete con;
+    }
+private:
+	Console *con;
+        SafeQueue<Message> input, output; 
+};
+
 CPPUNIT_TEST_SUITE_REGISTRATION(MessageTest);
+CPPUNIT_TEST_SUITE_REGISTRATION(ConsoleTest);
 
 int main()
 {
