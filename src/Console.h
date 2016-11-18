@@ -12,21 +12,14 @@ class Console : public Device {
 public:
     Console(SafeQueue<Message> &input, SafeQueue<Message> &output);
     virtual ~Console();
-
-    // lexer control functions
-    void scan_begin();
-    void scan_end();
-    bool trace_scanning;
-
+    void error(std::string &msg);
     void compound(uint8_t cmd, uint8_t data);
     void simple(uint8_t cmd);
-
     int run();
-    bool trace_parsing;
 
-    // error handling
-//    void error(const yy::location &loc, std::string &msg);
-    void error(std::string &msg);
+private:
+    bool trace_scanning;
+    bool trace_parsing;
 };
 
 #endif // CONSOLE_H
