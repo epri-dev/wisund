@@ -22,57 +22,6 @@ Message::Message(std::vector<uint8_t> v)
 
 bool Message::isRaw() const { return size() && front() == 0; }
 
-// give SLIP characters names
-enum { END = 0xc0, ESC = 0xdb, ESC_END = 0xdc, ESC_ESC = 0xdd };
-
-Message Message::encode() const {
-    // wrap the payload inside 0xC0 ... 0xC0 
-    Message ret{END};
-    for (const auto &byte : *this) {
-        switch (byte) {
-        case END:
-            ret.push_back(ESC);
-            ret.push_back(ESC_END);
-            break;
-        case ESC:
-            ret.push_back( ESC);
-            ret.push_back( ESC_ESC);
-            break;
-        default:
-            ret.push_back(byte);
-        }
-    }
-    ret.push_back(END);
-    return ret;
-}
-
-Message Message::decode() const {
-    std::vector<uint8_t> ret; 
-    uint8_t prev = front();
-    for (auto it = begin(); it != end(); ) {
-        switch(*it) {
-            case END:
-                // do nothing
-                break;
-            case ESC_END:
-                if (prev == ESC) {
-                    ++it;
-                    ret.push_back(END);
-                }
-                break;
-            case ESC_ESC:
-                if (prev == ESC) {
-                    ++it;
-                    ret.push_back(ESC);
-                }
-                break;
-            default:
-                ret.push_back(*it);
-        }
-        prev = *it++;
-    }
-    return Message{ret};
-}
 
 std::ostream& operator<<(std::ostream &out, const Message &msg) {
     for (auto byte : msg) {

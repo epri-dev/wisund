@@ -43,16 +43,14 @@ std::string diag(uint8_t cmd, uint8_t data, Serial &serial) {
     }
     std::cout << "diag " << (unsigned)data << "\n";
     std::string resp;
-    Message m = Message{0x6, cmd, data}.encode();
+    Message m = Message{0x6, cmd, data};
     // only a few cases send back data
     switch(data) {
         case DIAG_ID_IE_COUNTS:
             {
                 serial.send(m);
-                Message rawreply{serial.receive()};
-                std::cout << "rawreply = " << rawreply << "\n";
-                Message reply = rawreply.decode();
-                std::cout << "decoded = " << reply << "\n";
+                Message reply = serial.receive();
+                std::cout << "reply = " << reply << "\n";
                 std::cout << "message len = " << std::dec << reply.size() << "\n";
                 resp = IECounters::json(reply);
             }
