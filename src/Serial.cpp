@@ -11,9 +11,6 @@ Serial::Serial(const char *port, unsigned baud)
 Serial::~Serial() {
     m_port.close();
 }
-void Serial::close() {
-    m_port.close();
-}
 size_t Serial::receive(void *data, size_t length) {
     return m_port.read_some(asio::buffer(data, length));
 }

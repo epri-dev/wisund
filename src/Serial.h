@@ -11,7 +11,6 @@ public:
     size_t send(void *data, size_t length);
     size_t send(const Message &msg);
     Message receive();
-    void close();
 
 private:
     static Message encode(const Message &msg);

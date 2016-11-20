@@ -36,6 +36,7 @@ getzz       { return token::GETZZ; }
 ping        { return token::PING; }
 restart     { return token::RESTART; }
 help        { return token::HELP; }
+quit|exit   { return token::QUIT; }
 
 [ \t]+      { } /* ignore whitespace */
 \n          { return token::NEWLINE; }

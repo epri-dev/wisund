@@ -16,15 +16,17 @@ int Console::runTx(std::istream *in) {
     yy::Parser parser(scanner, *this);
     parser.set_debug_level(trace_parsing);
     int status = parser.parse();
-    stopRx();
+    std::cout << "Console parser ended with status " << status << "\n";
+    releaseHold();
     return status;
 }
 
 int Console::runRx(std::ostream *out) {
     Message m{0};
-    while (holdOnRxQueueEmpty || more()) {
+    while (wantHold() || more()) {
+        *out << "Console waiting for message\n";
         wait_and_pop(m);
-        *out << "Received message: " << m << '\n';
+        *out << "Console received message: " << m << '\n';
     }
     return 0;
 }

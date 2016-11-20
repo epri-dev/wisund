@@ -33,14 +33,15 @@ int main(int argc, char *argv[])
     // not done yet
     // rule 3
     SerialDevice ser{serialIn, consoleIn, argv[1], 115200};
-    ser.holdRx();
+    ser.hold();
+    con.hold();
     std::thread conThread{&Console::run, &con, &std::cin, &std::cout};
     std::thread serThread{&SerialDevice::run, &ser, &std::cin, &std::cout};
     conThread.join();
     std::cout << "We have joined the `con` thread\n";
-    ser.stopRx();
+    ser.releaseHold();
     std::cout << "We have stopped the serial RX\n";
-    ser.showState();
+    ser.showHoldState();
     serThread.join();  
 }
 

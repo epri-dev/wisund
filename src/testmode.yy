@@ -53,14 +53,14 @@ static void help(void)
         "fchan nn\nphy nn\ntr51cf\nlbr\nnlbr\nbuildid\n"
         "commands accepted n LBR or NLBR active state:\n"
         "state\ndiag nn\nget nn\nping nn\nrestart\n"
-        "help\n\n";
+        "help\nquit\n\n";
 }
 
 %}
 %define api.value.type variant
 %define parse.assert
 
-%token FCHAN TR51CF PHY LBR NLBR STATE DIAG BUILDID GETZZ PING RESTART HELP
+%token FCHAN TR51CF PHY LBR NLBR STATE DIAG BUILDID GETZZ PING RESTART HELP QUIT
 %token <int> HEXBYTE
 %token NEWLINE CHAR
 
@@ -82,6 +82,7 @@ command:    FCHAN HEXBYTE   { console.compound(0x01, $2); }
     |       PING HEXBYTE    { console.compound(0x30, $2); }
     |       RESTART         { console.push(RestartCmd); }
     |       HELP            { help(); }
+    |       QUIT            { return 0; }
     |       errors          { errortxt(); }
     ;
 
