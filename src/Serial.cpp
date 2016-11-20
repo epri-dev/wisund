@@ -11,6 +11,9 @@ Serial::Serial(const char *port, unsigned baud)
 Serial::~Serial() {
     m_port.close();
 }
+void Serial::close() {
+    m_port.close();
+}
 size_t Serial::receive(void *data, size_t length) {
     return m_port.read_some(asio::buffer(data, length));
 }
@@ -77,10 +80,10 @@ Message Serial::receive() {
     std::vector<uint8_t> mutableBuffer(1024);
     std::vector<uint8_t> msg;
     asio::streambuf b;
-    size_t sz = read_until(m_port, b, '\xc0');
-    msg.push_back('\xc0');
+    size_t sz = read_until(m_port, b, static_cast<uint8_t>(END));
+    msg.push_back(END);
     asio::streambuf c;
-    sz += read_until(m_port, c, '\xc0');
+    sz += read_until(m_port, c, static_cast<uint8_t>(END));
     std::cout << "Read " << std::dec << sz << " bytes\n";
     std::istream is(&c);
     std::copy(std::istream_iterator<uint8_t>(is), 

@@ -66,6 +66,7 @@ static void help(void)
 
 %%
 script:     /* empty */
+    |   NEWLINE
     |   script command NEWLINE
     
 
@@ -90,18 +91,3 @@ errors:     error
 
 %%
 
-#if 0
-int main(int argc, char *argv[])
-{
-    if (argc < 2) {
-        std::cout << "Usage: " << argv[0] << " serialport\n";
-        return 1;
-    }
-    yydebug = 0;
-    SafeQueue<Message> msgDeque;
-    std::cout << "Opening port " << argv[1] << "\n";
-    Serial s{argv[1], 115200};
-    serial = &s;
-    return yyparse();
-}
-#endif

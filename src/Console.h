@@ -15,8 +15,9 @@ public:
     void error(std::string &msg);
     void compound(uint8_t cmd, uint8_t data);
     void simple(uint8_t cmd);
-    int run();
-    int run(std::istream *in);
+    int runTx(std::istream *in = &std::cin);
+    int runRx(std::ostream *out = &std::cout);
+    int run(std::istream *in, std::ostream *out);
 
 private:
     bool trace_scanning;

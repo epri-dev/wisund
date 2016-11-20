@@ -1,5 +1,6 @@
 #include "Console.h"
 #include "scanner.h"
+#include <thread>
 
 
 Console::Console(SafeQueue<Message> &input, SafeQueue<Message> &output) :
@@ -10,18 +11,29 @@ Console::Console(SafeQueue<Message> &input, SafeQueue<Message> &output) :
 
 Console::~Console() = default;
 
-int Console::run() {
-    Scanner scanner;
-    yy::Parser parser(scanner, *this);
-    parser.set_debug_level(trace_parsing);
-    return parser.parse();
-}
-
-int Console::run(std::istream *in) {
+int Console::runTx(std::istream *in) {
     Scanner scanner(in);
     yy::Parser parser(scanner, *this);
     parser.set_debug_level(trace_parsing);
-    return parser.parse();
+    int status = parser.parse();
+    stopRx();
+    return status;
+}
+
+int Console::runRx(std::ostream *out) {
+    Message m{0};
+    while (holdOnRxQueueEmpty || more()) {
+        wait_and_pop(m);
+        *out << "Received message: " << m << '\n';
+    }
+    return 0;
+}
+
+int Console::run(std::istream *in, std::ostream *out) {
+    std::thread t1{&Console::runRx, this, out};
+    int status = runTx(in);
+    t1.join();
+    return status;
 }
 
 void Console::compound(uint8_t cmd, uint8_t data)
