@@ -1,8 +1,8 @@
 #ifndef SERIALDEVICE_H
 #define SERIALDEVICE_H
 
-#include "Serial.h"
 #include "Device.h"
+#include <asio.hpp>
 
 class SerialDevice : public Device
 {
@@ -15,7 +15,13 @@ public:
 private:
     void startReceive();
     void handleMessage(const asio::error_code &error, std::size_t size);
-    Serial serialport;
+    size_t send(const Message &msg);
+    static Message encode(const Message &msg);
+    static Message decode(const Message &msg);
+
+    asio::io_service m_io;
+    asio::serial_port m_port;
+    asio::streambuf m_data;
 };
 
 #endif // SERIALDEVICE_H

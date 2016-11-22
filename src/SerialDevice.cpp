@@ -3,10 +3,19 @@
 #include <functional>
 #include <iomanip>
 
+static constexpr uint8_t END{0xc0};
+static constexpr uint8_t ESC{0xdb};
+static constexpr uint8_t ESC_END{0xdc}; 
+static constexpr uint8_t ESC_ESC{0xdd};
+
 SerialDevice::SerialDevice(SafeQueue<Message> &input, SafeQueue<Message> &output, const char *port, unsigned baud) :
     Device(input, output),
-    serialport(port, baud)
-{}
+    m_io(), 
+    m_port(m_io, port)
+{
+    m_port.set_option(asio::serial_port_base::baud_rate(baud));
+}
+
 SerialDevice::~SerialDevice() = default;
 
 int SerialDevice::runTx(std::istream *in)
@@ -24,26 +33,27 @@ int SerialDevice::runRx(std::ostream *out)
     Message m{0};
     while (wantHold()) {
         wait_and_pop(m);
-        serialport.send(m);
+        send(m);
     }
-    serialport.m_port.close();
+    m_port.close();
     return 0;
 }
+
 int SerialDevice::run(std::istream *in, std::ostream *out)
 {
     std::thread t1{&SerialDevice::runRx, this, out};
     int status = runTx(in);
-    serialport.m_io.run();
+    m_io.run();
     t1.join();
     return status;
 }
 
 using iterator = asio::buffers_iterator<asio::streambuf::const_buffers_type>;
 
-std::pair<iterator, bool> match_slip(iterator begin, iterator end) {
+static std::pair<iterator, bool> match_slip(iterator begin, iterator end) {
     // find the first
     iterator first = begin;
-    for ( ; first != end && static_cast<uint8_t>(*first) != Serial::END; ++first) 
+    for ( ; first != end && static_cast<uint8_t>(*first) != END; ++first) 
     { /* just find the first */ }
     if (first == end) {
         return std::make_pair(begin, false);
@@ -51,7 +61,7 @@ std::pair<iterator, bool> match_slip(iterator begin, iterator end) {
     // found first; now find second
     iterator last = first;
     for ( ++last ; last != end; ++last) {
-        if (static_cast<uint8_t>(*last) == Serial::END) {
+        if (static_cast<uint8_t>(*last) == END) {
             return std::make_pair(++last, true);
         }
     }
@@ -59,8 +69,8 @@ std::pair<iterator, bool> match_slip(iterator begin, iterator end) {
 }
 
 void SerialDevice::startReceive() {
-    asio::async_read_until(serialport.m_port, 
-        serialport.m_data, 
+    asio::async_read_until(m_port, 
+        m_data, 
         match_slip,
         std::bind(&SerialDevice::handleMessage, this, std::placeholders::_1, std::placeholders::_2));
 }
@@ -69,14 +79,66 @@ void SerialDevice::handleMessage(const::asio::error_code &error, std::size_t siz
     if (error) {
         return;
     }
-
-    auto buf = serialport.m_data.data();
+    auto buf = m_data.data();
     std::vector<uint8_t> v(size);
     asio::buffer_copy(asio::buffer(v), buf);
-    Message m{v};
-    push(Serial::decode(m));
-    serialport.m_data.consume(size);
-    if (wantHold())
+    push(SerialDevice::decode(Message{v}));
+    m_data.consume(size);
+    if (wantHold()) {
         startReceive();
+    }
 }
 
+size_t SerialDevice::send(const Message &msg) {
+    auto encoded = encode(msg);
+    return m_port.write_some(asio::buffer(encoded.data(), encoded.size()));
+}
+
+Message SerialDevice::encode(const Message &msg) {
+    // wrap the payload inside 0xC0 ... 0xC0 
+    Message ret{END};
+    for (const auto &byte : msg) {
+        switch (byte) {
+        case END:
+            ret.push_back(ESC);
+            ret.push_back(ESC_END);
+            break;
+        case ESC:
+            ret.push_back(ESC);
+            ret.push_back(ESC_ESC);
+            break;
+        default:
+            ret.push_back(byte);
+        }
+    }
+    ret.push_back(END);
+    return ret;
+}
+
+Message SerialDevice::decode(const Message &msg) {
+    std::vector<uint8_t> ret; 
+    uint8_t prev = msg.front();
+    for (auto it = msg.begin(); it != msg.end(); ) {
+        switch(*it) {
+            case END:
+                // do nothing
+                break;
+            case ESC_END:
+                if (prev == ESC) {
+                    ++it;
+                    ret.push_back(END);
+                }
+                break;
+            case ESC_ESC:
+                if (prev == ESC) {
+                    ++it;
+                    ret.push_back(ESC);
+                }
+                break;
+            default:
+                ret.push_back(*it);
+        }
+        prev = *it++;
+    }
+    return Message{ret};
+}

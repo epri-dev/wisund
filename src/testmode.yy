@@ -24,9 +24,7 @@
 #include <cstdint>
 #include <iostream>
 #include <iomanip>
-#include "diag.h"
 #include "Message.h"
-#include "Serial.h"
 #include "SafeQueue.h"
 #include "Console.h"
 #include "scanner.h"
