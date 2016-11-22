@@ -8,7 +8,7 @@
 Message::Message(std::initializer_list<uint8_t> b) 
     : std::vector<uint8_t>(b)
 {}
-Message::Message(uint8_t *msg, size_t size) 
+Message::Message(const uint8_t *msg, size_t size) 
     : std::vector<uint8_t>(size,0) 
     {
         for (size_t i=0; i < size; ++i) {

@@ -13,6 +13,8 @@ public:
     int runRx(std::ostream *out = &std::cout);
     int run(std::istream *in, std::ostream *out);
 private:
+    void startReceive();
+    void handleMessage(const asio::error_code &error, std::size_t size);
     Serial serialport;
 };
 

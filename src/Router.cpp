@@ -38,10 +38,7 @@ int main(int argc, char *argv[])
     std::thread conThread{&Console::run, &con, &std::cin, &std::cout};
     std::thread serThread{&SerialDevice::run, &ser, &std::cin, &std::cout};
     conThread.join();
-    std::cout << "We have joined the `con` thread\n";
     ser.releaseHold();
-    std::cout << "We have stopped the serial RX\n";
-    ser.showHoldState();
     serThread.join();  
 }
 

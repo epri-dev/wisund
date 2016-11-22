@@ -12,12 +12,19 @@ public:
     size_t send(const Message &msg);
     Message receive();
 
-private:
+    // give SLIP characters names
+    static const uint8_t END;
+    static const uint8_t ESC;
+    static const uint8_t ESC_END; 
+    static const uint8_t ESC_ESC;
+
+public:
     static Message encode(const Message &msg);
     static Message decode(const Message &msg);
 
     uint8_t read_msg_[1024];
     asio::io_service m_io;
     asio::serial_port m_port;
+    asio::streambuf m_data;
 };
 #endif // SERIAL_H

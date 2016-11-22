@@ -2,6 +2,11 @@
 #include <algorithm>
 #include <istream>
 
+const uint8_t Serial::END{0xc0};
+const uint8_t Serial::ESC{0xdb};
+const uint8_t Serial::ESC_END{0xdc}; 
+const uint8_t Serial::ESC_ESC{0xdd};
+
 Serial::Serial(const char *port, unsigned baud) 
     : m_io(), 
       m_port(m_io, port)
@@ -21,9 +26,6 @@ size_t Serial::send(const Message &msg) {
     auto encoded = encode(msg);
     return m_port.write_some(asio::buffer(encoded.data(), encoded.size()));
 }
-
-// give SLIP characters names
-enum { END = 0xc0, ESC = 0xdb, ESC_END = 0xdc, ESC_ESC = 0xdd };
 
 Message Serial::encode(const Message &msg) {
     // wrap the payload inside 0xC0 ... 0xC0 
@@ -72,19 +74,4 @@ Message Serial::decode(const Message &msg) {
         prev = *it++;
     }
     return Message{ret};
-}
-Message Serial::receive() {
-    std::vector<uint8_t> mutableBuffer(1024);
-    std::vector<uint8_t> msg;
-    asio::streambuf b;
-    size_t sz = read_until(m_port, b, static_cast<uint8_t>(END));
-    msg.push_back(END);
-    asio::streambuf c;
-    sz += read_until(m_port, c, static_cast<uint8_t>(END));
-    std::cout << "Read " << std::dec << sz << " bytes\n";
-    std::istream is(&c);
-    std::copy(std::istream_iterator<uint8_t>(is), 
-            std::istream_iterator<uint8_t>(),
-            back_inserter(msg));
-    return decode(Message{msg});
 }
