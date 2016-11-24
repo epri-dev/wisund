@@ -1,5 +1,5 @@
 %skeleton "lalr1.cc"
-%require "3.0.4"
+%require "3.0"
 %debug
 %defines
 %define parser_class_name {Parser}
