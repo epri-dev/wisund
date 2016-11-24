@@ -49,9 +49,10 @@ static void help(void)
 {
     std::cerr << "Usage: testmode /dev/ttyUSB0\n\n"
         "Accepted commands:\n"
-        "fchan nn\nphy nn\ntr51cf\nexclude nn ...\nlbr\nnlbr\nbuildid\n"
+        "fchan nn\ntr51cf\nexclude nn ...\nphy nn\npanid nn\n"
+        "lbr\nnlbr\nindex nn\nsetmac macaddr\nbuildid\n"
         "commands accepted in LBR or NLBR active state:\n"
-        "state\ndiag nn\nneighbors\nmac\nget nn\nping nn\nrestart\n"
+        "state\ndiag nn\nneighbors\nmac\nget nn\nping nn\nlast\nrestart\n"
         "help\nquit\n\n";
 }
 
@@ -80,7 +81,7 @@ command:    FCHAN HEXBYTE   { console.compound(0x01, $2); }
     |       PANID HEXBYTE   { console.compound(0x06, $2); }  // TODO: verify this
     |       LBR             { console.simple(0x10); }
     |       NLBR            { console.simple(0x11); }
-    |       INDEX HEXBYTE   { console.compound(0x12, $2); } // TODO: verify this
+    |       INDEX HEXBYTE   { console.compound(0x12, $2); } 
     |       SETMAC bytes    { console.compound(0x13, 0); }  // TODO: handle list
     |       STATE           { console.simple(0x20); }
     |       DIAG HEXBYTE    { console.compound(0x21, $2); }

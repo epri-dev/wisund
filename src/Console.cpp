@@ -102,6 +102,7 @@ static std::string getAddr(const uint8_t **ptr)
 
 void Console::decode(const Message &msg, std::ostream &out)
 {
+    if (msg.size() == 0) return;
     switch (msg[0]) {
         case '\x20':
             out << "{ \"mode\":\"" 
@@ -211,6 +212,31 @@ void Console::decode(const Message &msg, std::ostream &out)
             out << "{ \"buildid\":\"";
             std::copy(++msg.begin(), msg.end(), std::ostream_iterator<uint8_t>(out));
             out << "\" }\n";
+            break;
+        case '\x23':
+            if (msg.size() != 2+14*msg[1]) {
+                out << "Error: bad neighbors packet: " << msg << "\n";
+            } else {
+                const uint8_t *ptr = &msg[1];
+                int count = getUint8(&ptr);
+                out << "{ \"neighbors\": [ " << std::dec;
+                for (int i=0; i < count; ++i) {
+                    if (i) out << ", ";
+                    out << "{ \"index\":" << getUint8(&ptr);
+                    out << ", \"validated\":" << getUint8(&ptr);
+                    out << ", \"timestamp\":" << getUint32(&ptr);
+                    out << ", \"mac\":" << getAddr(&ptr) << "}";
+                }
+                out << " ] }\n";
+            }
+            break;
+        case '\x24':
+            if (msg.size() != 9) {
+                out << "Error: mac packet: " << msg << "\n";
+            } else {
+                const uint8_t *ptr = &msg[1];
+                out << "{ \"mac\":" << getAddr(&ptr) << " }\n";
+            }
             break;
         default:
             out << "Console received message: " << msg << '\n';
