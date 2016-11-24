@@ -26,14 +26,21 @@ ID      [a-z][a-z0-9]*
             }
 fchan       { return token::FCHAN; }
 tr51cf      { return token::TR51CF; }
+exclude     { return token::EXCLUDE; }
 phy         { return token::PHY; }
+panid       { return token::PANID; }
 lbr         { return token::LBR; }
 nlbr        { return token::NLBR; }
+index       { return token::INDEX; }
+setmac      { return token::SETMAC; }
 state       { return token::STATE; }
 diag        { return token::DIAG; }
 buildid     { return token::BUILDID; }
+neighbors   { return token::NEIGHBORS; }
+mac         { return token::MAC; }
 getzz       { return token::GETZZ; }
 ping        { return token::PING; }
+last        { return token::LAST; }
 restart     { return token::RESTART; }
 help        { return token::HELP; }
 quit|exit   { return token::QUIT; }

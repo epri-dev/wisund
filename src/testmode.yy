@@ -38,6 +38,7 @@ void yy::Parser::error(const std::string &s)
 }
 
 static const Message RestartCmd = Message{0xff};
+static const Message ReportLastCmd = Message{0x07};
 
 static void errortxt(void)
 {
@@ -48,9 +49,9 @@ static void help(void)
 {
     std::cerr << "Usage: testmode /dev/ttyUSB0\n\n"
         "Accepted commands:\n"
-        "fchan nn\nphy nn\ntr51cf\nlbr\nnlbr\nbuildid\n"
-        "commands accepted n LBR or NLBR active state:\n"
-        "state\ndiag nn\nget nn\nping nn\nrestart\n"
+        "fchan nn\nphy nn\ntr51cf\nexclude nn ...\nlbr\nnlbr\nbuildid\n"
+        "commands accepted in LBR or NLBR active state:\n"
+        "state\ndiag nn\nneighbors\nmac\nget nn\nping nn\nrestart\n"
         "help\nquit\n\n";
 }
 
@@ -58,7 +59,9 @@ static void help(void)
 %define api.value.type variant
 %define parse.assert
 
-%token FCHAN TR51CF PHY LBR NLBR STATE DIAG BUILDID GETZZ PING RESTART HELP QUIT
+%token FCHAN TR51CF EXCLUDE PHY PANID LBR NLBR INDEX SETMAC 
+%token STATE DIAG BUILDID NEIGHBORS MAC GETZZ PING LAST RESTART 
+%token HELP QUIT 
 %token <int> HEXBYTE
 %token NEWLINE CHAR
 
@@ -66,18 +69,27 @@ static void help(void)
 script:     /* empty */
     |   NEWLINE
     |   script command NEWLINE
-    
 
+bytes:  HEXBYTE             // TODO: construct byte array for EXCLUDE command
+    |   bytes HEXBYTE
+    
 command:    FCHAN HEXBYTE   { console.compound(0x01, $2); }
-    |       PHY HEXBYTE     { console.compound(0x04, $2); }
     |       TR51CF          { console.simple(0x02); }
+    |       EXCLUDE bytes   { console.compound(0x03, 0); }  // TODO: handle list
+    |       PHY HEXBYTE     { console.compound(0x04, $2); }
+    |       PANID HEXBYTE   { console.compound(0x06, $2); }  // TODO: verify this
     |       LBR             { console.simple(0x10); }
     |       NLBR            { console.simple(0x11); }
+    |       INDEX HEXBYTE   { console.compound(0x12, $2); } // TODO: verify this
+    |       SETMAC bytes    { console.compound(0x13, 0); }  // TODO: handle list
     |       STATE           { console.simple(0x20); }
     |       DIAG HEXBYTE    { console.compound(0x21, $2); }
     |       BUILDID         { console.simple(0x22); }
+    |       NEIGHBORS       { console.simple(0x23); }
+    |       MAC             { console.simple(0x24); }
     |       GETZZ HEXBYTE   { console.compound(0x2F, $2); }
     |       PING HEXBYTE    { console.compound(0x30, $2); }
+    |       LAST            { console.push(ReportLastCmd); }
     |       RESTART         { console.push(RestartCmd); }
     |       HELP            { help(); }
     |       QUIT            { return 0; }
