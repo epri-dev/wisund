@@ -55,7 +55,7 @@ static void help(void)
         "lbr\nnlbr\nindex nn\nsetmac macaddr\nbuildid\n"
         "commands accepted in LBR or NLBR active state:\n"
         "state\ndiag nn\nneighbors\nmac\nget nn\nping nn\nlast\nrestart\n"
-        "\ndata nn ...\nhelp\nquit\n\n";
+        "data nn ...\nhelp\nquit\n\n";
 }
 
 %}

@@ -121,19 +121,14 @@ Message SerialDevice::decode(const Message &msg) {
     for (auto it = msg.begin(); it != msg.end(); ) {
         switch(*it) {
             case END:
+            case ESC:
                 // do nothing
                 break;
             case ESC_END:
-                if (prev == ESC) {
-                    ++it;
-                    ret.push_back(END);
-                }
+                ret.push_back(prev == ESC ? END : ESC_END);
                 break;
             case ESC_ESC:
-                if (prev == ESC) {
-                    ++it;
-                    ret.push_back(ESC);
-                }
+                ret.push_back(prev == ESC ? ESC : ESC_ESC);
                 break;
             default:
                 ret.push_back(*it);

@@ -12,12 +12,12 @@ public:
     int runTx(std::istream *in = &std::cin);
     int runRx(std::ostream *out = &std::cout);
     int run(std::istream *in, std::ostream *out);
+    static Message encode(const Message &msg);
+    static Message decode(const Message &msg);
 private:
     void startReceive();
     void handleMessage(const asio::error_code &error, std::size_t size);
     size_t send(const Message &msg);
-    static Message encode(const Message &msg);
-    static Message decode(const Message &msg);
 
     asio::io_service m_io;
     asio::serial_port m_port;
