@@ -87,6 +87,18 @@ static uint16_t getUint16(const uint8_t **ptr)
     return ret;
 }
 
+static std::string getPanId(const uint8_t **ptr)
+{
+    std::stringstream s;
+    s << "\"";
+    for (int i=0; i < 2; ++i) {
+        s << std::hex << std::setfill('0') << std::setw(2) << static_cast<unsigned>(**ptr);
+        ++(*ptr);
+    }
+    s << "\"";
+    return s.str();
+}
+
 static std::string getAddr(const uint8_t **ptr)
 {
     std::stringstream s;
@@ -125,8 +137,8 @@ void Console::decode(const Message &msg, std::ostream &out)
                         out << ", \"acceptedframes\":" << getUint32(&ptr);
                         out << ", \"rejectedaddresses\":" << getUint16(&ptr);
                         out << ", \"recvdmhr\":" << getUint16(&ptr);
-                        out << ", \"lastrcvddstpanid\":" << getUint16(&ptr);
-                        out << ", \"lastrcvdsrcpanid\":" << getUint16(&ptr);
+                        out << ", \"lastrcvddstpanid\":" << getPanId(&ptr);
+                        out << ", \"lastrcvdsrcpanid\":" << getPanId(&ptr);
                         out << ", \"lastrejectaddr\":" << getAddr(&ptr);
                         out << ", \"lastrcvdaddr\":" << getAddr(&ptr);
                         out << " } }\n";
@@ -214,7 +226,7 @@ void Console::decode(const Message &msg, std::ostream &out)
             out << "\" }\n";
             break;
         case '\x23':
-            if (msg.size() != 2+14*msg[1]) {
+            if (msg.size() != 2u+14*msg[1]) {
                 out << "Error: bad neighbors packet: " << msg << "\n";
             } else {
                 const uint8_t *ptr = &msg[1];

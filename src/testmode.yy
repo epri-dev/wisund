@@ -24,6 +24,8 @@
 #include <cstdint>
 #include <iostream>
 #include <iomanip>
+#include <algorithm>
+#include <vector>
 #include "Message.h"
 #include "SafeQueue.h"
 #include "Console.h"
@@ -53,7 +55,7 @@ static void help(void)
         "lbr\nnlbr\nindex nn\nsetmac macaddr\nbuildid\n"
         "commands accepted in LBR or NLBR active state:\n"
         "state\ndiag nn\nneighbors\nmac\nget nn\nping nn\nlast\nrestart\n"
-        "help\nquit\n\n";
+        "\ndata nn ...\nhelp\nquit\n\n";
 }
 
 %}
@@ -62,8 +64,9 @@ static void help(void)
 
 %token FCHAN TR51CF EXCLUDE PHY PANID LBR NLBR INDEX SETMAC 
 %token STATE DIAG BUILDID NEIGHBORS MAC GETZZ PING LAST RESTART 
-%token HELP QUIT 
-%token <int> HEXBYTE
+%token DATA HELP QUIT 
+%token <uint8_t> HEXBYTE
+%type <std::vector<uint8_t>> bytes
 %token NEWLINE CHAR
 
 %%
@@ -71,18 +74,31 @@ script:     /* empty */
     |   NEWLINE
     |   script command NEWLINE
 
-bytes:  HEXBYTE             // TODO: construct byte array for EXCLUDE command
-    |   bytes HEXBYTE
+bytes:  bytes HEXBYTE       { $$ = $1; $$.push_back($2); }
+    |   HEXBYTE             { $$.push_back($1); }
     
 command:    FCHAN HEXBYTE   { console.compound(0x01, $2); }
     |       TR51CF          { console.simple(0x02); }
-    |       EXCLUDE bytes   { console.compound(0x03, 0); }  // TODO: handle list
+    |       EXCLUDE bytes   { if (std::none_of($2.begin(), $2.end(), [](uint8_t i){ return i==0; })) {
+                                $2.push_back(0);
+                                console.compound(0x03, $2); 
+                                } else {
+                                    std::cout << "Error: exclude channels must not have the value of zero (channel numbering starts at 1)\n";
+                                    }
+                            }
+                                
     |       PHY HEXBYTE     { console.compound(0x04, $2); }
     |       PANID HEXBYTE   { console.compound(0x06, $2); }  // TODO: verify this
     |       LBR             { console.simple(0x10); }
     |       NLBR            { console.simple(0x11); }
     |       INDEX HEXBYTE   { console.compound(0x12, $2); } 
-    |       SETMAC bytes    { console.compound(0x13, 0); }  // TODO: handle list
+    |       DATA bytes      { console.push(Message{$2}); }
+    |       SETMAC bytes    { if ($2.size() == 8) {
+                                console.compound(0x13, $2); 
+                                } else {
+                                    std::cout << "Error: mac must have 8 bytes\n";
+                                } 
+                            }  
     |       STATE           { console.simple(0x20); }
     |       DIAG HEXBYTE    { console.compound(0x21, $2); }
     |       BUILDID         { console.simple(0x22); }

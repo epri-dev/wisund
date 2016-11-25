@@ -20,7 +20,7 @@ ID      [a-z][a-z0-9]*
         yylval = lval;
 %}
 
-{XDIGIT}+   { int val = std::atoi(yytext);
+{XDIGIT}{XDIGIT}   { uint8_t val = (0xffu & std::stoi(yytext, 0, 16));
                 yylval->build(val); 
                 return token::HEXBYTE;
             }
@@ -42,6 +42,7 @@ getzz       { return token::GETZZ; }
 ping        { return token::PING; }
 last        { return token::LAST; }
 restart     { return token::RESTART; }
+data        { return token::DATA; }
 help        { return token::HELP; }
 quit|exit   { return token::QUIT; }
 

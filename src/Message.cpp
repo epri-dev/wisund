@@ -15,7 +15,13 @@ Message::Message(const uint8_t *msg, size_t size)
             push_back(msg[i]);
         }
     }
+
 Message::Message(std::vector<uint8_t> v) 
+    : std::vector<uint8_t>(v)
+    {
+    }
+
+Message::Message(std::vector<uint8_t> &&v) 
     : std::vector<uint8_t>(v)
     {
     }
