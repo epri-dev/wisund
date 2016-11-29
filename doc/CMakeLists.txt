@@ -8,6 +8,16 @@ if(DOXYGEN_FOUND)
         "${CMAKE_BINARY_DIR}/doxygen.conf"
         @ONLY
     )
+    configure_file(
+        "${testmode_SOURCE_DIR}/doc/hardware.jpg"
+        "${CMAKE_BINARY_DIR}/doc/hardware.jpg"
+        COPYONLY
+    )
+    configure_file(
+        "${testmode_SOURCE_DIR}/doc/epri-logo.jpg"
+        "${CMAKE_BINARY_DIR}/doc/epri-logo.jpg"
+        COPYONLY
+    )
     add_custom_target(
         doc
         "${DOXYGEN_EXECUTABLE}"

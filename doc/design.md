@@ -1,3 +1,20 @@
+## Overview
+The purpose of this tool is to provide a reference implementation of the IEEE 802.15.4g radio protocol stack that conforms to the Wi-SUN Alliance specification. It also provides a means by which other such radios can be tested and evaluated.
+
+## Essential pieces
+The first iteration of this reference implementation is built using the Texas Instruments CC1200 evaluation board and a Raspberry Pi model B.  The evaluation board provides the radio parts and a minimal interface by which they can be used to build higher layer protocols.  The higher layers are built on a Raspberry Pi and the two boards (Raspberry Pi and CC1200 Evaluation board) are connected together via a serial connection running at 115200 bps.  A summary of the connections is shown below:
+
+![Hardware Photo](../hardware.jpg)
+
+The connections between the two are shown in the table below:
+
+Pi pin #|Pi pin name|CC1200 pin name
+--------|-----------|---------------
+1       | 3.3V      | Vext
+6       | GND       | GND
+8       | UART\_TXD  | Port 5 pin 7
+10      | UART\_RXD  | Port 5 pin 6
+
 ## Tool design
 This tool consists of two main parts.  One is a simple parser that is constructed with flex and bison.  Its purpose is to interact with either a human user or a script and to translate and convey the commands to the Wi-SUN board in binary form.  The other part connects the serial port to a tun device.  Essentially, anything that comes in via the IPv6 tun device is passed to the serial port and vice versa.  The program can differentiate message types because the first byte of each message designates the message type.  See [message types](#message-type).
 
@@ -16,8 +33,8 @@ There are essentially four interfaces that the program must handle:
 ## Class design
 The [original prototype](#original-prototype) was written in C and largely procedural.  The new version is written in C++ and incorporates the C++ `asio` library for both the serial port and for socket access.  This aids with both portability and structure.
 
-### SafeQueue
-Functioning as a message queue, but implemented as a queue, this class handles the sequential storage of messages.  It is "safe" because it is designed to be accessible by multiple threads.  
+### SafeDeque
+Functioning as a message queue, but implemented as a deque, this class handles the sequential processing and routing of messages.  Must be accessible by multiple threads.  Each interface has its own inbound queue; routing is done by the outbound message handler associated with the device.
 
 ### Device
 Each device has two interfaces; one is the external facing interface that defines it (e.g. serial port, console or tun) and the internal interface which looks the same for all devices.  The internal device interface is a receive message queue.  
