@@ -29,8 +29,6 @@ public:
     /// emits a compound command Message to the output queue
     void compound(uint8_t cmd, std::vector<uint8_t> &data);
     /// emits a compound command Message to the output queue
-    void compound(uint8_t cmd, std::vector<uint8_t> &data);
-    /// emits a compound command Message to the output queue
     void compound(uint8_t cmd, uint8_t data);
     /// emits a simple command Message to the output queue
     void simple(uint8_t cmd);
