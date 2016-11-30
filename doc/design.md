@@ -15,8 +15,11 @@ Pi pin #|Pi pin name|CC1200 pin name
 8       | UART\_TXD  | Port 5 pin 7
 10      | UART\_RXD  | Port 5 pin 6
 
+## Building the software and firmware
+There are [instructions for building the software on the Raspberry Pi](@ref pibuild) and also instructions for building the firmware for the CC1200 evaluation board. (TODO: add CC1200 instructions).
+
 ## Tool design
-This tool consists of two main parts.  One is a simple parser that is constructed with flex and bison.  Its purpose is to interact with either a human user or a script and to translate and convey the commands to the Wi-SUN board in binary form.  The other part connects the serial port to a tun device.  Essentially, anything that comes in via the IPv6 tun device is passed to the serial port and vice versa.  The program can differentiate message types because the first byte of each message designates the message type.  See [message types](#message-type).
+This tool consists of two main parts.  One is a simple parser that is constructed with flex and bison.  Its purpose is to interact with either a human user or a script and to translate and convey the commands to the Wi-SUN board in binary form.  The other part connects the serial port to a tun device.  Essentially, anything that comes in via the IPv6 tun device is passed to the serial port and vice versa.  The program can differentiate message types because the first byte of each message designates the message type.  See the Message types section below.
 
 ## Original prototype
 The original version was written in C and used the POSIX `select` to determine with of the three interfaces had data ready.  This worked well enough for a prototype, but the interface was not elegant and the code was even less so.  
@@ -31,7 +34,7 @@ There are essentially four interfaces that the program must handle:
   4. **`stdout`**: As with `stdin`, `stdout` is half of the interaction with the user.  The output that goes to the user is text messages that are neither IPv6 messages nor command responses.  They are simply printed to the screen as ASCII.
 
 ## Class design
-The [original prototype](#original-prototype) was written in C and largely procedural.  The new version is written in C++ and incorporates the C++ `asio` library for both the serial port and for socket access.  This aids with both portability and structure.
+The original prototype was written in C and largely procedural.  The new version is written in C++ and incorporates the C++ `asio` library for both the serial port and for socket access.  This aids with both portability and structure.
 
 ### SafeDeque
 Functioning as a message queue, but implemented as a deque, this class handles the sequential processing and routing of messages.  Must be accessible by multiple threads.  Each interface has its own inbound queue; routing is done by the outbound message handler associated with the device.
@@ -55,7 +58,8 @@ Anything received via tun is sent directly to Router; anything received on inter
 The program is multithreaded and includes three threads.  One is the main thread that has both the user interface (`std::cin` and `std::cout`) as well as the `SafeDeque` message queue.  The second thread handles the serial port, and the third thread handles the `tun` device.
 
 ## Message types
-The message types are summarized below:
+
+The Message types are summarized below:
 
 00
 : IPv6 packet with Ethertype

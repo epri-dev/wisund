@@ -10,6 +10,7 @@
  * Specialization of `std::exception` to handle an empty queue
  */
 struct EmptyQueue: std::exception {
+    /// returns the exception text
     const char * what() const throw();
 };
 
@@ -43,7 +44,7 @@ public:
         data.pop();
         return item;
     }
-    // returns true and populates passed reference only if the queue is not empty
+    /// returns true and populates passed reference only if the queue is not empty
     bool try_pop(T& value) {
         std::lock_guard<std::mutex> lock(m);
         if (data.empty())
