@@ -35,11 +35,15 @@ Install the following packages
     sudo apt-get upgrade
     sudo apt-get update
     sudo apt-get upgrade
-    sudo apt-get gvim vim cmake libboost-all-dev
-    sudo apt-get install gvim vim cmake libboost-all-dev
     sudo apt-get install vim-gnome vim cmake libboost-all-dev
     sudo apt-get install gcc-4.8 g++-4.8 bison flex
-    sudo apt-get install libasio-dev libcppunit-dev 
-    sudo apt-get install libncurses5-dev 
+    sudo apt-get install libasio-dev 
+    
+For the unit tests:
 
-(do we really need that last one?)
+    sudo apt-get install libcppunit-dev 
+
+For the documentation:
+
+    sudo apt-get install doxygen texlive-font-utils
+
