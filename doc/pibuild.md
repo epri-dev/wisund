@@ -1,0 +1,45 @@
+# Building the software on the Raspberry Pi  {#pibuild}
+This page describes both the installation of the software on a Raspberry Pi if the installer has already been created, and also detailed instructions on how to build it from scratch on the Pi.
+
+## Installing the software 
+
+What?
+First, obtain and install a Raspberry Pi image on a suitable microSD card.  Instructions and download images are available via <https://www.raspberrypi.org/downloads/raspbian/>.  
+
+Insert the resulting microSD card into the Raspberry Pi power it up.  
+
+Run `raspi-config` as root (`sudo raspi-config`) and do the following things:
+
+under "Advanced Options", choose "SSH" and enable the SSH Server.  Next, also under "Advanced Options", "Serial" diable the login shell via serial.  Optionally, you may also wish to set the locale and expand the filesystem but neither of these are strictly necessary.
+
+When you have completed these selections, finish and (if prompted) reboot.
+
+Then edit the file `/boot/config.txt` to add the following line:
+
+
+    device_tree=
+
+If there is a line that says either `enable_uart=0` or `enable_uart=1`, either delete the line or comment it out by adding a `#` character to the front of the line.
+
+Now reboot the Pi and copy the `testmode-0.1.1-Linux.sh` file onto the Pi via `ssh` or other means. Execute the shell script as root:
+
+    sudo ./testmode-0.1.1-Linux.sh
+
+Accept the license and the default installation location and the executables will be installed in `testmode-0.1.1-Linux` in a `bin` directory.
+
+## Building the software 
+
+Install the following packages
+
+    sudo raspi-config
+    sudo apt-get upgrade
+    sudo apt-get update
+    sudo apt-get upgrade
+    sudo apt-get gvim vim cmake libboost-all-dev
+    sudo apt-get install gvim vim cmake libboost-all-dev
+    sudo apt-get install vim-gnome vim cmake libboost-all-dev
+    sudo apt-get install gcc-4.8 g++-4.8 bison flex
+    sudo apt-get install libasio-dev libcppunit-dev 
+    sudo apt-get install libncurses5-dev 
+
+(do we really need that last one?)
