@@ -31,6 +31,7 @@ int main(int argc, char *argv[])
         switch (argv[opt][1]) {
             case 'v':
                 verbose = true;
+                break;
             default:
                 std::cout << "Ignoring uknown option \"" << argv[opt] << "\"\n";
         }
