@@ -11,7 +11,8 @@ static constexpr uint8_t ESC_ESC{0xdd};
 SerialDevice::SerialDevice(SafeQueue<Message> &input, SafeQueue<Message> &output, const char *port, unsigned baud) :
     Device(input, output),
     m_io(), 
-    m_port(m_io, port)
+    m_port(m_io, port),
+    m_verbose{false}
 {
     m_port.set_option(asio::serial_port_base::baud_rate(baud));
 }
@@ -82,7 +83,11 @@ void SerialDevice::handleMessage(const::asio::error_code &error, std::size_t siz
     auto buf = m_data.data();
     std::vector<uint8_t> v(size);
     asio::buffer_copy(asio::buffer(v), buf);
-    push(SerialDevice::decode(Message{v}));
+    Message msg{v};
+    if (m_verbose) {
+        std::cout << "received: " << msg << "\n";
+    }
+    push(SerialDevice::decode(msg));
     m_data.consume(size);
     if (wantHold()) {
         startReceive();
@@ -91,7 +96,15 @@ void SerialDevice::handleMessage(const::asio::error_code &error, std::size_t siz
 
 size_t SerialDevice::send(const Message &msg) {
     auto encoded = encode(msg);
+    if (m_verbose) {
+        std::cout << "sending: " << encoded << "\n";
+    }
     return m_port.write_some(asio::buffer(encoded.data(), encoded.size()));
+}
+
+bool SerialDevice::verbosity(bool verbose) {
+    std::swap(verbose, m_verbose);
+    return verbose;
 }
 
 Message SerialDevice::encode(const Message &msg) {

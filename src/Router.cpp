@@ -19,20 +19,32 @@
 int main(int argc, char *argv[])
 {
     if (argc < 2) {
-        std::cout << "Usage: " << argv[0] << " serialport\n";
+        std::cout << "Usage: " << argv[0] << "[-v] serialport\n";
         return 1;
     }
     SafeQueue<Message> routerIn;
     SafeQueue<Message> serialIn;
     SafeQueue<Message> consoleIn;
-    std::cout << "Opening port " << argv[1] << "\n";
+    bool verbose = false;
+    unsigned opt = 1;
+    if (argc >= 3 && argv[opt][0] == '-') {
+        switch (argv[opt][1]) {
+            case 'v':
+                verbose = true;
+            default:
+                std::cout << "Ignoring uknown option \"" << argv[opt] << "\"\n";
+        }
+        ++opt;
+    }
+    std::cout << "Opening port " << argv[opt] << "\n";
 
     // rule 1
     Console con(consoleIn, serialIn);
     // rule 2
     // not done yet
     // rule 3
-    SerialDevice ser{serialIn, consoleIn, argv[1], 115200};
+    SerialDevice ser{serialIn, consoleIn, argv[opt], 115200};
+    ser.verbosity(verbose);
     ser.hold();
     con.hold();
     std::thread conThread{&Console::run, &con, &std::cin, &std::cout};

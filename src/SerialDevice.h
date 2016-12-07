@@ -23,6 +23,8 @@ public:
     int runRx(std::ostream *out = &std::cout);
     /// runs both the receive and transmit handlers in required sequence
     int run(std::istream *in, std::ostream *out);
+    // set or clear verbose flag and return previous state
+    bool verbosity(bool verbose);
     /// encapsulate the message using SLIP coding
     static Message encode(const Message &msg);
     /// decapsulate the message using SLIP coding
@@ -41,6 +43,8 @@ private:
     asio::serial_port m_port;
     /// a stream buffer used by the receive functions
     asio::streambuf m_data;
+    /// if true, echo raw packets
+    bool m_verbose;
 };
 
 #endif // SERIALDEVICE_H
