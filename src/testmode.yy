@@ -88,7 +88,12 @@ command:    FCHAN HEXBYTE   { console.compound(0x01, $2); }
                             }
                                 
     |       PHY HEXBYTE     { console.compound(0x04, $2); }
-    |       PANID HEXBYTE   { console.compound(0x06, $2); }  // TODO: verify this
+    |       PANID bytes     {if ($2.size() == 2) {
+                                console.compound(0x06, $2); 
+                                } else {
+                                    std::cout << "Error: panid  must have 2 bytes\n";
+                                }  // 2 octets for PANID
+                            }
     |       LBR             { console.simple(0x10); }
     |       NLBR            { console.simple(0x11); }
     |       INDEX HEXBYTE   { console.compound(0x12, $2); } 

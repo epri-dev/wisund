@@ -78,6 +78,7 @@ static uint32_t getUint32(const uint8_t **ptr)
     return ret;
 }
 
+
 static uint16_t getUint16(const uint8_t **ptr) 
 {
     uint16_t ret = **ptr;
@@ -112,13 +113,37 @@ static std::string getAddr(const uint8_t **ptr)
     return s.str();
 }
 
+static std::string getExludedMask(const uint8_t **ptr)
+{
+    std::stringstream s;
+    s << "\"";
+    for (int i=0; i < 17; ++i) {
+        s << std::hex << std::setfill('0') << std::setw(2) << static_cast<unsigned>(**ptr);
+        ++(*ptr);
+    }
+    s << "\"";
+    return s.str();
+}
+
+static std::string getModeStr(uint8_t mode)
+{
+    std::stringstream s;
+    if (mode == 0) s << "IDLE";
+    else if (mode == 1) s << "LBR";
+    else if (mode == 2) s << "NLBR";
+    else s << "UNK";
+    return s.str();
+}
+
+
+
 void Console::decode(const Message &msg, std::ostream &out)
 {
     if (msg.size() == 0) return;
     switch (msg[0]) {
         case '\x20':
             out << "{ \"mode\":\"" 
-                << (msg[1] == 1 ? "LBR" : "NLBR")
+                << (getModeStr(msg[1]) )
                 << "\", \"neighbors\":" 
                 << std::dec << static_cast<unsigned>(msg[2])
                 << ", \"discoveryState\":"
@@ -169,7 +194,7 @@ void Console::decode(const Message &msg, std::ostream &out)
                     break;
                 case 3:  // DIAG_ID_IE_UNKNOWN
                     if (msg.size() != 46) {
-                        out << "Error: bad diag 2 packet: " << msg << "\n";
+                        out << "Error: bad diag 3 packet: " << msg << "\n";
                     } else {
                         const uint8_t *ptr = &msg[2];
                         out << "{ \"ieunknown\": { ";
@@ -183,18 +208,101 @@ void Console::decode(const Message &msg, std::ostream &out)
                         out << " ] } }\n";
                     }
                     break;
-#if 0
                 case 4:  // DIAG_ID_MPX_INFO
+                    if (msg.size() != 32) {
+                        out << "Error: bad diag 4 packet: " << msg << "\n";
+                    } else {
+                        const uint8_t *ptr = &msg[2];
+                        out << "{ \"mpxie\": { ";
+                        out << "\"timestamp\":" << std::dec << getUint32(&ptr);
+                        out << ", \"mpxie_count\":" << std::dec << getUint32(&ptr);
+                        out << ", \"mpx_id\":" << getUint16(&ptr);
+                        out << ", \"mpx_subid\":" << getUint16(&ptr);
+                        out << ", \"msdulenght\":" << std::dec << getUint16(&ptr);
+                        out << ", \"srcaddr\":" << getAddr(&ptr);
+                        out << ", \"destaddr\":" << getAddr(&ptr);
+                        out << " } }\n";
+                    }
                     break;
                 case 5:  // DIAG_ID_FH_IE_INFO
+                    if (msg.size() != 48) {
+                        out << "Error: bad diag 5 packet: " << msg << "\n";
+                    } else {
+                        const uint8_t *ptr = &msg[2];
+                        out << "{ \"fhieinfo\": { ";
+                        out << "\"index\":" << std::dec << getUint8(&ptr);
+                        out << ", \"timestamp\":" << std::dec << getUint32(&ptr);
+                        out << ", \"clock_drift;\":" << std::dec << getUint8(&ptr);
+                        out << ", \"timestamp_accuracy;\":" << std::dec << getUint8(&ptr);
+                        out << ", \"unicast_dwell;\":" << std::dec << getUint8(&ptr);
+                        out << ", \"broadcast_dwell;\":" << std::dec << getUint8(&ptr);
+                        out << ", \"broadcast_interval;\":" << std::dec << getUint32(&ptr);
+                        out << ", \"broadcast_schedule_id;\":" << std::dec << getUint16(&ptr);
+                        out << ", \"channel_plan\":" << std::dec << getUint8(&ptr);
+                        out << ", \"channel_function\":" << getUint8(&ptr);
+                        out << ", \"reg_domain;\":" << std::dec << getUint8(&ptr);
+                        out << ", \"operating_class;\":" << std::dec << getUint8(&ptr);
+                        out << ", \"ch0;\":" << std::dec << getUint32(&ptr);
+                        out << ", \"channelspacing;\":" << std::dec << getUint16(&ptr);
+                        out << ", \"number_channels;\":" << std::dec << getUint16(&ptr);
+                        out << ", \"fixed_channel;\":" << std::dec << getUint16(&ptr);
+                        out << ", \"excludedchanmask\":" << getExludedMask(&ptr);
+                        out << " } }\n";
+                    }
                     break;
-                case 6:  // DIAG_ID_FH_MY_SEQ
+                case 6:  // DIAG_ID_FH_MY_SEQ    
+                    if (msg.size() != 3u+4*msg[2]) {
+                        out << "Error: bad diag 6 packet: " << msg << "\n";
+                    } else {
+                        const uint8_t *ptr = &msg[2];
+                        int count = getUint8(&ptr);
+                        out << "{ \"mysequence\": [ " << std::dec;
+                        for (int i=0; i < count; ++i) {
+                            if (i) out << ", ";
+                            out << "{ \"slot\":" << getUint16(&ptr);
+                            out << ", \"chan\":" << getUint16(&ptr) << "}";
+                        }
+                        out << " ] }\n";
+                    }
                     break;
                 case 7:  // DIAG_ID_FH_NB_SEQ
+                    if (msg.size() != 3u+4*msg[2]) {
+                        out << "Error: bad diag 7 packet: " << msg << "\n";
+                    } else {
+                        const uint8_t *ptr = &msg[2];
+                        int count = getUint8(&ptr);
+                        out << "{ \"targetseq\": [ " << std::dec;
+                        for (int i=0; i < count; ++i) {
+                            if (i) out << ", ";
+                            out << "{ \"slot\":" << getUint16(&ptr);
+                            out << ", \"chan\":" << getUint16(&ptr) << "}";
+                        }
+                        out << " ] }\n";
+                    }
                     break;
+
                 case 8:  // DIAG_ID_FH_NB_INFO
+                    if (msg.size() != 59) {
+                        out << "Error: bad diag 8 packet: " << msg << "\n";
+                    } else {
+                        const uint8_t *ptr = &msg[2];
+                        out << "{ \"fhnbinfo\": { ";
+                        out << "\"index\":" << std::dec << getUint8(&ptr);
+                        out << ", \"timestamp\":" << std::dec << getUint32(&ptr);
+                        out << ", \"lastrcvdufsi\":" << getUint32(&ptr);
+                        out << ", \"neighborlastms\":"<< std::dec  << getUint32(&ptr);
+                        out << ", \"lastrslrssi\":" << getUint8(&ptr);
+                        out << ", \"rawmeasrssi\":" << getUint8(&ptr);
+                        out << ", \"lastrcvdbfi\":" << getUint32(&ptr);
+                        out << ", \"lastrcvdbsn\":" << std::dec << getUint16(&ptr);
+                        out << ", \"panid\":" << getPanId(&ptr);
+                        out << ", \"panversion\":" << std::dec << getUint16(&ptr);
+                        // gtkhash is 4 x 64-bit unsigned.  DOn't know how to 
+                        // do unsigned 64-bit int as uint64_t doesn't work?
+                        out << " } }\n";
+                    }
                     break;
-#endif
+
                 case 9:  // DIAG_ID_RADIO_STATS
                     if (msg.size() != 45) {
                         out << "Error: bad diag 9 packet: " << msg << "\n";
@@ -222,6 +330,11 @@ void Console::decode(const Message &msg, std::ostream &out)
             break;
         case '\x22':
             out << "{ \"buildid\":\"";
+            std::copy(++msg.begin(), msg.end(), std::ostream_iterator<uint8_t>(out));
+            out << "\" }\n";
+            break;
+        case '\xD0':
+            out << "{ \"TEST_PRINTF\":\"";
             std::copy(++msg.begin(), msg.end(), std::ostream_iterator<uint8_t>(out));
             out << "\" }\n";
             break;
