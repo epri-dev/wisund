@@ -333,7 +333,7 @@ void Console::decode(const Message &msg, std::ostream &out)
             std::copy(++msg.begin(), msg.end(), std::ostream_iterator<uint8_t>(out));
             out << "\" }\n";
             break;
-        case '\xD0':
+        case  0xD0:
             out << "{ \"TEST_PRINTF\":\"";
             std::copy(++msg.begin(), msg.end(), std::ostream_iterator<uint8_t>(out));
             out << "\" }\n";
