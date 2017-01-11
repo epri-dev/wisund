@@ -20,7 +20,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(Message Message.cpp)
 add_library(Console Console.cpp Device.cpp ${BISON_parser_OUTPUTS} ${FLEX_scanner_OUTPUTS})
-add_library(SerialDevice SerialDevice.cpp Device.cpp )
+add_library(SerialDevice SerialDevice.cpp Device.cpp TunDevice.cpp)
 if (WIN32)
 add_executable(${EXECUTABLE_NAME} ${BISON_parser_OUTPUTS} ${FLEX_scanner_OUTPUTS} Router.cpp)
 else()

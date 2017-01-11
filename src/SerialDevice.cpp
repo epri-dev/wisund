@@ -95,6 +95,9 @@ void SerialDevice::handleMessage(const::asio::error_code &error, std::size_t siz
 }
 
 size_t SerialDevice::send(const Message &msg) {
+    if (msg.size() == 0) {
+        return 0;
+    }
     auto encoded = encode(msg);
     if (m_verbose) {
         std::cout << "sending: " << encoded << "\n";
