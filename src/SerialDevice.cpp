@@ -31,7 +31,7 @@ int SerialDevice::runTx(std::istream *in)
 int SerialDevice::runRx(std::ostream *out)
 {
     out = out;
-    Message m{0};
+    Message m{};
     while (wantHold()) {
         wait_and_pop(m);
         send(m);

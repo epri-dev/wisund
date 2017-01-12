@@ -30,7 +30,7 @@ int Router::run(std::istream *in, std::ostream *out)
 {
     in = in;
     out = out;
-    Message m{0};
+    Message m{};
     while (wantHold()) {
         wait_and_pop(m);
         if (m.isRaw()) {

@@ -25,7 +25,7 @@ int Console::runTx(std::istream *in) {
 }
 
 int Console::runRx(std::ostream *out) {
-    Message m{0};
+    Message m{};
     while (wantHold() || more()) {
         wait_and_pop(m);
         decode(m, *out);
