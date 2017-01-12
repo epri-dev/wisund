@@ -28,6 +28,15 @@ Message::Message(std::vector<uint8_t> &&v)
     {
     }
 
+Message& Message::operator+=(const Message& msg) {
+    // TODO: optimize this?  Could be more efficient
+    // if we resize first and then copy?
+    for (const auto byte : msg) {
+        push_back(byte);
+    }
+    return *this;
+}
+
 bool Message::isRaw() const { return size() && front() == 0; }
 
 

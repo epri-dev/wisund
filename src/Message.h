@@ -19,6 +19,7 @@ public:
     /// create a Message by moving from a vector
     Message(std::vector<uint8_t> &&v);
     /// returns true if the vector is raw (that is, begins with a 0x00 byte)
+    Message &operator+=(const Message& msg);
     bool isRaw() const;
     /// overloaded inserter dumps the Message as a sequence of hex bytes
     friend std::ostream& operator<<(std::ostream &out, const Message &msg);
