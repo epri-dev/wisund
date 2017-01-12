@@ -12,13 +12,16 @@ public:
     Router(SafeQueue<Message> &input, SafeQueue<Message> &output, SafeQueue<Message> &rawOutput);
     virtual ~Router();
     int run(std::istream *in, std::ostream *out);
+    bool verbosity(bool verbose);
 private:
     SafeQueue<Message> &rawQ;
+    bool m_verbose;
 };
 
 Router::Router(SafeQueue<Message> &input, SafeQueue<Message> &output, SafeQueue<Message> &rawOutput) :
     Device{input, output},
-    rawQ{rawOutput}
+    rawQ{rawOutput},
+    m_verbose{false}
 {}
 
 Router::~Router() = default;
@@ -31,12 +34,23 @@ int Router::run(std::istream *in, std::ostream *out)
     while (wantHold()) {
         wait_and_pop(m);
         if (m.isRaw()) {
+            if (m_verbose) {
+                std::cout << "Router pushing raw msg: " << m << "\n";
+            }
             rawQ.push(m);
         } else {
+            if (m_verbose) {
+                std::cout << "Router pushing msg: " << m << "\n";
+            }
             push(m);
         }
     }
     return 0;
+}
+
+bool Router::verbosity(bool verbose) {
+    std::swap(verbose, m_verbose);
+    return verbose;
 }
 
 /*
