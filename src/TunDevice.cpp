@@ -75,20 +75,20 @@ void TunDevice::startReceive()
     FD_ZERO(&rfds);
     FD_SET(fd, &rfds);
 
-    // wait up to one second
-    timeval tv{1, 0};
+    // wait up to one half second
+    timeval tv{0, 500000lu};
     auto retval = select(fd+1, &rfds, NULL, NULL, &tv);
     if (retval == -1) {
         std::cout << "TUN: error in select\n";
         // error in select
-    } else if (retval) {
+    }
+    if (FD_ISSET(fd, &rfds)) { 
         uint8_t buf1[1600];
-        auto len = read(fd, buf1, sizeof(buf1));
-        push(Message(buf1, len));
+        size_t len = read(fd, buf1, sizeof(buf1));
+        push(Message{buf1, len});
     } else {
         //std::cout << "TUN: select timeout\n";
     }
-    // else timeout
 }
 
 size_t TunDevice::send(const Message &msg)
