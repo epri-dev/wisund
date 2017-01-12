@@ -218,7 +218,7 @@ void Console::decode(const Message &msg, std::ostream &out)
                         out << ", \"mpxie_count\":" << std::dec << getUint32(&ptr);
                         out << ", \"mpx_id\":" << getUint16(&ptr);
                         out << ", \"mpx_subid\":" << getUint16(&ptr);
-                        out << ", \"msdulenght\":" << std::dec << getUint16(&ptr);
+                        out << ", \"msdulength\":" << std::dec << getUint16(&ptr);
                         out << ", \"srcaddr\":" << getAddr(&ptr);
                         out << ", \"destaddr\":" << getAddr(&ptr);
                         out << " } }\n";
