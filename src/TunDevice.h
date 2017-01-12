@@ -17,8 +17,11 @@ private:
     void handleMessage(const asio::error_code &error, std::size_t size);
 #endif
     size_t send(const Message &msg);
+    bool isCompleteIpV6Msg(const Message& msg) const;
     /// File descriptor for TUN device
     int fd;
+    bool m_verbose;
+    bool m_ipv6only;
 };
 
 #endif // TUNDEVICE_H
