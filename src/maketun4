@@ -1,0 +1,23 @@
+#! /bin/bash
+machine=`uname -m`
+case "$machine" in
+    x86_64)
+        myaddr=101
+        ;;
+    armv7l)
+        myaddr=102
+        ;;
+    *)
+        echo "Unknown machine type $machine"
+        ;;
+esac
+
+fulladdr="10.0.0.$myaddr/24"
+echo "Setting tun0 address $fulladdr"
+
+# first create the tun device
+ip tuntap add mode tun
+# now assign an address to tun0
+ip -4 addr add $fulladdr dev tun0
+# bring up the link
+ip -4 link set dev tun0 up
