@@ -12,7 +12,8 @@ SerialDevice::SerialDevice(SafeQueue<Message> &input, SafeQueue<Message> &output
     Device(input, output),
     m_io(), 
     m_port(m_io, port),
-    m_verbose{false}
+    m_verbose{false},
+    m_delay{0}
 {
     m_port.set_option(asio::serial_port_base::baud_rate(baud));
 }
@@ -102,12 +103,17 @@ size_t SerialDevice::send(const Message &msg) {
     if (m_verbose) {
         std::cout << "sending: " << encoded << "\n";
     }
+    std::this_thread::sleep_for(m_delay);
     return m_port.write_some(asio::buffer(encoded.data(), encoded.size()));
 }
 
 bool SerialDevice::verbosity(bool verbose) {
     std::swap(verbose, m_verbose);
     return verbose;
+}
+
+void SerialDevice::sendDelay(std::chrono::duration<float, std::milli> delay) {
+    m_delay = delay;
 }
 
 Message SerialDevice::encode(const Message &msg) {

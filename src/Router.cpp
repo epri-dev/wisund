@@ -1,5 +1,6 @@
 #include <iostream>
 #include <thread>
+#include <chrono>
 #include "SafeQueue.h"
 #include "Console.h"
 #include "SerialDevice.h"
@@ -76,11 +77,19 @@ int main(int argc, char *argv[])
     SafeQueue<Message> tunIn;
     SafeQueue<Message> consoleIn;
     bool verbose = false;
+    bool strict = false;
+    std::chrono::milliseconds delay{0};
     unsigned opt = 1;
-    if (argc >= 3 && argv[opt][0] == '-') {
+    while (argv[opt][0] == '-') {
         switch (argv[opt][1]) {
             case 'v':
                 verbose = true;
+                break;
+            case 's':
+                strict = true;
+                break;
+            case 'd':
+                delay = std::chrono::milliseconds{std::atoi(argv[++opt])};
                 break;
             default:
                 std::cout << "Ignoring uknown option \"" << argv[opt] << "\"\n";
@@ -98,6 +107,7 @@ int main(int argc, char *argv[])
     Router rtr{routerIn, consoleIn, tunIn};
     SerialDevice ser{serialIn, routerIn, argv[opt], 115200};
 
+    ser.sendDelay(delay);
     ser.verbosity(verbose);
     ser.hold();
     con.hold();

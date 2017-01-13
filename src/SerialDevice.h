@@ -23,8 +23,10 @@ public:
     int runRx(std::ostream *out = &std::cout);
     /// runs both the receive and transmit handlers in required sequence
     int run(std::istream *in, std::ostream *out);
-    // set or clear verbose flag and return previous state
+    /// set or clear verbose flag and return previous state
     bool verbosity(bool verbose);
+    /// set optional pre-send delay time 
+    void sendDelay(std::chrono::duration<float, std::milli> delay); 
     /// encapsulate the message using SLIP coding
     static Message encode(const Message &msg);
     /// decapsulate the message using SLIP coding
@@ -45,6 +47,8 @@ private:
     asio::streambuf m_data;
     /// if true, echo raw packets
     bool m_verbose;
+    /// delay before each packet is sent
+    std::chrono::duration<float, std::milli> m_delay;
 };
 
 #endif // SERIALDEVICE_H
