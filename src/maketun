@@ -5,7 +5,10 @@ case "$machine" in
         myaddr=101
         ;;
     armv7l)
-        myaddr=102
+        if [ "$HOSTNAME" == "pi2" ]
+	    then myaddr=103
+	    else myaddr=102
+        fi
         ;;
     *)
         echo "Unknown machine type $machine"
