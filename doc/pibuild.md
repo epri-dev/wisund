@@ -3,7 +3,6 @@ This page describes both the installation of the software on a Raspberry Pi if t
 
 ## Installing the software 
 
-What?
 First, obtain and install a Raspberry Pi image on a suitable microSD card.  Instructions and download images are available via <https://www.raspberrypi.org/downloads/raspbian/>.  
 
 Insert the resulting microSD card into the Raspberry Pi power it up.  
@@ -12,14 +11,13 @@ Run `raspi-config` as root (`sudo raspi-config`) and do the following things:
 
 under "Advanced Options", choose "SSH" and enable the SSH Server.  Next, also under "Advanced Options", "Serial" diable the login shell via serial.  Optionally, you may also wish to set the locale and expand the filesystem but neither of these are strictly necessary.
 
-When you have completed these selections, finish and (if prompted) reboot.
-
-Then edit the file `/boot/config.txt` to add the following line:
-
+When you have completed these selections, finish and (if prompted) reboot.  For versions of the Raspbian operating system that are based on images before 2017, edit the file `/boot/config.txt` to add the following line:
 
     device_tree=
 
 If there is a line that says either `enable_uart=0` or `enable_uart=1`, either delete the line or comment it out by adding a `#` character to the front of the line.
+
+Images that are 2017 or newer only need `uart0=on`.
 
 Now reboot the Pi and copy the `testmode-0.1.1-Linux.sh` file onto the Pi via `ssh` or other means. Execute the shell script as root:
 
@@ -45,6 +43,6 @@ For the unit tests:
 
 For the documentation:
 
-    sudo apt-get install doxygen texlive-font-utils
+    sudo apt-get install doxygen texlive-font-utils graphviz
 
 Note that with the versions of Doxygen and Raspbian available at the moment (December 2016), there is a [problem with Doxygen's support of sqlite3](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=758975) that manifests itself as a large number of warnings when generating the documentation, as well as a sqlite database file which grows without bound.
