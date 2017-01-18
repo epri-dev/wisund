@@ -7,7 +7,6 @@
 #include "Message.h"
 #include "Device.h"
 #include "SafeQueue.h"
-#include "parser.h"
 #include <vector>
 
 /**
