@@ -146,8 +146,10 @@ int main(int argc, char *argv[]) {
     std::cout << "Enter the word \"quit\" to exit the program and shut down the server\n";
     while (!done && std::cin >> command) {
         if (command == "quit") {
+            std::cout << "Shutting down web server now...\n";
             done = true;
         }
     }
+    std::cout << "Joining web server thread...\n";
     web.join();
 }
