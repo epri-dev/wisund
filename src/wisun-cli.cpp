@@ -22,7 +22,7 @@
 int main(int argc, char *argv[])
 {
     if (argc < 2) {
-        std::cout << "Usage: " << argv[0] << "[-v] serialport\n";
+        std::cout << "Usage: " << argv[0] << "[-v] [-d msdelay] [-s] serialport\n";
         return 1;
     }
     SafeQueue<Message> routerIn;
@@ -42,6 +42,7 @@ int main(int argc, char *argv[])
                 strict = true;
                 break;
             case 'd':
+                // TODO: error handling if next arg is not a number
                 delay = std::chrono::milliseconds{std::atoi(argv[++opt])};
                 break;
             default:
@@ -55,6 +56,7 @@ int main(int argc, char *argv[])
     Console con(consoleIn, serialIn);
     // rule 2: Everything from the TUN goes to the serial port
     TunDevice tun(tunIn, serialIn);
+    tun.strict(strict);
     // rule 3: raw packets from the serial port go to the TUN
     // rule 4: non-raw packets from the serial port go to the Console
     Router rtr{routerIn, consoleIn, tunIn};

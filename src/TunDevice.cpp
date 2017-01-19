@@ -146,3 +146,15 @@ size_t TunDevice::send(const Message &msg)
     }
     return msg.size();
 }
+
+bool TunDevice::verbosity(bool verbose) 
+{
+    std::swap(verbose, m_verbose);
+    return verbose;
+}
+
+bool TunDevice::strict(bool strict)
+{
+    std::swap(strict, m_ipv6only);
+    return strict;
+}

@@ -11,6 +11,8 @@ public:
     int runTx(std::istream *in = &std::cin);
     int runRx(std::ostream *out = &std::cout);
     int run(std::istream *in, std::ostream *out);
+    bool strict(bool strict);
+    bool verbosity(bool verbose);
 private:
     void startReceive();
 #if 0
