@@ -39,7 +39,6 @@ public:
     int run(std::istream *in, std::ostream *out);
 
 private:
-    void decode(const Message &msg, std::ostream &out);
     bool trace_scanning;
     bool trace_parsing;
 };
