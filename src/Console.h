@@ -37,10 +37,15 @@ public:
     int runRx(std::ostream *out = &std::cout);
     /// runs both the receive and transmit handlers in required sequence
     int run(std::istream *in, std::ostream *out);
+    /// indicates a real "quit" request rather than EOF ended parser
+    void quit();
+    /// gets quit status
+    bool getQuitValue() const;
 
 private:
     bool trace_scanning;
     bool trace_parsing;
+    bool real_quit;
 };
 
 #endif // CONSOLE_H

@@ -36,20 +36,15 @@
 
 void yy::Parser::error(const std::string &s)
 {
-    std::cerr << s << '\n';
+    std::cout << s << '\n';
 }
 
 static const Message RestartCmd = Message{0xff};
 static const Message ReportLastCmd = Message{0x07};
 
-static void errortxt(void)
-{
-    std::cerr << "syntax error\n";
-}
-
 static void help(void)
 {
-    std::cerr << "Usage: testmode /dev/ttyUSB0\n\n"
+    std::cout << "Usage: testmode /dev/ttyUSB0\n\n"
         "Accepted commands:\n"
         "fchan nn\ntr51cf\nexclude nn ...\nphy nn\npanid nn\n"
         "lbr\nnlbr\nindex nn\nsetmac macaddr\nbuildid\n"
@@ -71,11 +66,12 @@ static void help(void)
 
 %%
 script:     /* empty */
-    |   NEWLINE
     |   script command NEWLINE
+    ;
 
 bytes:  bytes HEXBYTE       { $$ = $1; $$.push_back($2); }
     |   HEXBYTE             { $$.push_back($1); }
+    ;
     
 command:    FCHAN HEXBYTE   { console.compound(0x01, $2); }
     |       TR51CF          { console.simple(0x02); }
@@ -84,7 +80,7 @@ command:    FCHAN HEXBYTE   { console.compound(0x01, $2); }
                                 console.compound(0x03, $2); 
                                 } else {
                                     std::cout << "Error: exclude channels must not have the value of zero (channel numbering starts at 1)\n";
-                                    }
+                                }
                             }
                                 
     |       PHY HEXBYTE     { console.compound(0x04, $2); }
@@ -114,8 +110,8 @@ command:    FCHAN HEXBYTE   { console.compound(0x01, $2); }
     |       LAST            { console.push(ReportLastCmd); }
     |       RESTART         { console.push(RestartCmd); }
     |       HELP            { help(); }
-    |       QUIT            { return 0; }
-    |       errors          { errortxt(); }
+    |       QUIT            { console.quit(); return 0; }
+    |       errors          { error("unknown command"); }
     ;
 
 errors:     error

@@ -11,7 +11,8 @@
 Console::Console(SafeQueue<Message> &input, SafeQueue<Message> &output) :
     Device(input, output),
     trace_scanning{false},
-    trace_parsing{false}
+    trace_parsing{false},
+    real_quit{false}
 {}
 
 Console::~Console() = default;
@@ -30,6 +31,7 @@ int Console::runRx(std::ostream *out) {
     while (wantHold() || more()) {
         wait_and_pop(m);
         decode(m, *out);
+        out->flush();
     }
     return 0;
 }
@@ -57,4 +59,14 @@ void Console::compound(uint8_t cmd, uint8_t data)
 void Console::simple(uint8_t cmd)
 {
     push(Message{0x6, cmd});
+}
+
+void Console::quit() 
+{
+    real_quit = true; 
+}
+
+bool Console::getQuitValue() const 
+{
+    return real_quit;
 }
