@@ -31,6 +31,7 @@ int Console::runRx(std::ostream *out) {
     while (wantHold() || more()) {
         wait_and_pop(m);
         decode(m, *out);
+        // std::cout << decode(m);
         out->flush();
     }
     return 0;

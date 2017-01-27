@@ -311,3 +311,9 @@ void decode(const Message &msg, std::ostream &out)
             out << "unknown reply: " << msg << '\n';
     }
 }
+
+std::string decode(const Message &msg) {
+    std::stringstream ss;
+    decode(msg, ss);
+    return ss.str();
+}

@@ -9,6 +9,11 @@ extern "C" {
 #include <atomic>
 #include <thread>
 #include <fstream>
+#include <regex>
+#include <chrono>
+#include <asio.hpp>
+
+#define WEBSOCKET 0
 
 static std::atomic_int done{false};
 
@@ -17,7 +22,9 @@ struct device_settings {
   char setting2[100];
 };
 
+#if WEBSOCKET
 static std::fstream diag("moocow");
+#endif // WEBSOCKET
 
 static struct device_settings s_settings{"value1", "value2"};
 
@@ -31,6 +38,44 @@ static void handle_save(struct mg_connection *nc, struct http_message *hm) {
   // Send response
   mg_printf(nc, "%s", "HTTP/1.1 302 OK\r\nLocation: /\r\n\r\n");
 }
+
+static std::string replace_entities(std::string &str) {
+    const std::regex space_regex("%20");
+    std::string ret = std::regex_replace(str, space_regex, " ");
+    std::swap(ret, str);
+    return str;    
+}
+
+static std::string tool_call(std::string &request) {
+    asio::ip::tcp::iostream stream;
+    stream.expires_from_now(std::chrono::milliseconds(600));
+    asio::ip::tcp::endpoint endpoint(
+        asio::ip::address::from_string("127.0.0.1"), 5555);
+    stream.connect(endpoint);
+    stream << request;
+    std::cout << "Sending: " << request << "\n";
+    stream.flush();
+    std::string response;
+    std::getline(stream, response);
+    std::cout << "Reply was: " << response << "\n";
+    return response;
+}
+
+static void handle_tool_request(struct mg_connection *nc, http_message *hm) {
+    std::string str(hm->query_string.p, hm->query_string.len);
+    std::cout << replace_entities(str) << "\n";
+    std::string result = tool_call(str);
+
+  // Use chunked encoding in order to avoid calculating Content-Length
+  mg_printf(nc, "%s", "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n");
+
+  // Output JSON object which holds CPU usage data
+  mg_printf_http_chunk(nc, result.data());
+
+  // Send empty chunk, the end of response
+  mg_send_http_chunk(nc, "", 0);
+}
+
 
 static void handle_get_cpu_usage(struct mg_connection *nc) {
   // Generate random value, as an example of changing CPU usage
@@ -70,6 +115,8 @@ class WebServer
                     handle_save(nc, hm);
                 } else if (mg_vcmp(&hm->uri, "/get_diag") == 0) {
                     handle_get_cpu_usage(nc);
+                } else if (mg_vcmp(&hm->uri, "/tool") == 0) {
+                    handle_tool_request(nc, hm);
                 } else {
                     // serve static content 
                     mg_serve_http(nc, hm, *(mg_serve_http_opts *)nc->user_data);
@@ -102,6 +149,7 @@ public:
     }
     void run() {
         std::cout << "Starting web server on port " << s_http_port << "\n";
+#if WEBSOCKET
         while (!done) { 
             static time_t last_time;
             time_t now = time(NULL);
@@ -111,23 +159,31 @@ public:
                 last_time = now;
             }
         }
+#else // WEBSOCKET
+        while (!done) { 
+            mg_mgr_poll(&mgr, 1000);
+        }
+#endif // WEBSOCKET
     }
-
+#if WEBSOCKET
     static void push_data_to_all_websocket_connections(struct mg_mgr *m) {
         struct mg_connection *c;
         std::string line;
         std::getline(diag, line);
-        std::cout << "Got: " << line << "\n";
+        //std::cout << "Got: " << line << "\n";
         for (c = mg_next(m, NULL); c != NULL; c = mg_next(m, c)) {
             if (c->flags & MG_F_IS_WEBSOCKET) {
                 mg_printf_websocket_frame(c, WEBSOCKET_OP_TEXT, "%s", line.c_str());
             }
         }
     }
+#endif // WEBSOCKET
 
     virtual ~WebServer() {
         mg_mgr_free(&mgr);
+#if WEBSOCKET
         diag.close();
+#endif // WEBSOCKET
     }
 };
 
