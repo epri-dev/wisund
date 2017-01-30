@@ -23,7 +23,7 @@
 int main(int argc, char *argv[])
 {
     if (argc < 2) {
-        std::cout << "Usage: " << argv[0] << "[-v] [-d msdelay] [-s] serialport\n";
+        std::cout << "Usage: " << argv[0] << " [-v] [-r] [-d msdelay] [-s] serialport\n";
         return 1;
     }
     SafeQueue<Message> routerIn;
@@ -32,12 +32,16 @@ int main(int argc, char *argv[])
     SafeQueue<Message> consoleIn;
     bool verbose = false;
     bool strict = false;
+    bool rawpackets = false;
     std::chrono::milliseconds delay{0};
     unsigned opt = 1;
     while (argv[opt][0] == '-') {
         switch (argv[opt][1]) {
             case 'v':
                 verbose = true;
+                break;
+            case 'r':
+                rawpackets = true;
                 break;
             case 's':
                 strict = true;
@@ -65,6 +69,7 @@ int main(int argc, char *argv[])
 
     ser.sendDelay(delay);
     ser.verbosity(verbose);
+    ser.setraw(rawpackets);
     ser.hold();
     tun.hold();
     rtr.hold();

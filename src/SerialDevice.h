@@ -25,6 +25,8 @@ public:
     int run(std::istream *in, std::ostream *out);
     /// set or clear verbose flag and return previous state
     bool verbosity(bool verbose);
+    /// set or clear rawpacket flag and return previous state
+    bool setraw(bool rawpackets);
     /// set optional pre-send delay time 
     void sendDelay(std::chrono::duration<float, std::milli> delay); 
     /// encapsulate the message using SLIP coding
@@ -45,8 +47,10 @@ private:
     asio::serial_port m_port;
     /// a stream buffer used by the receive functions
     asio::streambuf m_data;
-    /// if true, echo raw packets
+    /// if true, echo encoded packets
     bool m_verbose;
+    /// if true, and if m_verbose, echo unencoded packets
+    bool m_raw;
     /// delay before each packet is sent
     std::chrono::duration<float, std::milli> m_delay;
 };

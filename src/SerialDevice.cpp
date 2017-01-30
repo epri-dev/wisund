@@ -13,6 +13,7 @@ SerialDevice::SerialDevice(SafeQueue<Message> &input, SafeQueue<Message> &output
     m_io(), 
     m_port(m_io, port),
     m_verbose{false},
+    m_raw{false},
     m_delay{0}
 {
     m_port.set_option(asio::serial_port_base::baud_rate(baud));
@@ -86,7 +87,11 @@ void SerialDevice::handleMessage(const::asio::error_code &error, std::size_t siz
     asio::buffer_copy(asio::buffer(v), buf);
     Message msg{v};
     if (m_verbose) {
-        std::cout << "received: " << msg << "\n";
+        if (m_raw) {
+            std::cout << "received: " << SerialDevice::decode(msg) << "\n";
+        } else {
+            std::cout << "received: " << msg << "\n";
+        }
     }
     push(SerialDevice::decode(msg));
     m_data.consume(size);
@@ -101,7 +106,11 @@ size_t SerialDevice::send(const Message &msg) {
     }
     auto encoded = encode(msg);
     if (m_verbose) {
-        std::cout << "sending: " << encoded << "\n";
+        if (m_raw) {
+            std::cout << "sending: " << msg << "\n";
+        } else {
+            std::cout << "sending: " << encoded << "\n";
+        }
     }
     std::this_thread::sleep_for(m_delay);
     return m_port.write_some(asio::buffer(encoded.data(), encoded.size()));
@@ -110,6 +119,11 @@ size_t SerialDevice::send(const Message &msg) {
 bool SerialDevice::verbosity(bool verbose) {
     std::swap(verbose, m_verbose);
     return verbose;
+}
+
+bool SerialDevice::setraw(bool rawpackets) {
+    std::swap(rawpackets, m_raw);
+    return rawpackets;
 }
 
 void SerialDevice::sendDelay(std::chrono::duration<float, std::milli> delay) {
