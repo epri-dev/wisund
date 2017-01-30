@@ -16,10 +16,6 @@ public:
     Simulator(SafeQueue<Message> &input, SafeQueue<Message> &output);
     /// destructor is virtual in case class needs to be further derived
     virtual ~Simulator();
-    /// runs the transmit handler (wrapping messages in SLIP encapsulation before sending)
-    int runTx(std::istream *in = &std::cin);
-    /// runs the receive handler (unwrapping messages in SLIP encapsulation)
-    int runRx(std::ostream *out = &std::cout);
     /// runs both the receive and transmit handlers in required sequence
     int run(std::istream *in, std::ostream *out);
     /// set or clear verbose flag and return previous state
@@ -36,6 +32,7 @@ private:
     bool m_verbose;
     /// delay before each packet is sent
     std::chrono::duration<float, std::milli> m_delay;
+    /// last received message
     Message lastMessage;
 };
 
