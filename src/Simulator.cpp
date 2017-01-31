@@ -121,8 +121,16 @@ static std::map<Message, cmdDetails> simCmd =
 /// receive simulated message from simulated device
 void Simulator::receive() 
 {
+    static uint32_t fcie = 600;
     try {
         Message msg{simCmd.at(lastMessage).response};
+        if (msg[0] == 0x21 && msg[1] == 2) {
+            ++fcie;
+            msg[2] = (fcie >> 0) & 0xff;
+            msg[3] = (fcie >> 8) & 0xff;
+            msg[4] = (fcie >> 16) & 0xff;
+            msg[5] = (fcie >> 24) & 0xff;
+        }
         if (m_verbose) {
             std::cout << "received: " << msg << "\n";
         }
