@@ -66,7 +66,7 @@ static void help(void)
 
 %%
 script:     /* empty */
-    |   script command NEWLINE
+    |   script command 
     ;
 
 bytes:  bytes HEXBYTE       { $$ = $1; $$.push_back($2); }

@@ -46,7 +46,7 @@ data        { return token::DATA; }
 help        { return token::HELP; }
 quit|exit   { return token::QUIT; }
 
-[ \t]+      { } /* ignore whitespace */
-\n          { return token::NEWLINE; }
+[ \t\n]+      { } /* ignore whitespace */
+\n          { } /* return token::NEWLINE; } */
 .           { return token::CHAR; }
 %%

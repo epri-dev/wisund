@@ -46,25 +46,41 @@ static std::string replace_entities(std::string &str) {
     return str;    
 }
 
+static bool isIncomplete(std::string &response) {
+    return response.length() < 3 || response.front() != '{' || response.back() != '}';
+}
+
 static std::string tool_call(std::string &request) {
     asio::ip::tcp::iostream stream;
-    stream.expires_from_now(std::chrono::milliseconds(600));
+    //stream.expires_from_now(std::chrono::milliseconds(800));
     asio::ip::tcp::endpoint endpoint(
         asio::ip::address::from_string("127.0.0.1"), 5555);
     stream.connect(endpoint);
     stream << request;
-    std::cout << "Sending: " << request << "\n";
     stream.flush();
+#if 0
+    std::cout << "Sending: " << request << "\n";
+#endif
+    // std::this_thread::sleep_for(std::chrono::milliseconds(100));
     std::string response;
     std::getline(stream, response);
+#if 0
+    for (std::getline(stream, response); isIncomplete(response);  ) {
+        stream.flush();
+        std::cout << "#";
+        std::string partial;
+        std::getline(stream, partial);
+        response += partial;
+    }
     std::cout << "Reply was: " << response << "\n";
+#endif
     return response;
 }
 
 static void handle_tool_request(struct mg_connection *nc, http_message *hm) {
     std::string str(hm->query_string.p, hm->query_string.len);
-    std::cout << replace_entities(str) << "\n";
-    std::string result = tool_call(str);
+    std::string command = replace_entities(str);
+    std::string result = tool_call(command);
 
   // Use chunked encoding in order to avoid calculating Content-Length
   mg_printf(nc, "%s", "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n");

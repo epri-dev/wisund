@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html>
-<meta charset="utf-8"/>
 <head>
+<meta charset="utf-8">
 <title>EPRI Wi-SUN Diagnostics</title>
-<script src="d3.v4.min.js"></script>
-<link rel="stylesheet" type="text/css" href="default.css" />
+
+<script src="d3.v4.min.js">
+</script>
+<link rel="stylesheet" type="text/css" href="default.css">
 <style>
 .line {
   fill: none;
@@ -13,7 +15,6 @@
 }
 </style>
 </head>
-
 <body>
 <script>
 function tableize(selector, hdr, dat) {
@@ -52,54 +53,61 @@ function tableize(selector, hdr, dat) {
 }
 </script>
 <div id="main" class="grid-container">
-				<header id="page-header" class="grid-100 tablet-grid-100 mobile-grid-100" role="banner">
-					<h1><img src="epri-logo.jpg" width="255" height="48" alt="EPRI: Electric Power Research Institute"></h1>
-				</header>
+<header id="page-header" class=
+"grid-100 tablet-grid-100 mobile-grid-100" role="banner">
+<h1><img src="epri-logo.jpg" width="255" height="48" alt=
+"EPRI: Electric Power Research Institute"></h1>
+</header>
 <div class="grid-65 tablet-grid-65 mobile-grid-100">
-	<div class="box grid-container grid-parent">
-
+<div class="box grid-container grid-parent">
 <ul class="tab">
-  <li><a href="#" class="tablinks" onclick="openTab(event, 'L1_L2')">L1_L2</a></li>
-  <li><a href="#" class="tablinks" onclick="openTab(event, 'L3_L4')">L3/L4</a></li>
-  <li><a href="#" class="tablinks" onclick="openTab(event, 'Confign')">Configuration</a></li>
-  <li><a href="#" class="tablinks" onclick="openTab(event, 'ConnMap')">Connectivity Map</a></li>
-  <li><a href="#" class="tablinks" onclick="openTab(event, 'WebSocket')">Graphs</a></li>
-  <li><a href="#" class="tablinks" onclick="openTab(event, 'Controls')">Controls</a></li>
+<li><a href="#" class="tablinks" onclick=
+"openTab(event, 'L1_L2')">L1_L2</a></li>
+<li><a href="#" class="tablinks" onclick=
+"openTab(event, 'L3_L4')">L3/L4</a></li>
+<li><a href="#" class="tablinks" onclick=
+"openTab(event, 'Confign')">Configuration</a></li>
+<li><a href="#" class="tablinks" onclick=
+"openTab(event, 'ConnMap')">Connectivity Map</a></li>
+<li><a href="#" class="tablinks" onclick=
+"openTab(event, 'WebSocket')">Graphs</a></li>
+<li><a href="#" class="tablinks" onclick=
+"openTab(event, 'Controls')">Controls</a></li>
 </ul>
-
+<!-- 
 <div id="L1_L2" class="tabcontent">
 <br>
 
 <div id="table1" style="position:relative; top: 0px;">
 <table>
-	<thead>
-	<tr><th> Address Information</th></tr>
-	</thead>
-	<tbody>
-	<tr><td style="padding:30px" id="AddInf"></td></tr>
-	</tbody>
+        <thead>
+        <tr><th> Address Information</th></tr>
+        </thead>
+        <tbody>
+        <tr><td style="padding:30px" id="AddInf"></td></tr>
+        </tbody>
 </table>
 </div>
 
 <div id="table2" style="position:relative; left: 350px; top: -430px;">
 <table>
-	<thead>
-	<tr><th>IE Counters</th></tr>
-	</thead>
-	<tbody>
-	<tr><td style="padding:30px"  id="IEcount"></td></tr>
-	</tbody>
+        <thead>
+        <tr><th>IE Counters</th></tr>
+        </thead>
+        <tbody>
+        <tr><td style="padding:30px"  id="IEcount"></td></tr>
+        </tbody>
 </table>
 </div>
 
 <div id="table3" style="position:relative; left: 60px; top: -670px;">
 <table>
-	<thead>
-	<tr><th>IE Information</th></tr>
-	</thead>
-	<tbody>
-	<tr><td style="padding:30px" id="IEinfo"></td></tr>
-	</tbody>
+        <thead>
+        <tr><th>IE Information</th></tr>
+        </thead>
+        <tbody>
+        <tr><td style="padding:30px" id="IEinfo"></td></tr>
+        </tbody>
 </table>
 </div>
 
@@ -110,11 +118,11 @@ var configdata = [
     ["Updated Time", "2016-01-01"],
     ["Frame Accept Count","1500"],
     ["Address Reject Count", "1000"],
-	["Received MHR", "1000"],
-	["Last Received Dest PAN ID", "1000"],
-	["Last Received Source PAN ID", "1000"],
-	["Last Reject Address", "1000"],
-	["Last Received Address", "1000"],
+        ["Received MHR", "1000"],
+        ["Last Received Dest PAN ID", "1000"],
+        ["Last Received Source PAN ID", "1000"],
+        ["Last Reject Address", "1000"],
+        ["Last Received Address", "1000"],
 ];
 tableize("#AddInf", headers, configdata);
 
@@ -123,17 +131,17 @@ var configdata = [
     ["FCIE", "Flow Control", "1000"],
     ["UTTIE", "Unicast Timing and Frame Type", "1500"],
     ["RSLIE", "Received Signal Level", "1000"],
-	["BTIE", "Broadcast Timing", "1000"],
-	["USIE", "Unicast Schedule", "1000"],
-	["BSIE", "Broadcast Schedule", "1000"],
-	["PANIE", "PAN", "1000"],
-	["NETNAMEIE", "Netork Name", "1000"],
-	["PANVERIE", "Pan Version", "1000"],
-	["GTKHASHIE", "GTK Hash", "1000"],
-	["MPIE", "Multiplexed Protocol", "1000"],
-	["MHDSIE", "Multi-Hop Deliver Service", "1000"],
-	["VHIE", "Vendor-Specific Header", "1000"],
-	["VPIE", "Vendor-Specific Payload", "1000"],
+        ["BTIE", "Broadcast Timing", "1000"],
+        ["USIE", "Unicast Schedule", "1000"],
+        ["BSIE", "Broadcast Schedule", "1000"],
+        ["PANIE", "PAN", "1000"],
+        ["NETNAMEIE", "Netork Name", "1000"],
+        ["PANVERIE", "Pan Version", "1000"],
+        ["GTKHASHIE", "GTK Hash", "1000"],
+        ["MPIE", "Multiplexed Protocol", "1000"],
+        ["MHDSIE", "Multi-Hop Deliver Service", "1000"],
+        ["VHIE", "Vendor-Specific Header", "1000"],
+        ["VPIE", "Vendor-Specific Payload", "1000"],
 ];
 tableize("#IEcount", headers, configdata);
 
@@ -154,12 +162,12 @@ tableize("#IEinfo", headers, configdata);
 <h2>Interface Data</h2>
 <h3></h3>
 <table>
-	<thead>
-	<tr><th>Statistics</th><th>Configuration</th></tr>
-	</thead>
-	<tbody>
-	<tr><td style="padding:30px" id="viz"></td><td id="config"></td></tr>
-	</tbody>
+        <thead>
+        <tr><th>Statistics</th><th>Configuration</th></tr>
+        </thead>
+        <tbody>
+        <tr><td style="padding:30px" id="viz"></td><td id="config"></td></tr>
+        </tbody>
 </table>
 
 <script type="text/javascript">
@@ -189,16 +197,16 @@ tableize("#config", headers, configdata);
 <h2>L3/L4 Data</h2>
 
 <table>
-	<thead>
-	<tr><th>Statistics</th></tr>
-	</thead>
-	<tbody>
-	<tr><td style="padding:30px" id="viz1"></td></tr>
-	</tbody>
+        <thead>
+        <tr><th>Statistics</th></tr>
+        </thead>
+        <tbody>
+        <tr><td style="padding:30px" id="viz1"></td></tr>
+        </tbody>
 </table>
 <div id="chartdiv5"  style="position:relative; top: -270px; left: 280px; width:450px; height:250px; border-style:ridge">
 </div>
-<script type="text/javascript">		
+<script type="text/javascript">         
 var headers = [["Name", "RX", "TX"]];
 var json_data = [["packets", "95235", "32351"],
                 ["bytes", "99676652", "5531142"],
@@ -214,12 +222,12 @@ tableize("#viz1", headers, json_data);
 <div id="Confign" class="tabcontent">
   <h2>Configuration Data</h2>
 <table>
-	<thead>
-	<tr><th>L1/L2</th><th>L3/L4</th></tr>
-	</thead>
-	<tbody>
-	<tr><td style="padding:30px"  id="config1"></td> <td id="config2"></td></tr>
-	</tbody>
+        <thead>
+        <tr><th>L1/L2</th><th>L3/L4</th></tr>
+        </thead>
+        <tbody>
+        <tr><td style="padding:30px"  id="config1"></td> <td id="config2"></td></tr>
+        </tbody>
 </table>  
   
 <script type="text/javascript">
@@ -266,20 +274,20 @@ tableize("#config2", headers, configdata);
   function startRec() {
     var x = document.getElementById("startRec");
     x.disabled = true;
-	var x = document.getElementById("stopRec");
+        var x = document.getElementById("stopRec");
     x.disabled = false;
-	var x = document.getElementById("recording");
+        var x = document.getElementById("recording");
     x.style = "color:red";
-	x.innerHTML = "Recording...";
+        x.innerHTML = "Recording...";
   }
   function stopRec() {
     var x = document.getElementById("stopRec");
     x.disabled = true;
-	var x = document.getElementById("startRec");
+        var x = document.getElementById("startRec");
     x.disabled = false;
-	var x = document.getElementById("recording");
+        var x = document.getElementById("recording");
     x.style = "color:gray";
-	x.innerHTML = "Stopped";
+        x.innerHTML = "Stopped";
   }
   </script>
 
@@ -379,13 +387,15 @@ d3.interval(get_cpu_usage, 1000);
 
 })()</script>
 </div>
-
+-->
 <div id="WebSocket" class="tabcontent">
-  <h3>Graph</h3>
-  <p>This graph shows the count of Multiplexed Protocol Information Elements (MPIEs) received
-<script>(function() {
+<h3>Graph</h3>
+<p>This graph shows the count of Multiplexed Protocol Information
+Elements (MPIEs) received 
+<script>
+(function() {
 
-var n = 243,
+var n = 30,
     duration = 750,
     now = new Date(Date.now() - duration),
     count = 0,
@@ -393,7 +403,7 @@ var n = 243,
 
 var margin = {top: 6, right: 0, bottom: 20, left: 40},
     width = 960 - margin.right,
-    height = 120 - margin.top - margin.bottom;
+    height = 240 - margin.top - margin.bottom;
 
 var x = d3.scaleTime()
     .domain([now - (n - 2) * duration, now - duration])
@@ -402,6 +412,10 @@ var x = d3.scaleTime()
 var y = d3.scaleLinear()
     .range([height, 0]);
 
+var yAxis = d3.axisLeft(y)
+    .scale(y)
+    .ticks(5);
+
 var line = d3.line()
     .x(function(d, i) { return x(now - (n - 1 - i) * duration); })
     .y(function(d, i) { return y(d); });
@@ -409,9 +423,12 @@ var line = d3.line()
 var svg = d3.select("#WebSocket").append("p").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
-    .style("margin-left", -margin.left + "px")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var vertaxis = svg.append("g")
+    .attr("class", "y axis")
+    .call(y.axis = yAxis);
 
 svg.append("defs").append("clipPath")
     .attr("id", "clip")
@@ -439,7 +456,7 @@ var updateGraph = function(newdata) {
     // update the domains
     now = new Date();
     x.domain([now - (n - 2) * duration, now - duration]);
-    y.domain([0, d3.max(data)]);
+    y.domain([d3.min(data), d3.max(data)]);
 
     // push the value on the stack
     data.push(newdata);
@@ -451,6 +468,8 @@ var updateGraph = function(newdata) {
 
     // slide the x-axis left
     axis.call(x.axis);
+    // update the y-axis scale
+    vertaxis.call(y.axis);
 
     // slide the line left
     path.transition()
@@ -461,20 +480,28 @@ var updateGraph = function(newdata) {
 
 };
 
-// Create Websocket connection. For simplicity, no reconnect logic is here.
-var ws = new WebSocket('ws://' + location.host);
-    ws.onmessage = function(ev) {
-    xxy = ev.data;
-    val=JSON.parse(xxy).addrinfo.time;
-    d3.select("#log").text(val);
-    updateGraph(val);
+var badness=0;
+var goodness=0;
+
+var diag = function() {
+    d3.json('/tool?diag 02', function(error, data) {
+        if (typeof data === "undefined") {
+            ++badness;
+        } else {
+            ++goodness;
+            updateGraph(data.iecounters.panie);
+        }
+        percentage=goodness/(badness+goodness);
+        //updateGraph(percentage);
+    });
 };
 
-})()</script>
-<p id="log">
-</p>
-</div>
+d3.interval(diag, 1000);
 
+})()
+</script></p>
+<p id="log"></p>
+</div>
 <script>
 
 function openTab(evt, tabName) {
@@ -497,25 +524,17 @@ function openTab(evt, tabName) {
      document.getElementById(tabName).style.display = "block";
     evt.currentTarget.className += " active";
 }
-</script>
-
+</script></div>
 </div>
+<div id="faux-footer"></div>
 </div>
-	<div id="faux-footer">
-    </div>
-	</div>
-
-			<footer id="page-footer" class="grid-container" role="contentinfo">
-			<div class="grid-100 tablet-grid-100 mobile-grid-100">
-			    <address>
-				    EPRI 3420 Hillview Avenue, Palo Alto, California 94304
-			    </address>
-			    <div>
-				    &copy; Electric Power Research Institute, Inc. 2015-2016
-				    All rights reserved
-			    </div>
-		    </div>
-			</footer>
-
+<footer id="page-footer" class="grid-container" role="contentinfo">
+<div class="grid-100 tablet-grid-100 mobile-grid-100">
+<address>EPRI 3420 Hillview Avenue, Palo Alto, California
+94304</address>
+<div>© Electric Power Research Institute, Inc. 2015-2016 All rights
+reserved</div>
+</div>
+</footer>
 </body>
 </html>

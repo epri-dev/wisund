@@ -5,8 +5,8 @@
 #include <iterator>
 #include <iomanip>
 #include <sstream>
+#include <ostream>
 #include <vector>
-
 
 Console::Console(SafeQueue<Message> &input, SafeQueue<Message> &output) :
     Device(input, output),
@@ -30,8 +30,7 @@ int Console::runRx(std::ostream *out) {
     Message m{};
     while (wantHold() || more()) {
         wait_and_pop(m);
-        decode(m, *out);
-        // std::cout << decode(m);
+        (*out) << decode(m);
         out->flush();
     }
     return 0;
