@@ -50,6 +50,93 @@ function tableize(selector, hdr, dat) {
         .style("align", "right")
         .style("font-size", "12px");
 }
+
+function newLinegraph(mytag, mywidth, myheight, pointcount, duration) {
+    var n = pointcount,
+        duration = duration,
+        now = new Date(Date.now() - duration),
+        data = d3.range(n).map(function() { return 0; });
+
+    var margin = {top: 6, right: 0, bottom: 20, left: 40},
+        width = mywidth - margin.right,
+        height = myheight - margin.top - margin.bottom;
+
+    var x = d3.scaleTime()
+        .domain([now - (n - 2) * duration, now - duration])
+        .range([0, width]);
+
+    var y = d3.scaleLinear()
+        .range([height, 0]);
+
+    var yAxis = d3.axisLeft(y)
+        .scale(y)
+        .ticks(5);
+
+    var line = d3.line()
+        .x(function(d, i) { return x(now - (n - 1 - i) * duration); })
+        .y(function(d, i) { return y(d); });
+
+    var svg = d3.select(mytag).append("p").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var vertaxis = svg.append("g")
+        .attr("class", "y axis")
+        .call(y.axis = yAxis);
+
+    svg.append("defs").append("clipPath")
+        .attr("id", "clip")
+      .append("rect")
+        .attr("width", width)
+        .attr("height", height);
+
+    var axis = svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(x.axis = d3.axisBottom(x));
+
+    var path = svg.append("g")
+        .attr("clip-path", "url(#clip)")
+      .append("path")
+        .datum(data)
+        .attr("class", "line");
+
+    var transition = d3.select({})
+        .transition()
+        .duration(duration)
+        .ease(d3.easeLinear);
+
+    update = function(newdata) {
+        // update the domains
+        now = new Date();
+        x.domain([now - (n - 2) * duration, now - duration]);
+        y.domain([d3.min(data), d3.max(data)]);
+
+        // push the value on the stack
+        data.push(newdata);
+
+        // redraw the line
+        svg.select(".line")
+            .attr("d", line)
+            .attr("transform", null);
+
+        // slide the x-axis left
+        axis.call(x.axis);
+        // update the y-axis scale
+        vertaxis.call(y.axis);
+
+        // slide the line left
+        path.transition()
+            .attr("transform", "translate(" + x(now - (n - 1) * duration) + ")");
+
+        // pop the old data point off the front
+        data.shift();
+
+    };
+        return update;
+}
 </script>
 <div id="main" class="grid-container">
 <header id="page-header" class=
@@ -69,127 +156,48 @@ function tableize(selector, hdr, dat) {
 <li><a href="#" class="tablinks" onclick=
 "openTab(event, 'ConnMap')">Connectivity Map</a></li>
 <li><a href="#" class="tablinks" onclick=
-"openTab(event, 'WebSocket')">Graphs</a></li>
+"openTab(event, 'Graphs')">Graphs</a></li>
 <li><a href="#" class="tablinks" onclick=
 "openTab(event, 'Controls')">Controls</a></li>
 </ul>
 
-<div id="WebSocket" class="tabcontent" style="display: block;":>
-<h3>Graph</h3>
-<p>This graph shows the count of Multiplexed Protocol Information
+<div id="Graphs" class="tabcontent" style="display: block;":>
+<h3>Graphs</h3>
+<p id="mpie">This graph shows the count of Multiplexed Protocol Information
 Elements (MPIEs) received 
+</p>
+
+<p id="fcie">This graph shows the number of FCIEs</p>
+<!-- ------------------------------------------------- -->
 <script>
+// This is the function that drives all dynamic data
 (function() {
-
-var n = 30,
-    duration = 750,
-    now = new Date(Date.now() - duration),
-    count = 0,
-    data = d3.range(n).map(function() { return 0; });
-
-var margin = {top: 6, right: 0, bottom: 20, left: 40},
-    width = 960 - margin.right,
-    height = 240 - margin.top - margin.bottom;
-
-var x = d3.scaleTime()
-    .domain([now - (n - 2) * duration, now - duration])
-    .range([0, width]);
-
-var y = d3.scaleLinear()
-    .range([height, 0]);
-
-var yAxis = d3.axisLeft(y)
-    .scale(y)
-    .ticks(5);
-
-var line = d3.line()
-    .x(function(d, i) { return x(now - (n - 1 - i) * duration); })
-    .y(function(d, i) { return y(d); });
-
-var svg = d3.select("#WebSocket").append("p").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-var vertaxis = svg.append("g")
-    .attr("class", "y axis")
-    .call(y.axis = yAxis);
-
-svg.append("defs").append("clipPath")
-    .attr("id", "clip")
-  .append("rect")
-    .attr("width", width)
-    .attr("height", height);
-
-var axis = svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(x.axis = d3.axisBottom(x));
-
-var path = svg.append("g")
-    .attr("clip-path", "url(#clip)")
-  .append("path")
-    .datum(data)
-    .attr("class", "line");
-
-var transition = d3.select({})
-    .transition()
-    .duration(750)
-    .ease(d3.easeLinear);
-
-var updateGraph = function(newdata) {
-    // update the domains
-    now = new Date();
-    x.domain([now - (n - 2) * duration, now - duration]);
-    y.domain([d3.min(data), d3.max(data)]);
-
-    // push the value on the stack
-    data.push(newdata);
-
-    // redraw the line
-    svg.select(".line")
-        .attr("d", line)
-        .attr("transform", null);
-
-    // slide the x-axis left
-    axis.call(x.axis);
-    // update the y-axis scale
-    vertaxis.call(y.axis);
-
-    // slide the line left
-    path.transition()
-        .attr("transform", "translate(" + x(now - (n - 1) * duration) + ")");
-
-    // pop the old data point off the front
-    data.shift();
-
-};
-
 var badness=0;
 var goodness=0;
 
+var g1 = newLinegraph("#mpie", 960, 240, 30, 750);
+var g2 = newLinegraph("#fcie", 960, 240, 30, 750);
 var diag = function() {
     d3.json('/tool?diag 02', function(error, data) {
         if (typeof data === "undefined") {
             ++badness;
         } else {
             ++goodness;
-            updateGraph(data.iecounters.fcie);
+            g1(data.iecounters.mpie);
+            g2(data.iecounters.fcie);
         }
         percentage=goodness/(badness+goodness);
         //updateGraph(percentage);
     });
 };
-
-d3.interval(diag, 1000);
-
+    d3.interval(diag, 1000);
 })()
-</script></p>
+</script>
+<!-- ------------------------------------------------- -->
+
 <p id="log"></p>
 </div>
 <script>
-
 function openTab(evt, tabName) {
     // Declare all variables
     var i, tabcontent, tablinks;
