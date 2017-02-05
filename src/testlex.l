@@ -46,7 +46,10 @@ data        { return token::DATA; }
 help        { return token::HELP; }
 quit|exit   { return token::QUIT; }
 
-[ \t\n]+      { } /* ignore whitespace */
-\n          { } /* return token::NEWLINE; } */
-.           { return token::CHAR; }
+[ \t\r]+    { } /* ignore whitespace */
+\n          { return token::NEWLINE; }
+.           {  uint8_t val = yytext[0];
+                yylval->build(val); 
+                return token::CHAR;
+            }
 %%

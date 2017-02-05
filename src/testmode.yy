@@ -56,17 +56,19 @@ static void help(void)
 %}
 %define api.value.type variant
 %define parse.assert
+%expect 1
 
 %token FCHAN TR51CF EXCLUDE PHY PANID LBR NLBR INDEX SETMAC 
 %token STATE DIAG BUILDID NEIGHBORS MAC GETZZ PING LAST RESTART 
 %token DATA HELP QUIT 
 %token <uint8_t> HEXBYTE
 %type <std::vector<uint8_t>> bytes
-%token NEWLINE CHAR
+%token NEWLINE 
+%token <uint8_t> CHAR
 
 %%
-script:     /* empty */
-    |   script command 
+script: script command 
+    |   command 
     ;
 
 bytes:  bytes HEXBYTE       { $$ = $1; $$.push_back($2); }
@@ -111,11 +113,12 @@ command:    FCHAN HEXBYTE   { console.compound(0x01, $2); }
     |       RESTART         { console.push(RestartCmd); }
     |       HELP            { help(); }
     |       QUIT            { console.quit(); return 0; }
+    |       NEWLINE         { }
     |       errors          { error("unknown command"); }
     ;
 
-errors:     error
-    |   errors error
+errors:     errors error
+    |   error
     ;
 
 %%
