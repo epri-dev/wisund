@@ -87,6 +87,9 @@ int main(int argc, char *argv[])
         asio::ip::tcp::iostream stream;
         acceptor.accept(*stream.rdbuf());
         con.run(&stream, &stream);
+        if (con.wantReset()) {
+            std::cout << "resetting\n";
+        }
     }
 
     ser.releaseHold();

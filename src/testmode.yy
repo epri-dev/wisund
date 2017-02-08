@@ -114,6 +114,7 @@ command:    FCHAN HEXBYTE   { console.compound(0x01, $2); }
     |       HELP            { help(); }
     |       QUIT            { console.quit(); return 0; }
     |       NEWLINE         { }
+    |       CHAR            { console.reset(); return 0; }
     |       errors          { error("unknown command"); }
     ;
 

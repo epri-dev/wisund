@@ -12,7 +12,8 @@ Console::Console(SafeQueue<Message> &input, SafeQueue<Message> &output) :
     Device(input, output),
     trace_scanning{false},
     trace_parsing{false},
-    real_quit{false}
+    real_quit{false},
+    want_reset{false}
 {}
 
 Console::~Console() = default;
@@ -37,6 +38,7 @@ int Console::runRx(std::ostream *out) {
 }
 
 int Console::run(std::istream *in, std::ostream *out) {
+    want_reset = false;
     std::thread t1{&Console::runRx, this, out};
     int status = runTx(in);
     t1.join();
@@ -61,6 +63,12 @@ void Console::simple(uint8_t cmd)
     push(Message{0x6, cmd});
 }
 
+void Console::reset() 
+{
+    want_reset = true; 
+    real_quit = false; 
+}
+
 void Console::quit() 
 {
     real_quit = true; 
@@ -69,4 +77,9 @@ void Console::quit()
 bool Console::getQuitValue() const 
 {
     return real_quit;
+}
+
+bool Console::wantReset() const 
+{
+    return want_reset;
 }

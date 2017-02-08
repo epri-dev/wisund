@@ -39,13 +39,18 @@ public:
     int run(std::istream *in, std::ostream *out);
     /// indicates a real "quit" request rather than EOF ended parser
     void quit();
+    /// indicates an error causes us to want to restart
+    void reset();
     /// gets quit status
     bool getQuitValue() const;
+    /// gets quit status
+    bool wantReset() const;
 
 private:
     bool trace_scanning;
     bool trace_parsing;
     bool real_quit;
+    bool want_reset;
 };
 
 #endif // CONSOLE_H

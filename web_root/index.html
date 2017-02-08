@@ -429,10 +429,19 @@ tableize("#config2", headers, configdata);
                     } else {
                         ++goodness;
                         g1(data.iecounters.mpie);
-                        g2(data.iecounters.fcie);
+                        //g2(data.iecounters.fcie);
                     }
                     percentage=goodness/(badness+goodness);
                     //updateGraph(percentage);
+                });
+                d3.json('/tool?diag 09', function(error, data) {
+                    if (typeof data === "undefined") {
+                        ++badness;
+                    } else {
+                        ++goodness;
+                    }
+                    percentage=goodness/(badness+goodness);
+                    g2(percentage);
                 });
                 };
                 d3.interval(diag, 1000);
