@@ -26,6 +26,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <vector>
+#include <thread>
 #include "Message.h"
 #include "SafeQueue.h"
 #include "Console.h"
@@ -60,7 +61,7 @@ static void help(void)
 
 %token FCHAN TR51CF EXCLUDE PHY PANID LBR NLBR INDEX SETMAC 
 %token STATE DIAG BUILDID NEIGHBORS MAC GETZZ PING LAST RESTART 
-%token DATA HELP QUIT 
+%token DATA HELP QUIT PAUSE
 %token <uint8_t> HEXBYTE
 %type <std::vector<uint8_t>> bytes
 %token NEWLINE 
@@ -112,6 +113,7 @@ command:    FCHAN HEXBYTE   { console.compound(0x01, $2); }
     |       LAST            { console.push(ReportLastCmd); }
     |       RESTART         { console.push(RestartCmd); }
     |       HELP            { help(); }
+    |       PAUSE HEXBYTE   { std::this_thread::sleep_for(std::chrono::milliseconds(100 * $2)); }
     |       QUIT            { console.quit(); return 0; }
     |       NEWLINE         { }
     |       CHAR            { console.reset(); return 0; }

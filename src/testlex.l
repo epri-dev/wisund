@@ -44,6 +44,7 @@ last        { return token::LAST; }
 restart     { return token::RESTART; }
 data        { return token::DATA; }
 help        { return token::HELP; }
+pause       { return token::PAUSE; }
 quit|exit   { return token::QUIT; }
 
 [ \t\r]+    { } /* ignore whitespace */
