@@ -52,7 +52,7 @@ static bool isIncomplete(std::string &response) {
 
 static std::string tool_call(std::string &request) {
     asio::ip::tcp::iostream stream;
-    //stream.expires_from_now(std::chrono::milliseconds(800));
+    stream.expires_from_now(std::chrono::milliseconds(300));
     asio::ip::tcp::endpoint endpoint(
         asio::ip::address::from_string("127.0.0.1"), 5555);
     stream.connect(endpoint);
