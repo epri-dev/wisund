@@ -478,8 +478,8 @@ tableize("#config2", headers, configdata);
                         g1.update(Object.values(responses[1].iecounters));
                     }
                     percentage=goodness/(badness+goodness);
-                    g2.update(percentage);
-                    g3.update(badness);
+                    g2.update([percentage]);
+                    g3.update([badness]);
                 };
                 d3.interval(diag, 1000);
             })()
