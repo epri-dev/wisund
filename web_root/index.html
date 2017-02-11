@@ -9,9 +9,8 @@
   </script>
   <link rel="stylesheet" type="text/css" href="default.css">
   <style>
-  .line0 {
+  .line {
   fill: none;
-  stroke: red;
   stroke-width: 1.5px;
   }
   </style>
@@ -108,7 +107,8 @@
             .attr("clip-path", "url(#clip)")
           .append("path")
             .datum(data[i])
-            .attr("class", "line"+i)
+            .attr("class", "line")
+            .attr("id", "line"+i)
             .attr("fill", "none")
             .attr("style", "stroke:hsl("+ i*360/numlines +",100%,50%);"));
     }
@@ -135,7 +135,7 @@
 
         // redraw the lines
         for (var i=0; i < newdata.length; ++i) {
-            svg.select(".line"+i)
+            svg.select("#line"+i)
                 .attr("d", line)
                 .attr("transform", null);
         }
