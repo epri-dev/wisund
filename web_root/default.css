@@ -117,3 +117,28 @@ ul.tab li a:focus, .active {background-color: #ccc;}
     border: 1px solid #ccc;
     border-top: none;
 }
+
+.line {
+  fill: none;
+  stroke-width: 1.5px;
+}
+.nofloat {
+  clear: left;
+}
+.floating-box {
+  float: left;
+  margin: 10px;
+}
+.table {
+    border-collapse: collapse;
+}
+.th {
+    border: 1px black solid;
+    padding: 10px;
+    font-size: 12px;
+}
+.tr {
+    border: 1px black solid;
+    padding: 10px;
+    font-size: 12px;
+}
