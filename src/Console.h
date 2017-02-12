@@ -41,6 +41,8 @@ public:
     void quit();
     /// indicates an error causes us to want to restart
     void reset();
+    /// sets echo status and returns previous echo state
+    bool setEcho(bool echo);
     /// gets quit status
     bool getQuitValue() const;
     /// gets quit status
@@ -51,6 +53,7 @@ private:
     bool trace_parsing;
     bool real_quit;
     bool want_reset;
+    bool want_echo;
 };
 
 #endif // CONSOLE_H

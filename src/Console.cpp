@@ -13,7 +13,8 @@ Console::Console(SafeQueue<Message> &input, SafeQueue<Message> &output) :
     trace_scanning{false},
     trace_parsing{false},
     real_quit{false},
-    want_reset{false}
+    want_reset{false},
+    want_echo{false}
 {}
 
 Console::~Console() = default;
@@ -31,8 +32,12 @@ int Console::runRx(std::ostream *out) {
     Message m{};
     while (wantHold() || more()) {
         wait_and_pop(m);
-        (*out) << decode(m);
+        auto d = decode(m);
+        (*out) << d;
         out->flush();
+        if (want_echo) {
+            std::cout << d;
+        }
     }
     return 0;
 }
@@ -72,6 +77,12 @@ void Console::reset()
 void Console::quit() 
 {
     real_quit = true; 
+}
+
+bool Console::setEcho(bool echo) 
+{
+    std::swap(echo, want_echo);
+    return echo;
 }
 
 bool Console::getQuitValue() const 

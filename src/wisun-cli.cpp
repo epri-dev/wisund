@@ -31,6 +31,8 @@ int main(int argc, char *argv[])
     SafeQueue<Message> consoleIn;
     bool verbose = false;
     bool strict = false;
+    bool rawpackets = false;
+    bool echo = false;
     std::chrono::milliseconds delay{0};
     unsigned opt = 1;
     while (argv[opt][0] == '-') {
@@ -38,8 +40,14 @@ int main(int argc, char *argv[])
             case 'v':
                 verbose = true;
                 break;
+            case 'r':
+                rawpackets = true;
+                break;
             case 's':
                 strict = true;
+                break;
+            case 'e':
+                echo = true;
                 break;
             case 'd':
                 // TODO: error handling if next arg is not a number
@@ -64,6 +72,8 @@ int main(int argc, char *argv[])
 
     ser.sendDelay(delay);
     ser.verbosity(verbose);
+    ser.setraw(rawpackets);
+    con.setEcho(echo);
     ser.hold();
     con.hold();
     tun.hold();
