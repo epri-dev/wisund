@@ -13,43 +13,62 @@
   fill: none;
   stroke-width: 1.5px;
   }
+  .floating-box {
+    display: inline-block;
+    margin: 10px;
+    border: 3px solid #73AD21;
+}
+    .table {
+        border-collapse: collapse;
+    }
+    .th {
+        border: 1px black solid;
+        padding: 10px;
+        font-size: 12px;
+    }
+    .tr {
+        border: 1px black solid;
+        padding: 10px;
+        font-size: 12px;
+    }
   </style>
 </head>
 <body>
   <script>
-  function tableize(selector, hdr, dat) {
-    var rxtxTable = d3.select(selector)
-        .append("table")
-        .style("border-collapse", "collapse");
+  function AutoTable(selector, withcolor) {
+    var tBody = d3.select(selector).selectAll("tbody");
+    var withcolor = withcolor;
 
-    var tHead = rxtxTable.append("thead");
-    var tBody = rxtxTable.append("tbody");
+    this.update = function(newdata) {
+        var tr = tBody.selectAll("tr")
+            .data(newdata, function(d){return d[0];});
+        if (withcolor) 
+          tr.style("color", function(d,i,j){ return "hsl("+i*360/newdata.length+",100%,50%)";})
 
-    tHead.selectAll("tr")
-        .data(hdr)
-        .enter().append("tr")
-        .selectAll("th")
-        .data(function(d){return d;})
-        .enter().append("th")
-        .style("border", "1px black solid")
-        .style("padding", "10px")
-        .text(function(d){return d;})
-        .style("font-size", "12px");
-        
-    tBody.selectAll("tr")
-        .data(dat)
-        .enter().append("tr")
+        tr.enter().append("tr")
+            .style("background-color", "white");
 
-        .selectAll("td")
-        .data(function(d){return d;})
-        .enter().append("td")
-        .style("border", "1px black solid")
-        .style("padding", "10px")
-        .on("mouseover", function(){d3.select(this).style("background-color", "aliceblue")}) 
-        .on("mouseout", function(){d3.select(this).style("background-color", "white")}) 
-        .text(function(d){return d;})
-        .style("align", "right")
-        .style("font-size", "12px");
+        tr.order();
+
+        var td = tr.selectAll("td")
+            .data(function(d) {
+                var retval = [];
+                for (var i=0; i<d.length; ++i) {
+                    retval.push([i, d[i]]);
+                }
+                return retval;
+            });
+
+        td.enter().append("td")
+                .on("mouseover", function(){d3.select(this).style("background-color", "aliceblue")}) 
+                .on("mouseout", function(){d3.select(this).style("background-color", "white")});
+
+        td.text(function(d){return d[1];});
+
+        td.exit().remove();
+
+        tr.exit().remove(); 
+    }
   }
 
   function Linegraph(mytag, mywidth, myheight, pointcount, duration, numlines) {
@@ -155,7 +174,6 @@
         for (var i=0; i < newdata.length; ++i) {
             data[i].shift();
         }
-
     };
   }
   </script>
@@ -215,6 +233,7 @@
            </script>
            <button id="refresh" onclick="ieupdate()">Update</button>
           <div id="table2">
+
             <table>
               <thead>
                 <tr>
@@ -228,6 +247,7 @@
               </tbody>
             </table>
           </div><!-- 
+
 <div id="table3" style="position:relative; left: 60px; top: -670px;">
 <table>
         <thead>
@@ -429,8 +449,21 @@ tableize("#config2", headers, configdata);
         <div id="Graphs" class="tabcontent" style=
         "display: block;">
           <h3>Graph</h3>
+          <div class="floating-box">
+            <table id="myIECounts">
+              <thead>
+                <tr>
+                  <th>Name</th><th>Count</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+          <div class="floating-box">
           <p id="mpie">This graph shows the count of Multiplexed
           Protocol Information Elements (MPIEs) received</p>
+          </div>
           <p id="fcie">This graph shows the number of FCIEs</p>
           <p id="badness">This graph shows the number of packet receive failures</p>
           <!-- ================================================= -->
@@ -447,7 +480,8 @@ tableize("#config2", headers, configdata);
                     || document.documentElement.clientHeight
                     || document.body.clientHeight;
 
-                var g1 = new Linegraph("#mpie", width*0.7, 240, 30, 750, 14);
+                var g1 = new Linegraph("#mpie", width*0.5, 240, 30, 750, 14);
+                var t1 = new AutoTable("#myIECounts", true);
                 var g2 = new Linegraph("#fcie", width*0.7, 240, 30, 750, 1);
                 var g3 = new Linegraph("#badness", 960, 240, 30, 750, 1);
                 var fixed = ['buildid','state'];
@@ -476,6 +510,7 @@ tableize("#config2", headers, configdata);
                     } else {
                         ++goodness;
                         g1.update(Object.values(responses[1].iecounters));
+                        t1.update(Object.entries(responses[1].iecounters));
                     }
                     percentage=goodness/(badness+goodness);
                     g2.update([percentage]);
