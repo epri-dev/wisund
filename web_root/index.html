@@ -21,266 +21,26 @@
         <ul class="tab">
           <li>
             <a href="#" class="tablinks" onclick=
-            "openTab(event, 'L1_L2')">IE Counters</a>
-          </li>
-          <li>
-            <a href="#" class="tablinks" onclick=
-            "openTab(event, 'L3_L4')">L3/L4</a>
-          </li>
-          <li>
-            <a href="#" class="tablinks" onclick=
-            "openTab(event, 'Config')">Configuration</a>
-          </li>
-          <li>
-            <a href="#" class="tablinks" onclick=
             "openTab(event, 'ConnMap')">Connectivity Map</a>
           </li>
           <li>
             <a href="#" class="tablinks" onclick=
-            "openTab(event, 'Graphs')">Graphs</a>
+            "openTab(event, 'SerialPort')">Serial Reliability</a>
+          </li>
+          <li>
+            <a href="#" class="tablinks active" onclick=
+            "openTab(event, 'IEs')">IEs</a>
           </li>
         </ul>
-        <div id="L1_L2" class="tabcontent">
-          <br>
-          <!-- 
-          <div id="table1" style="position:relative; top: 0px;">
-<table>
-        <thead>
-        <tr><th> Address Information</th></tr>
-        </thead>
-        <tbody>
-        <tr><td style="padding:30px" id="AddInf"></td></tr>
-        </tbody>
-</table>
-</div>
--->
-           <script>
-           function ieupdate(){
-          d3.json('/tool?diag 02', function(error, data) {
-              if (typeof data === "undefined") {
-              } else {
-                tableize("#IEcount", [["Name","Count"]], data.iecounters);
-              }
-          });
-          }
-           </script>
-           <button id="refresh" onclick="ieupdate()">Update</button>
-          <div id="table2">
 
-            <table>
-              <thead>
-                <tr>
-                  <th>IE Counters</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td style="padding:30px" id="IEcount"></td>
-                </tr>
-              </tbody>
-            </table>
-          </div><!-- 
-
-<div id="table3" style="position:relative; left: 60px; top: -670px;">
-<table>
-        <thead>
-        <tr><th>IE Information</th></tr>
-        </thead>
-        <tbody>
-        <tr><td style="padding:30px" id="IEinfo"></td></tr>
-        </tbody>
-</table>
-</div>
--->
-          <!-- 
-<script type="text/javascript">
-
-var headers = [["Name", "Value"]];
-var configdata = [
-    ["Updated Time", "2016-01-01"],
-    ["Frame Accept Count","1500"],
-    ["Address Reject Count", "1000"],
-        ["Received MHR", "1000"],
-        ["Last Received Dest PAN ID", "1000"],
-        ["Last Received Source PAN ID", "1000"],
-        ["Last Reject Address", "1000"],
-        ["Last Received Address", "1000"],
-];
-tableize("#AddInf", headers, configdata);
-
-var headers = [["Name", "Description", "Value"]];
-var configdata = [
-    ["FCIE", "Flow Control", "1000"],
-    ["UTTIE", "Unicast Timing and Frame Type", "1500"],
-    ["RSLIE", "Received Signal Level", "1000"],
-        ["BTIE", "Broadcast Timing", "1000"],
-        ["USIE", "Unicast Schedule", "1000"],
-        ["BSIE", "Broadcast Schedule", "1000"],
-        ["PANIE", "PAN", "1000"],
-        ["NETNAMEIE", "Netork Name", "1000"],
-        ["PANVERIE", "Pan Version", "1000"],
-        ["GTKHASHIE", "GTK Hash", "1000"],
-        ["MPIE", "Multiplexed Protocol", "1000"],
-        ["MHDSIE", "Multi-Hop Deliver Service", "1000"],
-        ["VHIE", "Vendor-Specific Header", "1000"],
-        ["VPIE", "Vendor-Specific Payload", "1000"],
-];
-tableize("#IEcount", headers, configdata);
-
-var headers = [["Name", "Value"]];
-var configdata = [
-    ["Count", "1000"],
-    ["Header Ring","1500"],
-    ["Ring Index", "1000"],
-];
-tableize("#IEinfo", headers, configdata);
-</script>
--->
-        </div>
-        <div id="eth0" class="tabcontent">
-          <h2>Interface Data</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Statistics</th>
-                <th>Configuration</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style="padding:30px" id="viz"></td>
-                <td id="config"></td>
-              </tr>
-            </tbody>
-          </table><!-- 
-<script type="text/javascript">
-
-var headers = [["name", "RX", "TX"]];
-var json_data = [["packets", "95235", "32351"],
-                ["bytes", "99676652", "5531142"],
-                ["errors", "0", "0"],
-                ["dropped", "0", "0"],
-                ["overruns", "0", "0"]];
-
-tableize("#viz", headers, json_data);
-
-var headers = [["name", "value"]];
-var configdata = [
-    ["inet6", "2016:bd8:0:f101::102/64"],
-    ["mtu","1500"],
-    ["txqueuelen", "1000"],
-];
-
-tableize("#config", headers, configdata);
-
-</script>
--->
-        </div>
-        <div id="L3_L4" class="tabcontent">
-          <h2>L3/L4 Data</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Statistics</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style="padding:30px" id="viz1"></td>
-              </tr>
-            </tbody>
-          </table>
-          <div id="chartdiv5" style=
-          "position:relative; top: -270px; left: 280px; width:450px; height:250px; border-style:ridge">
-          </div><!-- 
-<script type="text/javascript">         
-var headers = [["Name", "RX", "TX"]];
-var json_data = [["packets", "95235", "32351"],
-                ["bytes", "99676652", "5531142"],
-                ["errors", "0", "0"],
-                ["dropped", "0", "0"],
-                ["overruns", "0", "0"]];
-
-tableize("#viz1", headers, json_data);
-
-</script>
--->
-        </div>
-        <div id="Config" class="tabcontent">
-          <h2>Configuration Data</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>L1/L2</th>
-                <th>L3/L4</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style="padding:30px" id="config1"></td>
-                <td id="config2"></td>
-              </tr>
-            </tbody>
-          </table><!--
-<script type="text/javascript">
-var headers = [["Name", "Value"]];
-var configdata = [
-    ["MACaddr", "00:19:59:FF:FE:0F:FF:01"],
-    ["Bcast", "FF:FF:FF:FF:FF:FF:FF:FF"],
-    ["Net Name","FANInterop02"],
-    ["RegDomain", "North America"],
-    ["Channel Spacing", "200 kHz"],
-    ["Num Channels", "129"],
-];
-tableize("#config1", headers, configdata);
-
-var headers = [["name", "value"]];
-var configdata = [
-    ["inet6", "2016:bd8:0:f101::102/64"],
-    ["mtu","1500"],
-    ["txqueuelen", "1000"],
-];
-tableize("#config2", headers, configdata);
-</script>
--->
-        </div>
         <div id="ConnMap" class="tabcontent">
           <h2>Connectivity Map</h2>
-          <h1><img src="network.svg" width="538" height="418" alt=
-          "network graph"></h1>
+          <h3><img src="network.svg" width="538" height="418" alt="network graph"></h3>
         </div>
-        <div id="Controls" class="tabcontent">
-          <h2>Recording Controls</h2>
-          <p>Use these controls to log all streaming data into a
-          CSV file.</p><br>
-          <input type="file" id="myFile"><br>
-          <button id="startRec" onclick=
-          "startRec()">Record</button> <button id="stopRec"
-          onclick="stopRec()">Stop</button>
-          <p id="recording" style="color:gray"></p>
-          <script>
-            function startRec() {
-            var x = document.getElementById("startRec");
-            x.disabled = true;
-            var x = document.getElementById("stopRec");
-            x.disabled = false;
-            var x = document.getElementById("recording");
-            x.style = "color:red";
-            x.innerHTML = "Recording...";
-            }
-            function stopRec() {
-            var x = document.getElementById("stopRec");
-            x.disabled = true;
-            var x = document.getElementById("startRec");
-            x.disabled = false;
-            var x = document.getElementById("recording");
-            x.style = "color:gray";
-            x.innerHTML = "Stopped";
-            }
-          </script>
-        </div>
-        <div id="Graphs" class="tabcontent" style="display: block;">
-          <h3>Graph</h3>
+
+        <div id="IEs" class="tabcontent" style="display: block;">
+          <h2>Information Element Counters</h2>
+          <p>Is this in the box?</p>
           <div class="floating-box">
             <table id="myIECounts">
               <thead>
@@ -293,57 +53,62 @@ tableize("#config2", headers, configdata);
             </table>
           </div>
           <div class="floating-box">
-          <p id="mpie">This graph shows the count of Multiplexed
-          Protocol Information Elements (MPIEs) received</p>
+            <p id="mpie">This graph shows the counts of each kind of Information Elements (IE) received.</p>
           </div>
+        </div>
+
+        <div id="SerialPort" class="tabcontent">
+          <h3>Serial Port Reliability</h3>
           <div class="nofloat">
-          <p id="fcie">This graph shows the number of FCIEs</p>
-          <p id="badness">This graph shows the number of packet receive failures</p>
+            <p id="fcie">Success ratio of serial port packet reception.</p>
+            <p id="badness">Number of serial port packet receive failures</p>
           </div>
-          <!-- ================================================= -->
-          <script>
-            // This is the function that drives all dynamic data
-            (function() {
-                var badness=0;
-                var goodness=0;
-                var width = window.innerWidth
-                    || document.documentElement.clientWidth
-                    || document.body.clientWidth;
+        </div>
 
-                var height = window.innerHeight
-                    || document.documentElement.clientHeight
-                    || document.body.clientHeight;
+        <!-- ================================================= -->
+        <script>
+          // This is the function that drives all dynamic data
+          (function() {
+              var badness=0;
+              var goodness=0;
+              var width = window.innerWidth
+                  || document.documentElement.clientWidth
+                  || document.body.clientWidth;
 
-                var g1 = new Linegraph("#mpie", width*0.6, 240, 30, 750, 14);
-                var t1 = new AutoTable("#myIECounts", true);
-                var g2 = new Linegraph("#fcie", width*0.7, 240, 30, 750, 1);
-                var g3 = new Linegraph("#badness", width*0.7, 240, 30, 750, 1);
-                var fixed = ['buildid','state'];
-                var diags = ['diag 02'];
-                //'neighbors', 'diag 01', 'diag 02', 'diag 03', 'diag 04', 'diag 05', 'diag 06', 'diag 07', 'diag 08', 'diag 09'];
+              var height = window.innerHeight
+                  || document.documentElement.clientHeight
+                  || document.body.clientHeight;
 
-                var requests = [];
-                for (var i=0, tot=diags.length; i < tot; i++) {
-                    requests.push(d3.json('/tool?'+diags[i]));
-                }
-                var responses = [];
-                var diag = function() {
-                    for (var i=0, tot=requests.length; i < tot; i++) {
-                        requests[i].get(function(error, data) {
-                            if (typeof data === 'undefined') {
-                                //++badness;
-                            } else {
-                                //++goodness;
-                                //responses.push(data);
-                            }
-                            responses[i]=data;
-                        });
-                    }
-                    if (typeof responses[1] === 'undefined') {
-                        ++badness;
-                    } else {
-                        ++goodness;
-                        g1.update(Object.values(responses[1].iecounters));
+              var t1 = new AutoTable("#myIECounts", true);
+              var g1 = new Linegraph("#mpie", width*0.6, 240, 30, 750, 14);
+              var g2 = new Linegraph("#fcie", width*0.7, 240, 30, 750, 1);
+              var g3 = new Linegraph("#badness", width*0.7, 240, 30, 750, 1);
+              var fixed = ['buildid','state'];
+              var diags = ['diag 02'];
+              //'neighbors', 'diag 01', 'diag 02', 'diag 03', 'diag 04', 'diag 05', 'diag 06', 'diag 07', 'diag 08', 'diag 09'];
+
+              var requests = [];
+              for (var i=0, tot=diags.length; i < tot; i++) {
+                  requests.push(d3.json('/tool?'+diags[i]));
+              }
+              var responses = [];
+              var diag = function() {
+                  for (var i=0, tot=requests.length; i < tot; i++) {
+                      requests[i].get(function(error, data) {
+                          if (typeof data === 'undefined') {
+                              //++badness;
+                          } else {
+                              //++goodness;
+                              //responses.push(data);
+                          }
+                          responses[i]=data;
+                      });
+                  }
+                  if (typeof responses[1] === 'undefined') {
+                      ++badness;
+                  } else {
+                      ++goodness;
+                      g1.update(Object.values(responses[1].iecounters));
                         t1.update(Object.entries(responses[1].iecounters));
                     }
                     percentage=goodness/(badness+goodness);
@@ -352,32 +117,30 @@ tableize("#config2", headers, configdata);
                 };
                 d3.interval(diag, 1000);
             })()
-          </script> 
+        </script> 
           <!-- ================================================= -->
-          <p id="log"></p>
-        </div>
         <script>
 
-          function openTab(evt, tabName) {
+        function openTab(evt, tabName) {
           // Declare all variables
           var i, tabcontent, tablinks;
 
           // Get all elements with class="tabcontent" and hide them
           tabcontent = document.getElementsByClassName("tabcontent");
           for (i = 0; i < tabcontent.length; i++) {
-          tabcontent[i].style.display = "none";
+            tabcontent[i].style.display = "none";
           }
 
           // Get all elements with class="tablinks" and remove the class "active"
           tablinks = document.getElementsByClassName("tablinks");
           for (i = 0; i < tablinks.length; i++) {
-          tablinks[i].className = tablinks[i].className.replace(" active", "");
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
           }
 
           // Show the current tab, and add an "active" class to the link that opened the tab
           document.getElementById(tabName).style.display = "block";
           evt.currentTarget.className += " active";
-          }
+        }
         </script>
       </div>
     </div>
