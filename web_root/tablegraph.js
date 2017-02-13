@@ -9,7 +9,17 @@ function AutoTable(selector, withcolor) {
         tr.style("color", function(d,i,j){ return "hsl("+i*360/newdata.length+",100%,50%)";})
 
       tr.enter().append("tr")
-          .style("background-color", "white");
+          .style("background-color", "white")
+          .selectAll("td")
+          .data(function(d) {
+              var retval = [];
+              for (var i=0; i<d.length; ++i) {
+                  retval.push([i, d[i]]);
+              }
+              return retval;
+          })
+          .enter().append("td")
+            .text(function(d){return d[1];});
 
       tr.order();
 
