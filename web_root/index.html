@@ -21,6 +21,10 @@
         <ul class="tab">
           <li>
             <a href="#" class="tablinks" onclick=
+            "openTab(event, 'AddrInfo')">Address Info</a>
+          </li>
+          <li>
+            <a href="#" class="tablinks" onclick=
             "openTab(event, 'ConnMap')">Connectivity Map</a>
           </li>
           <li>
@@ -33,6 +37,21 @@
           </li>
         </ul>
 
+        <div id="AddrInfo" class="tabcontent">
+          <h2>Address Information</h2>
+          <button onclick="addrinfoUpdate()">Update</button>
+          <p>
+            <table id="addrTable">
+                <thead>
+                  <th>Name</th><th>Count</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </p>
+        </div>
+
         <div id="ConnMap" class="tabcontent">
           <h2>Connectivity Map</h2>
           <h3><img src="network.svg" width="538" height="418" alt="network graph"></h3>
@@ -40,7 +59,6 @@
 
         <div id="IEs" class="tabcontent" style="display: block;">
           <h2>Information Element Counters</h2>
-          <p>Is this in the box?</p>
           <div class="floating-box">
             <table id="myIECounts">
               <thead>
@@ -109,16 +127,29 @@
                   } else {
                       ++goodness;
                       g1.update(Object.values(responses[1].iecounters));
-                        t1.update(Object.entries(responses[1].iecounters));
+                      t1.update(Object.entries(responses[1].iecounters));
                     }
                     percentage=goodness/(badness+goodness);
                     g2.update([percentage]);
                     g3.update([badness]);
                 };
-                d3.interval(diag, 1000);
+                d3.interval(diag, 11000);
             })()
         </script> 
           <!-- ================================================= -->
+
+          <script>
+          var addrinfoTable = new AutoTable("#addrTable", false);
+          function addrinfoUpdate(){
+              d3.json('/tool?diag 01', function(error, data) {
+                  if (error || typeof data === "undefined") {
+                  } else {
+                    var stuff=Object.entries(data.addrinfo);
+                    addrinfoTable.update(stuff);
+                  }
+              });
+              }
+          </script>
         <script>
 
         function openTab(evt, tabName) {
