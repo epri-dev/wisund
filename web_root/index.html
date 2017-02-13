@@ -21,7 +21,19 @@
         <ul class="tab">
           <li>
             <a href="#" class="tablinks" onclick=
+            "openTab(event, 'ConfigData')">Configuration</a>
+          </li>
+          <li>
+            <a href="#" class="tablinks" onclick=
             "openTab(event, 'AddrInfo')">Address Info</a>
+          </li>
+          <li>
+            <a href="#" class="tablinks" onclick=
+            "openTab(event, 'FHInfo')">Frequency Hopping</a>
+          </li>
+          <li>
+            <a href="#" class="tablinks" onclick=
+            "openTab(event, 'RadioInfo')">Radio Stats</a>
           </li>
           <li>
             <a href="#" class="tablinks" onclick=
@@ -37,15 +49,44 @@
           </li>
         </ul>
 
+        <div id="ConfigData" class="tabcontent">
+          <h2>Configuration and State Information</h2>
+          <button onclick="getConfig()">Update</button>
+          <p>
+            <table id="configTable">
+              <tbody>
+              </tbody>
+            </table>
+          </p>
+        </div>
+
+        <div id="FHInfo" class="tabcontent">
+          <h2>Frequency Hopping Information</h2>
+          <button onclick="fhieUpdate()">Update</button>
+          <p>
+            <table id="fhieTable">
+              <tbody>
+              </tbody>
+            </table>
+          </p>
+        </div>
+
+        <div id="RadioInfo" class="tabcontent">
+          <h2>Radio Statistics</h2>
+          <button onclick="radioStatUpdate()">Update</button>
+          <p>
+            <table id="radiostatTable">
+              <tbody>
+              </tbody>
+            </table>
+          </p>
+        </div>
+
         <div id="AddrInfo" class="tabcontent">
           <h2>Address Information</h2>
           <button onclick="addrinfoUpdate()">Update</button>
           <p>
             <table id="addrTable">
-                <thead>
-                  <th>Name</th><th>Count</th>
-                </tr>
-              </thead>
               <tbody>
               </tbody>
             </table>
@@ -54,7 +95,7 @@
 
         <div id="ConnMap" class="tabcontent">
           <h2>Connectivity Map</h2>
-          <h3><img src="network.svg" width="538" height="418" alt="network graph"></h3>
+          <p><img src="network.svg" width="538" height="418" alt="network graph"></p>
         </div>
 
         <div id="IEs" class="tabcontent" style="display: block;">
@@ -133,24 +174,86 @@
                     g2.update([percentage]);
                     g3.update([badness]);
                 };
-                d3.interval(diag, 11000);
+                d3.interval(diag, 1000);
             })()
         </script> 
           <!-- ================================================= -->
 
-          <script>
-          var addrinfoTable = new AutoTable("#addrTable", false);
-          function addrinfoUpdate(){
-              d3.json('/tool?diag 01', function(error, data) {
-                  if (error || typeof data === "undefined") {
-                  } else {
-                    var stuff=Object.entries(data.addrinfo);
-                    addrinfoTable.update(stuff);
-                  }
-              });
-              }
-          </script>
         <script>
+          var configDataTable = new AutoTable("#configTable", false);
+          var conf = new WisunConfig();
+          function getConfig() {
+            conf.fetch();
+            configDataTable.update(Object.entries(conf.data));
+          }
+          function WisunConfig() {
+            var data = {};
+            this.data = data;
+            this.fetch = function(){
+                d3.json('/tool?mac', function(error, mydata) {
+                    if (error || typeof mydata === "undefined") {
+                    } else {
+                      data.mac = mydata.mac;
+                    }
+                });
+                d3.json('/tool?buildid', function(error, mydata) {
+                    if (error || typeof mydata === "undefined") {
+                    } else {
+                      data.buildid = mydata.buildid;
+                    }
+                });
+                d3.json('/tool?state', function(error, mydata) {
+                    if (error || typeof mydata === "undefined") {
+                    } else {
+                      data.mode = mydata.mode;
+                      data.neighbors = mydata.neighbors;
+                      data.discoveryState = mydata.discoveryState;
+                    }
+                });
+              };
+            }
+        </script>
+
+        <script>
+        var addrinfoTable = new AutoTable("#addrTable", false);
+        function addrinfoUpdate(){
+            d3.json('/tool?diag 01', function(error, data) {
+                if (error || typeof data === "undefined") {
+                } else {
+                  var stuff=Object.entries(data.addrinfo);
+                  addrinfoTable.update(stuff);
+                }
+            });
+            }
+        </script>
+
+        <script>
+        var fhinfoTable = new AutoTable("#fhieTable", false);
+        function fhieUpdate(){
+            d3.json('/tool?diag 05', function(error, data) {
+                if (error || typeof data === "undefined") {
+                } else {
+                  var stuff=Object.entries(data.fhieinfo);
+                  fhinfoTable.update(stuff);
+                }
+            });
+            }
+        </script>
+
+        <script>
+        var radioinfoTable = new AutoTable("#radiostatTable", false);
+        function radioStatUpdate(){
+            d3.json('/tool?diag 09', function(error, data) {
+                if (error || typeof data === "undefined") {
+                } else {
+                  var stuff=Object.entries(data.radiostats);
+                  radioinfoTable.update(stuff);
+                }
+            });
+            }
+        </script>
+
+      <script>
 
         function openTab(evt, tabName) {
           // Declare all variables
