@@ -22,7 +22,18 @@ if(DOXYGEN_FOUND)
         doc
         "${DOXYGEN_EXECUTABLE}"
         "${CMAKE_BINARY_DIR}/doxygen.conf"
+        DEPENDS "${CMAKE_BINARY_DIR}/doc/blocks.dot.svg"
         WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
         COMMENT "Generating API Reference documentation..." VERBATIM
     )
+
+    # There must be a better way to do this!
+    add_custom_command(
+        OUTPUT "${CMAKE_BINARY_DIR}/doc/blocks.dot.svg"
+        COMMAND ${DOXYGEN_DOT_EXECUTABLE} -Tsvg ${testmode_SOURCE_DIR}/doc/blocks.dot -o${CMAKE_BINARY_DIR}/doc/blocks.dot.svg
+        DEPENDS "blocks.dot"
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+        COMMENT "Generating drawings using graphviz..." 
+    )
 endif(DOXYGEN_FOUND)
+

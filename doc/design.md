@@ -37,28 +37,29 @@ As the name suggests, this software is intended to run on the Raspberry Pi and i
 There are [instructions for building the software on the Raspberry Pi](@ref pibuild) and also instructions for building the firmware for the CC1200 evaluation board. (TODO: add CC1200 instructions).
 
 ## Tool design
-This tool consists of two main parts.  One is a simple parser that is constructed with flex and bison.  Its purpose is to interact with either a human user or a script and to translate and convey the commands to the Wi-SUN board in binary form.  The other part connects the serial port to a tun device.  Essentially, anything that comes in via the IPv6 tun device is passed to the serial port and vice versa.  The program can differentiate message types because the first byte of each message designates the message type.  See the Message types section below.
+![Block Diagram](../blocks.dot.svg)
+ 
+As shown in the diagram above, the tool interacts with the radio stack via a SerialDevice class.  All [messages](@ref MsgTypes) to and from the radio are either commands to the stack (and associated responses) or IPv6 traffic that is transmitted over the air.  The `Router` portion of the software differentiates the two kinds of inbound traffic and routes it appropriately to either the `TunDevice` or to the `Console` if it is IPv6 traffic or command-related traffic respectively.  Internal to the software, all of the commands and responses are binary messages, but both commands and responses are translated from/to human-readable text.
 
-## Original prototype
-The original version was written in C and used the POSIX `select` to determine with of the three interfaces had data ready.  This worked well enough for a prototype, but the interface was not elegant and the code was even less so.  
+For commands, this is done via a simple parser that is constructed with flex and bison.  Its purpose is to interact with either a human user or a script and to translate and convey the commands to the Wi-SUN board in binary form.  For responses, there is a `Reply` class that converts received messages into human-readable JSON responses.
 
 ## Interfaces
 
-There are essentially four interfaces that the program must handle:
+As the block diagram above shows, there are essentially four interfaces that the programs must handle:
 
-  1. **`tun` device**: The `tun` device provides both read and write access to what is essentially a serial stream of IPv6 traffic for the purposes of this program.  On the Raspberry Pi, *other* software will interact with this device just as with any other IPv6 network interface.  The only difference is that instead of a device name such as `/dev/eth0` for a typical Ethernet device, this device is generally named `/dev/tun0`.  
+  1. **`tun` device**: The `tun` device provides both read and write access to what is essentially a serial stream of IPv6 traffic for the purposes of this program.  On the Raspberry Pi, *other* software can interact with this device just as with any other IPv6 network interface.  The only difference is that instead of a device name such as `/dev/eth0` for a typical Ethernet device, this device is generally named `/dev/tun0`.  
   2. **serial port**: The serial port is physically connected to the radio board. Sending data to the serial port is simple, but messages coming in need to be classified according to message type.  Messages that are IPv6 frames are sent to the `tun` device.  All others are handled internally.
   3. **`stdin`**: Unlike the two above, interaction with the user is divided into input and output.  The program gets commands from `stdin` which are simple text commands.  These are translated into packets according to the [message types](@ref MsgTypes).
-  4. **`stdout`**: As with `stdin`, `stdout` is half of the interaction with the user.  The output that goes to the user is text messages that are neither IPv6 messages nor command responses.  They are simply printed to the screen as ASCII.
+  4. **`stdout`**: As with `stdin`, `stdout` is half of the interaction with the user.  The output that goes to the user is text messages that are neither IPv6 messages nor command responses.  They are simply printed to the screen as ASCII, and are translated from binary into the relevant human-readable JSON format via the Reply class.
 
 ## Class design
-The original prototype was written in C and largely procedural.  The new version is written in C++ and incorporates the C++ `asio` library for both the serial port and for socket access.  This aids with both portability and structure.
+The tool software is written in object-oriented C++.  The major classes are described below.
 
 ### SafeQueue
 Functioning as a message queue, this class handles the sequential processing and routing of messages.  Must be accessible by multiple threads.  Each interface has its own inbound queue; routing is done by the outbound message handler associated with the device.
 
 ### Device
-Each device has two interfaces; one is the external facing interface that defines it (e.g. serial port, console or tun) and the internal interface which looks the same for all devices.  The internal device interface is a receive message queue.  
+`Device` is an abstract class providing a base for other relevant classes.  Each device has two interfaces; one is the external facing interface that defines it (e.g. serial port, console or tun) and the internal interface which looks the same for all devices.  The internal device interface is a receive message queue.  
 
 ### Router
 This object is at the heart of the application and has at least three bidirectional ports for six total I/O ports.  Messages that come in via one port are classified and sent to one (or more) of the other ports based on the arrival port and the contents of the message.
@@ -75,8 +76,8 @@ Anything received via tun is sent directly to Router; anything received on inter
 ### Simulator
 As the name suggests, this device is intended to provide a simulated version of the radio hardware.  The primary purpose for this module is to allow for a simulated test to run on any Linux machine without the need for any additional hardware. This can be useful for performing development on the web pages or server.
 
-## Threads
-The program is multithreaded and includes three threads.  One is the main thread that has both the user interface (`std::cin` and `std::cout`) as well as the `SafeQueue` message queue.  The second thread handles the serial port, and the third thread handles the `tun` device.
+## threads
+The program is multithreaded and generally uses two threads per Device (one for transmit and one for receive).  Refer to the source code for details.
 
 Message types  {#MsgTypes} 
 =============
