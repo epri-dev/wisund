@@ -1,5 +1,8 @@
 #! /bin/bash
 machine=`uname -m`
+# derive OUI-64 from OUI-48 from first Ethernet port
+ethmac=`ip link show | awk '/ether/{print $2; exit}' | awk 'BEGIN {FS=":"; OFS=":"}{print $1 $2, $3 "ff:fe" $4, $5 $6}'` 
+linkaddr="fe80::${ethmac}/64"
 case "$machine" in
     x86_64)
         myaddr=101
@@ -17,10 +20,12 @@ esac
 
 fulladdr="2016:bd8:0:f101::$myaddr/64"
 echo "Setting tun0 address $fulladdr"
-
+echo "Setting tun0 link address $linkaddr"
 # first create the tun device
 ip tuntap add mode tun
 # now assign an address to tun0
 ip -6 addr add $fulladdr dev tun0 nodad
+# assign the link address to tun0
+ip -6 addr add $linkaddr scope link dev tun0 nodad
 # bring up the link
 ip -6 link set dev tun0 up
