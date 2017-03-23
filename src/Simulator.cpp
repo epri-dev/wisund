@@ -113,8 +113,13 @@ static std::map<Message, cmdDetails> simCmd =
         "diag 09", R"({ "radiostats": { "rxcount":122, "fifoerrors":0, "crcerrors":0, "rxinterrupts":122, "lastrxlen":58, "rssi":43, "txinterrupts":352, "spuriousints":0, "txerrors":0, "txpackets":352, "txfifoerr":0, "txchipstat":15 } })", }
     },
     { 
+#if 0
         {{0x06,0x23,}}, { {{0x23,0x01,0x00,0x01,0x7e,0x02,0x4e,0x00,0x00,0x19,0x59,0xff,0xfe,0x0f,0xff,0x02}},
         "neighbors", R"({ "neighbors": [ { "index":0, "validated":1, "timestamp":5112446, "mac":"00:19:59:ff:fe:0f:ff:02"} ] })", }
+#else
+        {{0x06,0x23,}}, { {{0x23,0x02,0x00,0x01,0x7e,0x02,0x4e,0x00,0x00,0x19,0x59,0xff,0xfe,0x0f,0xff,0x02,0x01,0x01,0x7f,0x02,0x4e,0x00,0x00,0x19,0x59,0xff,0xfe,0x0f,0xff,0x03}},
+        "neighbors", R"({ "neighbors": [ { "index":0, "validated":1, "timestamp":5112446, "mac":"00:19:59:ff:fe:0f:ff:02"}, { "index":1, "validated":1, "timestamp":5112447, "mac":"00:19:59:ff:fe:0f:ff:03"}  ] })", }
+#endif
     },
 };
 
