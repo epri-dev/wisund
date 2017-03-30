@@ -236,6 +236,7 @@
             .force("center", d3.forceCenter(width / 2, height / 2));
 
         function neighborInfoUpdate(){
+            simulation.stop();
             svg.selectAll("*").remove();
             d3.json('/tool?neighbors', function(error, data) {
                 if (error || typeof data === "undefined") {
@@ -243,9 +244,9 @@
                   var graph={"links":[], "nodes":[]};
                   data.neighbors.forEach(function(node) {
                       graph.nodes.push(node);
-                      graph.links.push({"source":conf.data.mac, "target":node.mac, "value":1});
+                      graph.links.push({"source":conf.data.mac, "target":node.mac, "value":1,"fx":width/2, "fy":height/2});
                   });
-                  graph.nodes.push({"index":-1, "mac":conf.data.mac, "validated":99});
+                  graph.nodes.push({"mac":conf.data.mac, "validated":99});
 
                   var link = svg.append("g")
                       .attr("class", "links")
@@ -267,7 +268,7 @@
                   node.append("ellipse")
                           .attr("rx", 100)
                           .attr("ry", 40)
-                          .attr("class", function(d) { return d.index==-1 ? "base" : "node";});
+                          .attr("class", function(d) { return d.validated==99 ? "base" : "node";});
 
                   node.append("text") 
                       .attr("fill", "black")
@@ -300,6 +301,7 @@
                         });
                   }
                 }
+                simulation.restart();
             });
             }                
 
