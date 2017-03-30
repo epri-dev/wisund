@@ -95,7 +95,15 @@
 
         <div id="ConnMap" class="tabcontent">
           <h2>Connectivity Map</h2>
-          <p><img src="network.svg" width="538" height="418" alt="network graph"></p>
+          <p>
+          <button onclick="neighborInfoUpdate()">Update</button>
+          </p>
+          <p>
+          <svg id="connex" width=960 height=600>
+          </svg>
+          </p>
+          <script type="text/javascript">
+          </script>
         </div>
 
         <div id="IEs" class="tabcontent" style="display: block;">
@@ -114,7 +122,7 @@
           <div class="floating-box">
             <p id="mpie">This graph shows the counts of each kind of Information Elements (IE) received.</p>
           </div>
-          <div style="clear:both;"/>
+          <div style="clear:both;"></div>
         </div>
 
         <div id="SerialPort" class="tabcontent">
@@ -213,6 +221,105 @@
                 });
               };
             }
+        </script>
+
+        <script>
+        // var addrinfoTable = new AutoTable("#addrTable", false);
+        var svg = d3.select("#connex"),
+            width = +svg.attr("width"),
+            height = +svg.attr("height");
+
+        var simulation = d3.forceSimulation()
+            .force("link", d3.forceLink().id(function(d) { return d.mac; }))
+            .force("radius", d3.forceCollide(100))
+            .force("charge", d3.forceManyBody())
+            .force("center", d3.forceCenter(width / 2, height / 2));
+
+        function neighborInfoUpdate(){
+            svg.selectAll("*").remove();
+            d3.json('/tool?neighbors', function(error, data) {
+                if (error || typeof data === "undefined") {
+                } else {
+                  var graph={"links":[], "nodes":[]};
+                  data.neighbors.forEach(function(node) {
+                      graph.nodes.push(node);
+                      graph.links.push({"source":conf.data.mac, "target":node.mac, "value":1});
+                  });
+                  graph.nodes.push({"index":-1, "mac":conf.data.mac, "validated":99});
+
+                  var link = svg.append("g")
+                      .attr("class", "links")
+                    .selectAll("line")
+                    .data(graph.links)
+                    .enter().append("line")
+                      .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
+                  
+                  var node = svg.append("g")
+                      .attr("class", "nodes")
+                    .selectAll("ellipse")
+                    .data(graph.nodes)
+                    .enter().append("g")
+                      .call(d3.drag()
+                          .on("start", dragstarted)
+                          .on("drag", dragged)
+                          .on("end", dragended));
+
+                  node.append("ellipse")
+                          .attr("rx", 100)
+                          .attr("ry", 40)
+                          .attr("class", function(d) { return d.index==-1 ? "base" : "node";});
+
+                  node.append("text") 
+                      .attr("fill", "black")
+                      .attr("font-size", "12px")
+                      .attr("dx", -60)
+                      .attr("dy", 5)
+                      .text(function(d) { return d.mac; });
+                      
+                  node.append("title")
+                      .text(function(d) { return d.mac; });
+
+                  simulation
+                      .nodes(graph.nodes)
+                      .on("tick", ticked);
+
+                  simulation.force("link")
+                      .links(graph.links)
+                      .distance(250);
+
+                  function ticked() {
+                    link
+                        .attr("x1", function(d) { return d.source.x; })
+                        .attr("y1", function(d) { return d.source.y; })
+                        .attr("x2", function(d) { return d.target.x; })
+                        .attr("y2", function(d) { return d.target.y; });
+
+                    node
+                        .attr("transform", function(d) { 
+                            return "translate("+d.x+","+d.y+")"; 
+                        });
+                  }
+                }
+            });
+            }                
+
+        function dragstarted(d) {
+          if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+          d.fx = d.x;
+          d.fy = d.y;
+        }
+
+        function dragged(d) {
+          d.fx = d3.event.x;
+          d.fy = d3.event.y;
+        }
+
+        function dragended(d) {
+          if (!d3.event.active) simulation.alphaTarget(0);
+          d.fx = null;
+          d.fy = null;
+        }
+
         </script>
 
         <script>

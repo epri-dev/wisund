@@ -142,3 +142,22 @@ ul.tab li a:focus, .active {background-color: #ccc;}
     padding: 10px;
     font-size: 12px;
 }
+.node {
+      stroke: black;
+      fill: none;
+      stroke-width: 1.5px;
+}
+.nodes ellipse.base {
+  fill: green;
+  stroke: black;
+  stroke-width: 1.5px;
+}
+.nodes ellipse.node {
+  fill: white;
+  stroke: black;
+  stroke-width: 1.5px;
+}
+.links line {
+  stroke: #999;
+  stroke-opacity: 0.6;
+}
