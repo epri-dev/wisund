@@ -34,8 +34,8 @@ int main(int argc, char *argv[])
     bool rawpackets = false;
     bool echo = false;
     std::chrono::milliseconds delay{0};
-    unsigned opt = 1;
-    while (argv[opt][0] == '-') {
+    int opt = 1;
+    while (opt < argc && argv[opt][0] == '-') {
         switch (argv[opt][1]) {
             case 'v':
                 verbose = true;
@@ -57,6 +57,10 @@ int main(int argc, char *argv[])
                 std::cout << "Ignoring uknown option \"" << argv[opt] << "\"\n";
         }
         ++opt;
+    }
+    if (opt >= argc) {
+        std::cout << "Error: no device given\n";
+        return 0;
     }
     std::cout << "Opening port " << argv[opt] << "\n";
 
