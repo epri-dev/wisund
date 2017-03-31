@@ -34,7 +34,7 @@ As the name suggests, this software is intended to run on the Raspberry Pi and i
 
 
 ## Building the software and firmware
-There are [instructions for building the software on the Raspberry Pi](@ref pibuild) and also instructions for building the firmware for the CC1200 evaluation board. (TODO: add CC1200 instructions).
+There are [instructions for building the software on the Raspberry Pi](@ref pibuild) and also [instructions for building the firmware for the CC1200 evaluation board](@ref cc1200build).
 
 ## Tool design
 ![Block Diagram](../blocks.dot.svg)

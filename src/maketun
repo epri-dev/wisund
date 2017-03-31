@@ -20,6 +20,7 @@ case "$machine" in
 	    then myaddr=105
 	    else myaddr=104
         fi
+        ;;
     *)
         echo "Unknown machine type $machine"
         ;;
