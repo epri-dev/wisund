@@ -8,11 +8,18 @@ case "$machine" in
         myaddr=101
         ;;
     armv7l)
+        # Raspberry Pi model B
         if [ "$HOSTNAME" == "pi2" ]
 	    then myaddr=103
 	    else myaddr=102
         fi
         ;;
+    armv6l)
+        # Raspberry Pi Zero
+        if [ "$HOSTNAME" == "pi4" ]
+	    then myaddr=105
+	    else myaddr=104
+        fi
     *)
         echo "Unknown machine type $machine"
         ;;
