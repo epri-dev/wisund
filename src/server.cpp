@@ -39,8 +39,8 @@ static void handle_save(struct mg_connection *nc, struct http_message *hm) {
   mg_printf(nc, "%s", "HTTP/1.1 302 OK\r\nLocation: /\r\n\r\n");
 }
 
-static std::string replace_entities(std::string &str) {
-    const std::regex space_regex("%20");
+static std::string replace_entities(std::string str) {
+    static const std::regex space_regex("%20");
     std::string ret = std::regex_replace(str, space_regex, " ");
     std::swap(ret, str);
     return str;    
@@ -78,8 +78,11 @@ static std::string tool_call(std::string &request) {
 }
 
 static void handle_tool_request(struct mg_connection *nc, http_message *hm) {
-    std::string str(hm->query_string.p, hm->query_string.len);
-    std::string command = replace_entities(str);
+    constexpr std::size_t cmdsize{100};
+    char cmd[cmdsize];
+    auto ret = mg_get_http_var(&hm->query_string, "cmd", cmd, cmdsize);
+    std::string command = replace_entities(cmd);
+    if (ret > 0) {
     std::string result = tool_call(command);
 
   // Use chunked encoding in order to avoid calculating Content-Length
@@ -90,6 +93,7 @@ static void handle_tool_request(struct mg_connection *nc, http_message *hm) {
 
   // Send empty chunk, the end of response
   mg_send_http_chunk(nc, "", 0);
+    }
 }
 
 
