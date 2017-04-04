@@ -51,7 +51,7 @@ public:
     void testMacReply() {
         std::stringstream reply;
         CPPUNIT_ASSERT(con != nullptr);
-        Message macReply{0x24, 0x01, 0x02, 0xf3, 0xe4, 0xd5, 0xc6, 0xb7, 0xa8};
+        Message macReply{0x24, 0xa8,0xb7,0xc6,0xd5,0xe4,0xf3,0x02,0x01};
         std::string desired{"{ \"mac\":\"01:02:f3:e4:d5:c6:b7:a8\" }\n"};
         input.push(macReply);
         CPPUNIT_ASSERT(con->runRx(&reply) == 0);

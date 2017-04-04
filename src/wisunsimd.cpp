@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
                 verbose = true;
                 break;
             case 'r':
-                // we only do raw packets with the simulator, so silently igore
+                // we only do raw packets with the simulator, so silently ignore
                 // rawpackets = true;
                 break;
             case 's':
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
                 delay = std::chrono::milliseconds{std::atoi(argv[++opt])};
                 break;
             default:
-                std::cout << "Ignoring uknown option \"" << argv[opt] << "\"\n";
+                std::cout << "Ignoring unknown option \"" << argv[opt] << "\"\n";
         }
         ++opt;
     }
