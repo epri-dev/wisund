@@ -21,7 +21,7 @@
 int main(int argc, char *argv[])
 {
     if (argc < 2) {
-        std::cout << "Usage: " << argv[0] << " [-v] [-r] [-d msdelay] [-s] serialport\n";
+        std::cout << "Usage: " << argv[0] << " [-e] [-v] [-r] [-d msdelay] [-s] serialport\n";
         return 1;
     }
     SafeQueue<Message> serialIn;
