@@ -30,7 +30,7 @@ This software is mostly identical to the `wisun-cli` code except that instead of
 This software is mostly identical to the `wisund` software except for two significant differences.  First, it uses a simulator rather than actually communicating with a radio over the serial port.  Second, since the RF link is simulated, the IPv6 routing portion of the code is omitted from `wisunsimd`
 
 ## @ref server.cpp
-As the name suggests, this software is intended to run on the Raspberry Pi and implements a complete web server running on port 8000 with facilities for communicating with `wisund` or `wisunsimd`.  One of those programs must also be running for the web server to operate properly.  All of the [commands](@ref commands) are accessible via the relative path `\tool?`.  That is, if the server is running on `localhost`, one can request `diag 03` by using the url [http://localhost:8000/tool?diag 03](http://localhost:8000/tool?diag 03).
+As the name suggests, this software is intended to run on the Raspberry Pi and implements a complete web server running on port 8000 with facilities for communicating with `wisund` or `wisunsimd`.  One of those programs must also be running for the web server to operate properly.  All of the [commands](@ref commands) are accessible via the relative path `\tool?cmd=`.  That is, if the server is running on `localhost`, one can request `diag 03` by using the url [http://localhost:8000/tool?cmd=diag 03](http://localhost:8000/tool?cmd=diag 03).
 
 
 ## Building the software and firmware
