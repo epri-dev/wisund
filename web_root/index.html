@@ -44,8 +44,12 @@
             "openTab(event, 'SerialPort')">Serial Reliability</a>
           </li>
           <li>
-            <a href="#" class="tablinks active" onclick=
+            <a href="#" class="tablinks" onclick=
             "openTab(event, 'IEs')">IEs</a>
+          </li>
+          <li>
+            <a href="#" class="tablinks active" onclick=
+            "openTab(event, 'Command')">Command</a>
           </li>
         </ul>
 
@@ -106,7 +110,7 @@
           </script>
         </div>
 
-        <div id="IEs" class="tabcontent" style="display: block;">
+        <div id="IEs" class="tabcontent">
           <h2>Information Element Counters</h2>
           <div class="floating-box">
             <table id="myIECounts">
@@ -133,7 +137,51 @@
           </div>
         </div>
 
+        <div id="Command" class="tabcontent" style="display: block;">
+          <h2>Command</h2>
+          <form onSubmit="return toolFetch(this);">
+            Command: <input type="text" name="cmd" value="buildid">
+          </form>
+          <p id="cmdresponse"></p>
+          <p>Enter a command in the dialog box.  Supported commands include:</p>
+          <dl>
+            <dt>lbr</dt><dd>Puts the node in LBR mode (only one per network)</dd>
+            <dt>nlbr</dt><dd>Puts the node in NLBR mode</dd>
+            <dt>buildid</dt><dd>Returns firmware build ID</dd>
+            <dl>fchan nn</dl><dd>Set to fixed channel operation on channel nn</dd>
+            <dl>tr51cf</dl><dd>Use TR51 channel function</dd>
+            <dl>exclude nn ...</dl><dd>Set excluded channel list (last must be 00)</dd>
+            <dl>phy nn</dl><dd>Set PHY mode: 01=50kbps FSK, 02=100kbps FSK, 03=150kbps FSK, 04=300kbps FSK</dd>
+            <dl>panid nn</dl><dd>set PANID used by the MAC</dd>
+            <dl>index nn</dl><dd>Set default index into neighbor table for later <i>data</i> command</dd>
+            <dl>setmac nn nn nn nn nn nn nn nn</dl><dd>Set local MAC address</dd>
+            <dl>state</dl><dd>Gets current state information</dd>
+            <dl>diag nn</dl><dd>Various diagnostics; see documentation</dd>
+            <dl>neighbors</dl><dd>Get neighbor information</dd>
+            <dl>mac</dl><dd>Get local MAC address</dd>
+            <dl>get nn</dl><dd>General get <i>not yet supported</i></dd>
+            <dl>ping nn</dl><dd>Initiate canned ping with neighbor nn</dd>
+            <dl>last</dl><dd>Returns status of last <i>data</i> command</dd>
+            <dl>restart</dl><dd>Restart radio firmware and return to idle state</dd>
+            <dl>data nn ...</dl><dd>Sends raw data packet to node selected with previous <i>index nn</i> command</dd>
+          </dl>
+        </div>
+
         <!-- ================================================= -->
+        <script>
+function toolFetch(theForm) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("cmdresponse").innerHTML = this.responseText;
+    }
+  };
+  xhttp.open("GET", "tool?cmd="+theForm["cmd"].value, true);
+  xhttp.send();
+  return false;
+}
+</script>
+
         <script>
           // This is the function that drives all dynamic data
           (function() {
@@ -157,7 +205,7 @@
 
               var requests = [];
               for (var i=0, tot=diags.length; i < tot; i++) {
-                  requests.push(d3.json('/tool?'+diags[i]));
+                  requests.push(d3.json('/tool?cmd='+diags[i]));
               }
               var responses = [];
               var diag = function() {
@@ -199,19 +247,19 @@
             var data = {};
             this.data = data;
             this.fetch = function(){
-                d3.json('/tool?mac', function(error, mydata) {
+                d3.json('/tool?cmd=mac', function(error, mydata) {
                     if (error || typeof mydata === "undefined") {
                     } else {
                       data.mac = mydata.mac;
                     }
                 });
-                d3.json('/tool?buildid', function(error, mydata) {
+                d3.json('/tool?cmd=buildid', function(error, mydata) {
                     if (error || typeof mydata === "undefined") {
                     } else {
                       data.buildid = mydata.buildid;
                     }
                 });
-                d3.json('/tool?state', function(error, mydata) {
+                d3.json('/tool?cmd=state', function(error, mydata) {
                     if (error || typeof mydata === "undefined") {
                     } else {
                       data.mode = mydata.mode;
@@ -238,7 +286,7 @@
         function neighborInfoUpdate(){
             simulation.stop();
             svg.selectAll("*").remove();
-            d3.json('/tool?neighbors', function(error, data) {
+            d3.json('/tool?cmd=neighbors', function(error, data) {
                 if (error || typeof data === "undefined") {
                 } else {
                   var graph={"links":[], "nodes":[]};
@@ -327,7 +375,7 @@
         <script>
         var addrinfoTable = new AutoTable("#addrTable", false);
         function addrinfoUpdate(){
-            d3.json('/tool?diag 01', function(error, data) {
+            d3.json('/tool?cmd=diag 01', function(error, data) {
                 if (error || typeof data === "undefined") {
                 } else {
                   var stuff=Object.entries(data.addrinfo);
@@ -340,7 +388,7 @@
         <script>
         var fhinfoTable = new AutoTable("#fhieTable", false);
         function fhieUpdate(){
-            d3.json('/tool?diag 05', function(error, data) {
+            d3.json('/tool?cmd=diag 05', function(error, data) {
                 if (error || typeof data === "undefined") {
                 } else {
                   var stuff=Object.entries(data.fhieinfo);
@@ -353,7 +401,7 @@
         <script>
         var radioinfoTable = new AutoTable("#radiostatTable", false);
         function radioStatUpdate(){
-            d3.json('/tool?diag 09', function(error, data) {
+            d3.json('/tool?cmd=diag 09', function(error, data) {
                 if (error || typeof data === "undefined") {
                 } else {
                   var stuff=Object.entries(data.radiostats);
