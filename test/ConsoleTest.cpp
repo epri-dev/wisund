@@ -17,6 +17,7 @@ class ConsoleTest : public CppUnit::TestFixture {
     CPPUNIT_TEST(testReplies);
     CPPUNIT_TEST(testMacReply);
     CPPUNIT_TEST(testRun);
+    CPPUNIT_TEST(testNeighbors);
     CPPUNIT_TEST_SUITE_END();
 public:
     void testBasic() {
@@ -77,6 +78,24 @@ public:
         CPPUNIT_ASSERT(con->run(&cmds, &reply) == 0);
         CPPUNIT_ASSERT(reply.str() == desired);
     }
+
+    void testNeighbors() {
+        std::stringstream cmds{"neighbors\n"};
+        std::stringstream reply;
+        CPPUNIT_ASSERT(con != nullptr);
+        Message neighborsreply{
+            0x23,0x02,
+                0x00,0x01,0x7e,0x02,0x4e,0x00,
+                0x02,0xff,0x0f,0xfe,0xff,0x59,0x19,0x00,
+                0x01,0x01,0x7f,0x02,0x4e,0x00,
+                0x03,0xff,0x0f,0xfe,0xff,0x59,0x19,0x00 };
+        std::string desired{R"({ "neighbors": [ { "index":0, "validated":1, "timestamp":5112446, "mac":"00:19:59:ff:fe:0f:ff:02"}, { "index":1, "validated":1, "timestamp":5112447, "mac":"00:19:59:ff:fe:0f:ff:03"} ] }
+)"};
+        input.push(neighborsreply);
+        CPPUNIT_ASSERT(con->run(&cmds, &reply) == 0);
+        CPPUNIT_ASSERT(reply.str() == desired);
+    }
+
     void setUp() {
         con = new Console(input, output);
     }

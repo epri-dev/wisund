@@ -56,6 +56,7 @@ static std::string getAddr(const uint8_t **ptr)
         s << std::hex << std::setfill('0') << std::setw(2) << static_cast<unsigned>(**ptr);
         --(*ptr);
     }
+    *ptr += 9;
     s << "\"";
     return s.str();
 }
