@@ -1,0 +1,19 @@
+#!/bin/sh -e
+# This is designed to be run from within rc.local
+# It starts the WiSUN stack
+
+# figure out where this script is located
+MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+WEBROOT=${MYDIR}/../web_root/ 
+
+# make the TUN device
+${MYDIR}/maketun
+
+# start Wi-SUN stack
+/usr/local/bin/wisund /dev/serial0 &
+/usr/local/bin/web_server ${WEBROOT} &
+
+# start the Wi-SUN stack in NLBR mode
+${MYDIR}/rfinit &
+
+exit 0
