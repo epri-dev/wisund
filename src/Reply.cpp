@@ -49,14 +49,12 @@ static std::string getPanId(const uint8_t **ptr)
 static std::string getAddr(const uint8_t **ptr)
 {
     std::stringstream s;
-    *ptr += 7;  // advance to end of number
     s << "\"";
     for (int i=0; i < 8; ++i) {
         if (i) s << ':';
         s << std::hex << std::setfill('0') << std::setw(2) << static_cast<unsigned>(**ptr);
-        --(*ptr);
+        ++(*ptr);
     }
-    *ptr += 9;
     s << "\"";
     return s.str();
 }

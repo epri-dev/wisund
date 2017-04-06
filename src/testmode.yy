@@ -98,7 +98,6 @@ command:    FCHAN HEXBYTE   { console.compound(0x01, $2); }
     |       INDEX HEXBYTE   { console.compound(0x12, $2); } 
     |       DATA bytes      { console.push(Message{$2}); }
     |       SETMAC bytes    { if ($2.size() == 8) {
-                                std::reverse(std::begin($2), std::end($2));
                                 console.compound(0x13, $2); 
                                 } else {
                                     std::cout << "Error: mac must have 8 bytes\n";
