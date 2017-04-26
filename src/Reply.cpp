@@ -268,6 +268,27 @@ void decode(const Message &msg, std::ostream &out)
                         out << " } }\n";
                     }
                     break;
+
+				case 10: // DIAG_MAC_STATS_1
+                    if (msg.size() != 34) {
+                        out << "Error: bad diag 10 packet: " <<"[size:" 
+							<< std::dec << msg.size() << "] " << msg << "\n";
+                    } else {
+                        const uint8_t *ptr = &msg[2];
+                        out << "{ \"macstats\": { ";
+                        out << " \"timestamp\":" << getUint32(&ptr);
+                        out << ", \"dataRequest\":" << getUint32(&ptr);
+                        out << ", \"dataRequestError\":" << getUint32(&ptr);
+                        out << ", \"dataSendError\":" << getUint32(&ptr);
+                        out << ", \"dataIndication\":" << getUint32(&ptr);
+                        out << ", \"retransmission\":" << getUint32(&ptr);
+                        out << ", \"ackFailure\":" << getUint32(&ptr);
+                        out << ", \"inFrameOverflow\":" << getUint32(&ptr);
+                        out << " } }\n";
+                    }
+                    break;
+
+			   	   
                 default:  // DIAG_ID_INVALID
                     out << "Console received message: " << msg << '\n';
             }
