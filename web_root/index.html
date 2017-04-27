@@ -33,6 +33,10 @@
           </li>
           <li>
             <a href="#" class="tablinks" onclick=
+            "openTab(event, 'MacInfo')">MAC Stats</a>
+          </li>
+          <li>
+            <a href="#" class="tablinks" onclick=
             "openTab(event, 'RadioInfo')">Radio Stats</a>
           </li>
           <li>
@@ -80,6 +84,17 @@
           <button onclick="radioStatUpdate()">Update</button>
           <p>
             <table id="radiostatTable">
+              <tbody>
+              </tbody>
+            </table>
+          </p>
+        </div>
+
+        <div id="MacInfo" class="tabcontent">
+          <h2>MAC Statistics</h2>
+          <button onclick="macStatUpdate()">Update</button>
+          <p>
+            <table id="macstatTable">
               <tbody>
               </tbody>
             </table>
@@ -231,7 +246,7 @@ function toolFetch(theForm) {
                     g2.update([percentage]);
                     g3.update([badness]);
                 };
-                d3.interval(diag, 30000);
+                d3.interval(diag, 1000);
             })()
         </script> 
           <!-- ================================================= -->
@@ -406,6 +421,19 @@ function toolFetch(theForm) {
                 } else {
                   var stuff=Object.entries(data.radiostats);
                   radioinfoTable.update(stuff);
+                }
+            });
+            }
+        </script>
+
+        <script>
+        var macinfoTable = new AutoTable("#macstatTable", false);
+        function macStatUpdate(){
+            d3.json('/tool?cmd=diag 0a', function(error, data) {
+                if (error || typeof data === "undefined") {
+                } else {
+                  var stuff=Object.entries(data.macstats);
+                  macinfoTable.update(stuff);
                 }
             });
             }
