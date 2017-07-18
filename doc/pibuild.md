@@ -9,7 +9,7 @@ Insert the resulting microSD card into the Raspberry Pi power it up.
 
 Run `raspi-config` as root (`sudo raspi-config`) and do the following things:
 
-under "Advanced Options", choose "SSH" and enable the SSH Server.  Next, also under "Advanced Options", "Serial" diable the login shell via serial.  Optionally, you may also wish to set the locale and expand the filesystem but neither of these are strictly necessary.
+under "Advanced Options", choose "SSH" and enable the SSH Server.  Next, also under "Advanced Options", "Serial" disable the login shell via serial.  Optionally, you may also wish to set the locale and expand the filesystem but neither of these are strictly necessary.
 
 When you have completed these selections, finish and (if prompted) reboot.  For versions of the Raspbian operating system that are based on images before 2017, edit the file `/boot/config.txt` to add the following line:
 
