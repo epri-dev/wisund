@@ -1,8 +1,14 @@
 #ifndef TUNDEVICE_H
 #define TUNDEVICE_H
-
+/** 
+ *  \file TunDevice.h
+ *  \brief Interface for the TunDevice class
+ */
 #include "Device.h"
 
+/**
+ * \brief Wrapper for the TUN device.
+ */
 class TunDevice : public Device
 {
 public:

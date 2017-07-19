@@ -1,12 +1,16 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
+/** 
+ *  \file Message.h
+ *  \brief Interface for the Message class
+ */
 #include <cstdint>
 #include <vector>
 #include <initializer_list>
 #include <iostream>
 
 /**
- * A Message is a specialization of a vector of bytes.
+ * \brief A Message is a specialization of a vector of bytes.
  */
 class Message : public std::vector<uint8_t> {
 public:

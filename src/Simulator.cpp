@@ -1,3 +1,7 @@
+/** 
+ *  \file Simulator.cpp
+ *  \brief Implementation of the Simulator class
+ */
 #include "Simulator.h"
 #include <thread>
 #include <map>
@@ -55,7 +59,7 @@ size_t Simulator::send(const Message &msg)
     return msg.size();
 }
 
-/// container for messages that get replies
+/// container for test messages that get replies
 struct cmdDetails {
     Message response;
     const char *command;

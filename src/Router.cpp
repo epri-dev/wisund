@@ -1,3 +1,7 @@
+/** 
+ *  \file Router.cpp
+ *  \brief Implementation of the Router class
+ */
 #include "Router.h"
 #include <iostream>
 

@@ -1,3 +1,7 @@
+/** 
+ *  \file wisun-cli.cpp
+ *  \brief implemenation of WiSUN command-line interface
+ */
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -22,7 +26,12 @@
 int main(int argc, char *argv[])
 {
     if (argc < 2) {
-        std::cout << "Usage: " << argv[0] << "[-v] [-d msdelay] [-s] serialport\n";
+        std::cout << "Usage: " << argv[0] << "[-e] [-r] [-v] [-d msdelay] [-s] serialport\n"
+            "-e  echo packets\n"
+            "-r  raw packets\n"
+            "-d  delay (in milliseconds)\n"
+            "-s  strict packet checking\n";
+
         return 1;
     }
     SafeQueue<Message> routerIn;

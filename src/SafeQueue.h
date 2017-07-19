@@ -1,5 +1,9 @@
 #ifndef SAFEQUEUE_H
 #define SAFEQUEUE_H
+/** 
+ *  \file SafeQueue.h
+ *  \brief Interface for the SafeQueue class
+ */
 #include <exception>
 #include <memory>
 #include <queue>
@@ -7,7 +11,7 @@
 #include <condition_variable>
 
 /**
- * Specialization of `std::exception` to handle an empty queue
+ * \brief Specialization of `std::exception` to handle an empty queue
  */
 struct EmptyQueue: std::exception {
     /// returns the exception text
@@ -15,7 +19,7 @@ struct EmptyQueue: std::exception {
 };
 
 /**
- * implementation of a thread-safe queue
+ * \brief implementation of a thread-safe queue
  */
 template<typename T>
 class SafeQueue {

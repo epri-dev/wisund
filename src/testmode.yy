@@ -21,6 +21,10 @@
 %parse-param {Console &console} 
 
 %{
+/** 
+ *  \file testmode.yy
+ *  \brief formal grammar for command-line Console class
+ */
 #include <cstdint>
 #include <iostream>
 #include <iomanip>

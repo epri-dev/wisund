@@ -1,3 +1,8 @@
+/**
+ *  \file Message.cpp
+ *  \brief Implementation of the Message class
+ */
+#include "Console.h"
 #include "Message.h"
 #include <iostream>
 #include <iomanip>

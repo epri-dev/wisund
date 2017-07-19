@@ -1,3 +1,7 @@
+/** 
+ *  \file TunDevice.cpp
+ *  \brief Implementation of the TunDevice class
+ */
 #include "TunDevice.h"
 #include <thread>
 #include <cstdio>

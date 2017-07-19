@@ -1,5 +1,9 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
+/** 
+ *  \file Console.h
+ *  \brief Interface for the Console class
+ */
 
 #ifdef __linux__
 #include <unistd.h>
@@ -10,7 +14,7 @@
 #include <vector>
 
 /**
- * wrapper class for the parser/lexer code.
+ * \brief wrapper class for the parser/lexer code.
  *
  * This class gets text input from the input stream (passed to `run`)
  * and converts into the messages that are sent to the radio.  It also 

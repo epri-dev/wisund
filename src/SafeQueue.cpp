@@ -1,3 +1,7 @@
+/** 
+ *  \file SafeQueue.cpp
+ *  \brief Implementation of the SafeQueue class
+ */
 #include "SafeQueue.h"
 
 template<typename T>

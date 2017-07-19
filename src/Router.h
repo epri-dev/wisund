@@ -1,10 +1,14 @@
 #ifndef ROUTER_H
 #define ROUTER_H
+/** 
+ *  \file Router.h
+ *  \brief Interface for the Router class
+ */
 
 #include "Device.h"
 
 /** 
- * class for router device.
+ * \brief class for router device.
  *
  * This class receives Messages from its single input queue, but unlike 
  * other Devices, the Router has two output queues; one for raw (IPv6)

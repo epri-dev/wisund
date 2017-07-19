@@ -2,6 +2,10 @@
 }
 
 %{
+/** 
+ *  \file testlex.l
+ *  \brief lexer for command-line Console class
+ */
 #include <cstdlib>
 #include "Console.h"
 #include "testmode.hpp"

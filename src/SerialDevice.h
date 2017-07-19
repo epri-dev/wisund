@@ -1,11 +1,16 @@
 #ifndef SERIALDEVICE_H
 #define SERIALDEVICE_H
+/** 
+ *  \file SerialDevice.h
+ *  \brief Interface for the SerialDevice class
+ */
+
 
 #include "Device.h"
 #include <asio.hpp>
 
 /**
- * wrapper class for the serial port.
+ * \brief wrapper class for the serial port.
  *
  * This class uses its Message queues to send and receive data via the
  * serial port to the radio.

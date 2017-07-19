@@ -1,3 +1,7 @@
+/** 
+ *  \file Device.cpp
+ *  \brief Implementation of the Device class
+ */
 #include "Device.h"
 
 Device::Device(SafeQueue<Message> &input, SafeQueue<Message> &output) :

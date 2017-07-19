@@ -1,3 +1,7 @@
+/** 
+ *  \file SerialDevice.cpp
+ *  \brief Implementation of the SerialDevice class
+ */
 #include "SerialDevice.h"
 #include <thread>
 #include <functional>

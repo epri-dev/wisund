@@ -1,3 +1,7 @@
+/** 
+ *  \file Console.cpp
+ *  \brief Implementation of the Console class
+ */
 #include "Console.h"
 #include "scanner.h"
 #include "Reply.h"

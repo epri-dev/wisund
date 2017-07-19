@@ -1,5 +1,10 @@
 #ifndef REPLY_H
 #define REPLY_H
+/** 
+ *  \file Reply.h
+ *  \brief Interface for the Reply class
+ */
+
 #include "Message.h"
 #include <ostream>
 /// standalone function that parses reply message to passed ostream

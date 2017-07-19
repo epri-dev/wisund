@@ -1,5 +1,9 @@
 #ifndef SCANNER_H
 #define SCANNER_H
+/** 
+ *  \file scanner.h
+ *  \brief Interface for the Scanner class
+ */
 
 #if !defined(yyFlexLexerOnce)
 #include <FlexLexer.h>

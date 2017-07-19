@@ -6,7 +6,10 @@
 #include "Console.h"
 #include "Simulator.h"
 
-/*
+/** 
+ * \file wisunsimd.cpp
+ * \brief Implementation of simulated WiSUN daemon.
+ *
  * The simulator works the same way as the wisund code except that 
  * instead of using a real serial port and a real TUN device, both are 
  * simulated. Because the TUN device for the real winsund code only

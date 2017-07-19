@@ -1,11 +1,17 @@
 #ifndef DEVICE_H
 #define DEVICE_H
+/** 
+ *  \file Device.h
+ *  \brief Interface for the Device class
+ */
+
 #include "Message.h"
 #include "SafeQueue.h"
 #include <atomic>
 
 /**
- * This is the base class for all devices that pass Messages
+ * \brief This is the base class for all devices that pass Messages.
+ *
  */
 class Device {
 public:

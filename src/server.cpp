@@ -1,3 +1,7 @@
+/** 
+ *  \file server.cpp
+ *  \brief Implementation of the Server class
+ */
 #define MG_DISABLE_DAV_AUTH 
 #define MG_ENABLE_FAKE_DAVLOCK
 extern "C" {
@@ -17,6 +21,7 @@ extern "C" {
 
 static std::atomic_int done{false};
 
+/// Placeholder for web-settable settings.  Currently unused.
 struct device_settings {
   char setting1[100];
   char setting2[100];
@@ -120,6 +125,7 @@ static void handle_ssi_call(struct mg_connection *nc, const char *param) {
   }
 }
 
+/// Wrapper class for the C-code mongoose web server.
 class WebServer 
 {
     const char *s_http_port;

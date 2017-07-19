@@ -1,3 +1,9 @@
+/**
+ *  \file Reply.cpp
+ *  \brief Implementation of the Reply class
+ */
+#include "Console.h"
+
 #include "Reply.h"
 #include "Message.h"
 #include <iomanip>

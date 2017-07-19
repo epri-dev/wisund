@@ -1,10 +1,14 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
+/** 
+ *  \file Simulator.h
+ *  \brief Interface for the Simulator class
+ */
 
 #include "Device.h"
 
 /**
- * wrapper class for the simulator.
+ * \brief wrapper class for the simulator.
  *
  * This class uses its Message queues to send and receive data via the
  * a simulated radio interface.
