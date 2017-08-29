@@ -51,7 +51,8 @@ static void help(void)
 {
     std::cout << "Usage: testmode /dev/ttyUSB0\n\n"
         "Accepted commands:\n"
-        "fchan nn\ntr51cf\nexclude nn ...\nphy nn\npanid nn\n"
+        "fchan nn rr\ntr51cf\nexclude nn ...\nphy nn\npanid nn\n"
+        "pansize nn\nroutecost nn\nuseparbs nn\n" 
         "lbr\nnlbr\nindex nn\nsetmac macaddr\nbuildid\n"
         "commands accepted in LBR or NLBR active state:\n"
         "state\ndiag nn\nneighbors\nmac\nget nn\nping nn\nlast\nrestart\n"
@@ -66,6 +67,7 @@ static void help(void)
 %token FCHAN TR51CF EXCLUDE PHY PANID LBR NLBR INDEX SETMAC 
 %token STATE DIAG BUILDID NEIGHBORS MAC GETZZ PING LAST RESTART 
 %token DATA HELP QUIT PAUSE
+%token PANSIZE ROUTECOST USEPARBS RANK NETNAME
 %token <uint8_t> HEXBYTE
 %type <std::vector<uint8_t>> bytes
 %token NEWLINE 
@@ -80,7 +82,7 @@ bytes:  bytes HEXBYTE       { $$ = $1; $$.push_back($2); }
     |   HEXBYTE             { $$.push_back($1); }
     ;
     
-command:    FCHAN HEXBYTE   { console.compound(0x01, $2); }
+command:    FCHAN bytes     { console.compound(0x01, $2); }
     |       TR51CF          { console.simple(0x02); }
     |       EXCLUDE bytes   { if (std::none_of($2.begin(), $2.end(), [](uint8_t i){ return i==0; })) {
                                 $2.push_back(0);
@@ -97,6 +99,26 @@ command:    FCHAN HEXBYTE   { console.compound(0x01, $2); }
                                     std::cout << "Error: panid  must have 2 bytes\n";
                                 }  // 2 octets for PANID
                             }
+    |       PANSIZE bytes   {if ($2.size() == 2) {
+                                console.compound(0x41, $2); 
+                                } else {
+                                    std::cout << "Error: pansize  must have 2 bytes\n";
+                                }  // 2 octets for PANID
+                            }
+    |       ROUTECOST bytes {if ($2.size() == 2) {
+                                console.compound(0x45, $2); 
+                                } else {
+                                    std::cout << "Error: routecost  must have 2 bytes\n";
+                                }  // 2 octets for PANID
+                            }
+	|       USEPARBS HEXBYTE { console.compound(0x42, $2); }
+	|       RANK HEXBYTE    { console.compound(0x46, $2); }
+    |       NETNAME bytes   { if ($2.size() >= 2) {
+                                console.compound(0x44, $2); 
+                                } else {
+                                    std::cout << "Error: netname must be at least 2 bytes\n";
+                                } 
+                            }  
     |       LBR             { console.simple(0x10); }
     |       NLBR            { console.simple(0x11); }
     |       INDEX HEXBYTE   { console.compound(0x12, $2); } 

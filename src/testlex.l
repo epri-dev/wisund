@@ -33,6 +33,10 @@ tr51cf      { return token::TR51CF; }
 exclude     { return token::EXCLUDE; }
 phy         { return token::PHY; }
 panid       { return token::PANID; }
+pansize     { return token::PANSIZE; }
+routecost   { return token::ROUTECOST; }
+rank        { return token::RANK; }
+netname     { return token::NETNAME; }
 lbr         { return token::LBR; }
 nlbr        { return token::NLBR; }
 index       { return token::INDEX; }
