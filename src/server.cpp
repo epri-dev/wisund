@@ -16,10 +16,13 @@ extern "C" {
 #include <regex>
 #include <chrono>
 #include <asio.hpp>
+#include "gpio.h"
 
 #define WEBSOCKET 0
 
 static std::atomic_int done{false};
+
+GPIO *lamp{nullptr};
 
 /// Placeholder for web-settable settings.  Currently unused.
 struct device_settings {
@@ -101,6 +104,16 @@ static void handle_tool_request(struct mg_connection *nc, http_message *hm) {
     }
 }
 
+static void handle_pin_request(struct mg_connection *nc, http_message *hm) {
+    constexpr std::size_t cmdsize{100};
+    char cmd[cmdsize];
+    auto ret = mg_get_http_var(&hm->query_string, "pin", cmd, cmdsize);
+    std::string command = replace_entities(cmd);
+    if (ret > 0) {
+	lamp->operator()(command == "on" ? 1 : 0);
+	mg_printf(nc, "%s", "HTTP/1.1 204 OK\r\nContent-Length: 0\r\n\r\n");
+    }
+}
 
 static void handle_get_cpu_usage(struct mg_connection *nc) {
   // Generate random value, as an example of changing CPU usage
@@ -141,6 +154,8 @@ class WebServer
                     handle_save(nc, hm);
                 } else if (mg_vcmp(&hm->uri, "/get_diag") == 0) {
                     handle_get_cpu_usage(nc);
+                } else if (mg_vcmp(&hm->uri, "/set") == 0) {
+                    handle_pin_request(nc, hm);
                 } else if (mg_vcmp(&hm->uri, "/tool") == 0) {
                     handle_tool_request(nc, hm);
                 } else {
@@ -223,6 +238,7 @@ int main(int argc, char *argv[]) {
         std::cout << "Usage: web_server web_root_dir\n";
         return 1;
     }
+    lamp = new GPIO{4};
     std::thread web{serve, argv[1]};
     std::string command;
     std::cout << "Enter the word \"quit\" to exit the program and shut down the server\n";
@@ -234,4 +250,5 @@ int main(int argc, char *argv[]) {
     }
     std::cout << "Joining web server thread...\n";
     web.join();
+    delete lamp;
 }
