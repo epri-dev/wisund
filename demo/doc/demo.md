@@ -30,6 +30,13 @@ In order to use the speech synthesizer, additional packages need to be installed
 
 That will also install other dependencies; around 20 is typical.
 
+## Building the software
+The software is only optionally built.  Building it is enabled using `cmake`.  The usual build procedure would be to create a build directory, e.g. `build` from the root.  Navigate to that directory and execute `cmake` as follows.
+
+    cmake -DWITH_DEMO=ON ..
+
+This will create the usual array of software, but with the special hooks and additional software that's needed for the demonstration described above.
+
 ## Tasks
   1. ~~Create HTML page with rain effect and house picture~~
   1. ~~Wire LED to GPIO4 on `pi2`~~
