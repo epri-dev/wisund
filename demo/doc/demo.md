@@ -37,6 +37,12 @@ The software is only optionally built.  Building it is enabled using `cmake`.  T
 
 This will create the usual array of software, but with the special hooks and additional software that's needed for the demonstration described above.
 
+The `demo` software listens on port 4321 (an arbitrarily chosen port) and calls the Festival speech synthesizer.  
+
+The `demotest` software is only written for troubleshooting and testing.  It sends arbitrary strings to the `demo` software which is assumed to be running.  The arbitrary strings are passed to the speech synthesizer's text-to-speech engine and the result should be audio output from the device running `demo`.  
+
+Note that as of this time (September 2017) the version of Festival that is packaged with Fedora 26 (the latest) is rather buggy and crashes rather than producing speech.  
+
 ## Tasks
   1. ~~Create HTML page with rain effect and house picture~~
   1. ~~Wire LED to GPIO4 on `pi2`~~
