@@ -10,7 +10,10 @@ WEBROOT=${MYDIR}/../web_root/
 ${MYDIR}/maketun
 
 # start Wi-SUN stack
+# TI board connected via serial
 /usr/local/bin/wisund /dev/serial0 &
+# TI board connected via USB
+#/usr/local/bin/wisund /dev/ttyACM0 &
 /usr/local/bin/web_server ${WEBROOT} &
 
 # start the Wi-SUN stack in NLBR mode
