@@ -31,7 +31,6 @@
 #include <algorithm>
 #include <vector>
 #include <thread>
-#include <initializer_list>
 #include "Message.h"
 #include "SafeQueue.h"
 #include "Console.h"
