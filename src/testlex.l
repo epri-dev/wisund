@@ -37,6 +37,7 @@ pansize     { return token::PANSIZE; }
 routecost   { return token::ROUTECOST; }
 rank        { return token::RANK; }
 netname     { return token::NETNAME; }
+macsec      { return token::MACSEC; }
 lbr         { return token::LBR; }
 nlbr        { return token::NLBR; }
 index       { return token::INDEX; }
