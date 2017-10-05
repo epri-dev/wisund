@@ -72,6 +72,13 @@ void Console::simple(uint8_t cmd)
     push(Message{0x6, cmd});
 }
 
+void Console::selfInput(const std::vector<uint8_t> &data) 
+{
+    Message m{data};
+    m.insert(m.begin(), 0xED);
+    inQ.push(m);
+}
+
 void Console::reset() 
 {
     want_reset = true; 

@@ -35,6 +35,8 @@ public:
     void compound(uint8_t cmd, uint8_t data);
     /// emits a simple command Message to the output queue
     void simple(uint8_t cmd);
+    /// emits the passed data as Message to the *input* queue
+    void selfInput(const std::vector<uint8_t> &data); 
     /// runs the transmit handler (converting text commands to command Messages)
     int runTx(std::istream *in = &std::cin);
     /// runs the receive handler (converting received Messages to JSON text output)

@@ -31,6 +31,7 @@
 #include <algorithm>
 #include <vector>
 #include <thread>
+#include <initializer_list>
 #include "Message.h"
 #include "SafeQueue.h"
 #include "Console.h"
@@ -47,18 +48,18 @@ void yy::Parser::error(const std::string &s)
 static const Message RestartCmd = Message{0xff};
 static const Message ReportLastCmd = Message{0x07};
 
-static void help(void)
-{
-    std::cout << "Usage: testmode /dev/ttyUSB0\n\n"
-        "Accepted commands:\n"
-        "fchan nn rr\ntr51cf\nexclude nn ...\nphy nn\npanid nn\n"
-        "pansize nn\nroutecost nn\nuseparbs nn\n" 
-        "macsec nn\n" 
-        "lbr\nnlbr\nindex nn\nsetmac macaddr\nbuildid\n"
-        "commands accepted in LBR or NLBR active state:\n"
-        "state\ndiag nn\nneighbors\nmac\nget nn\nping nn\nlast\nrestart\n"
-        "data nn ...\nhelp\nquit\n\n";
-}
+static const std::string helpText{
+    "Usage: testmode /dev/ttyUSB0\n\n"
+    "Accepted commands:\n"
+    "fchan nn rr\ntr51cf\nexclude nn ...\nphy nn\npanid nn\n"
+    "pansize nn\nroutecost nn\nuseparbs nn\n" 
+    "macsec nn\n" 
+    "lbr\nnlbr\nindex nn\nsetmac macaddr\nbuildid\n"
+    "commands accepted in LBR or NLBR active state:\n"
+    "state\ndiag nn\nneighbors\nmac\nget nn\nping nn\nlast\nrestart\n"
+    "data nn ...\nhelp\nquit\n\n"
+};
+static const std::vector<uint8_t> helpString{helpText.begin(), helpText.end()};
 
 %}
 %define api.value.type variant
@@ -113,9 +114,9 @@ command:    FCHAN bytes     { console.compound(0x01, $2); }
                                     std::cout << "Error: routecost  must have 2 bytes\n";
                                 }  // 2 octets for PANID
                             }
-	|       USEPARBS HEXBYTE { console.compound(0x42, $2); }
-	|       RANK HEXBYTE    { console.compound(0x46, $2); }
-	|       MACSEC HEXBYTE  { console.compound(0x47, $2); }
+    |       USEPARBS HEXBYTE { console.compound(0x42, $2); }
+    |       RANK HEXBYTE    { console.compound(0x46, $2); }
+    |       MACSEC HEXBYTE  { console.compound(0x47, $2); }
     |       NETNAME bytes   { if ($2.size() >= 2) {
                                 console.compound(0x44, $2); 
                                 } else {
@@ -141,7 +142,7 @@ command:    FCHAN bytes     { console.compound(0x01, $2); }
     |       PING HEXBYTE    { console.compound(0x30, $2); }
     |       LAST            { console.push(ReportLastCmd); }
     |       RESTART         { console.push(RestartCmd); }
-    |       HELP            { help(); }
+    |       HELP            { console.selfInput(helpString); }
     |       PAUSE HEXBYTE   { std::this_thread::sleep_for(std::chrono::milliseconds(100 * $2)); }
     |       QUIT            { console.quit(); return 0; }
     |       NEWLINE         { }

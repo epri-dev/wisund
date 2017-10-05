@@ -275,10 +275,10 @@ void decode(const Message &msg, std::ostream &out)
                     }
                     break;
 
-				case 10: // DIAG_MAC_STATS_1
+                case 10: // DIAG_MAC_STATS_1
                     if (msg.size() != 34) {
                         out << "Error: bad diag 10 packet: " <<"[size:" 
-							<< std::dec << msg.size() << "] " << msg << "\n";
+                            << std::dec << msg.size() << "] " << msg << "\n";
                     } else {
                         const uint8_t *ptr = &msg[2];
                         out << "{ \"macstats\": { ";
@@ -294,7 +294,7 @@ void decode(const Message &msg, std::ostream &out)
                     }
                     break;
 
-			   	   
+                      
                 default:  // DIAG_ID_INVALID
                     out << "Console received message: " << msg << '\n';
             }
@@ -304,8 +304,13 @@ void decode(const Message &msg, std::ostream &out)
             std::copy(++msg.begin(), msg.end(), std::ostream_iterator<uint8_t>(out));
             out << "\" }\n";
             break;
-        case  0xD0:
+        case 0xD0:
             out << "{ \"TEST_PRINTF\":\"";
+            std::copy(++msg.begin(), msg.end(), std::ostream_iterator<uint8_t>(out));
+            out << "\" }\n";
+            break;
+        case 0xED:
+            out << " \"selfinput\":\"";
             std::copy(++msg.begin(), msg.end(), std::ostream_iterator<uint8_t>(out));
             out << "\" }\n";
             break;
