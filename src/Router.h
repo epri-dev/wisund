@@ -21,7 +21,7 @@ class Router : public Device
 {
 public:
     /// constructor takes one input and two output queues 
-    Router(SafeQueue<Message> &input, SafeQueue<Message> &output, SafeQueue<Message> &rawOutput);
+    Router(SafeQueue<Message> &input, SafeQueue<Message> &output, SafeQueue<Message> &rawOutput, SafeQueue<Message> &capOutput);
     /// destructor is virtual in case class needs to be further derived
     virtual ~Router();
     /// runs both the receive and transmit handlers in required sequence
@@ -31,6 +31,8 @@ public:
 private:
     /// this queue is for raw (IPv6) messages
     SafeQueue<Message> &rawQ;
+    /// this queue is for captured messages
+    SafeQueue<Message> &capQ;
     /// if true, provide more diagnostic output
     bool m_verbose;
 };

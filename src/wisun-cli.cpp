@@ -10,6 +10,7 @@
 #include "Router.h"
 #include "SerialDevice.h"
 #include "TunDevice.h"
+#include "CaptureDevice.h"
 
 /*
  * The router has a few simple rules.
@@ -21,7 +22,8 @@
  *    1. Everything from the Console goes to the serial port
  *    2. Everything from the TUN goes to the serial port
  *    3. If a raw packet comes from the serial port, it goes to the TUN
- *    4. All non-raw packets from the serial port goes to the Console
+ *    4. If a capture packet comes from the serial port, it goes to the Capture device
+ *    5. All non-raw, non-capture packets from the serial port goes to the Console
  */
 int main(int argc, char *argv[])
 {
@@ -38,6 +40,7 @@ int main(int argc, char *argv[])
     SafeQueue<Message> serialIn;
     SafeQueue<Message> tunIn;
     SafeQueue<Message> consoleIn;
+    SafeQueue<Message> captureIn;
     bool verbose = false;
     bool strict = false;
     bool rawpackets = false;
@@ -79,9 +82,11 @@ int main(int argc, char *argv[])
     TunDevice tun(tunIn, serialIn);
     tun.strict(strict);
     // rule 3: raw packets from the serial port go to the TUN
-    // rule 4: non-raw packets from the serial port go to the Console
-    Router rtr{routerIn, consoleIn, tunIn};
+    // rule 4: If a capture packet comes from the serial port, it goes to the Capture device
+    // rule 5: All non-raw, non-capture packets from the serial port goes to the Console
+    Router rtr{routerIn, consoleIn, tunIn, captureIn};
     SerialDevice ser{serialIn, routerIn, argv[opt], 115200};
+    CaptureDevice cap{captureIn};
 
     ser.sendDelay(delay);
     ser.verbosity(verbose);
@@ -91,10 +96,13 @@ int main(int argc, char *argv[])
     con.hold();
     tun.hold();
     rtr.hold();
+    cap.hold();
+
     std::thread conThread{&Console::run, &con, &std::cin, &std::cout};
     std::thread serThread{&SerialDevice::run, &ser, &std::cin, &std::cout};
     std::thread tunThread{&TunDevice::run, &tun, &std::cin, &std::cout};
     std::thread rtrThread{&Router::run, &rtr, &std::cin, &std::cout};
+    std::thread capThread{&CaptureDevice::run, &cap, &std::cin, &std::cout};
     conThread.join();
     ser.releaseHold();
     serThread.join();  
@@ -102,5 +110,7 @@ int main(int argc, char *argv[])
     tunThread.join();  
     rtr.releaseHold();
     rtrThread.join();  
+    cap.releaseHold();
+    capThread.join();  
 }
 

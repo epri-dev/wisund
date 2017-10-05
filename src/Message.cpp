@@ -44,6 +44,8 @@ Message& Message::operator+=(const Message& msg) {
 
 bool Message::isRaw() const { return size() && front() == 0; }
 
+bool Message::isCap() const { return size() && front() == 0x31; }
+
 
 std::ostream& operator<<(std::ostream &out, const Message &msg) {
     for (auto byte : msg) {

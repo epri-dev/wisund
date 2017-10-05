@@ -26,6 +26,8 @@ public:
     Message &operator+=(const Message& msg);
     /// returns true if the vector is raw (that is, begins with a 0x00 byte)
     bool isRaw() const;
+    /// returns true if the vector is capture packet (that is, begins with a 0x31 byte)
+    bool isCap() const;
     /// overloaded inserter dumps the Message as a sequence of hex bytes
     friend std::ostream& operator<<(std::ostream &out, const Message &msg);
 };
