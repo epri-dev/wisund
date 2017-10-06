@@ -5,9 +5,10 @@
 #include "Router.h"
 #include <iostream>
 
-Router::Router(SafeQueue<Message> &input, SafeQueue<Message> &output, SafeQueue<Message> &rawOutput) :
+Router::Router(SafeQueue<Message> &input, SafeQueue<Message> &output, SafeQueue<Message> &rawOutput, SafeQueue<Message> &capOutput) :
     Device{input, output},
     rawQ{rawOutput},
+    capQ{capOutput},
     m_verbose{false}
 {}
 
@@ -25,7 +26,12 @@ int Router::run(std::istream *in, std::ostream *out)
                 std::cout << "Router pushing raw msg: " << m << "\n";
             }
             rawQ.push(m);
-        } else {
+        } else if (m.isCap()) {
+            if (m_verbose) {
+                std::cout << "Router pushing capture msg: " << m << "\n";
+            }
+            capQ.push(m);
+        }else {
             if (m_verbose) {
                 std::cout << "Router pushing msg: " << m << "\n";
             }
