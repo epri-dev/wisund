@@ -305,9 +305,9 @@ void decode(const Message &msg, std::ostream &out)
             out << "\" }\n";
             break;
         case 0xD0:
-            out << "{ \"TEST_PRINTF\":\"";
-            std::copy(++msg.begin(), msg.end(), std::ostream_iterator<uint8_t>(out));
-            out << "\" }\n";
+            std::cerr << "{ \"TEST_PRINTF\":\"";
+            std::copy(++msg.begin(), msg.end(), std::ostream_iterator<uint8_t>(std::cerr));
+            std::cerr << "\" }\n";
             break;
         case 0xED:
             out << " \"selfinput\":\"";

@@ -23,6 +23,17 @@ SerialDevice::SerialDevice(SafeQueue<Message> &input, SafeQueue<Message> &output
     m_port.set_option(asio::serial_port_base::baud_rate(baud));
 }
 
+SerialDevice::SerialDevice(SafeQueue<Message> &input, SafeQueue<Message> &output, const std::string &port, unsigned baud) :
+    Device(input, output),
+    m_io(), 
+    m_port(m_io, port.c_str()),
+    m_verbose{false},
+    m_raw{false},
+    m_delay{0}
+{
+    m_port.set_option(asio::serial_port_base::baud_rate(baud));
+}
+
 SerialDevice::~SerialDevice() = default;
 
 int SerialDevice::runTx(std::istream *in)
