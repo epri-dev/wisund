@@ -43,6 +43,7 @@ nlbr        { return token::NLBR; }
 index       { return token::INDEX; }
 setmac      { return token::SETMAC; }
 state       { return token::STATE; }
+maccap      { return token::MACCAP; }
 diag        { return token::DIAG; }
 buildid     { return token::BUILDID; }
 neighbors   { return token::NEIGHBORS; }

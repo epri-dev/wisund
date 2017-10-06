@@ -52,7 +52,7 @@ static const std::string helpText{
     "Accepted commands:\n"
     "fchan nn rr\ntr51cf\nexclude nn ...\nphy nn\npanid nn\n"
     "pansize nn\nroutecost nn\nuseparbs nn\n" 
-    "macsec nn\n" 
+    "macsec nn\nmaccap nn\n" 
     "lbr\nnlbr\nindex nn\nsetmac macaddr\nbuildid\n"
     "commands accepted in LBR or NLBR active state:\n"
     "state\ndiag nn\nneighbors\nmac\nget nn\nping nn\nlast\nrestart\n"
@@ -69,7 +69,7 @@ static const std::vector<uint8_t> helpString{helpText.begin(), helpText.end()};
 %token STATE DIAG BUILDID NEIGHBORS MAC GETZZ PING LAST RESTART 
 %token DATA HELP QUIT PAUSE
 %token PANSIZE ROUTECOST USEPARBS RANK NETNAME
-%token MACSEC
+%token MACSEC MACCAP
 %token <uint8_t> HEXBYTE
 %type <std::vector<uint8_t>> bytes
 %token NEWLINE 
@@ -116,6 +116,7 @@ command:    FCHAN bytes     { console.compound(0x01, $2); }
     |       USEPARBS HEXBYTE { console.compound(0x42, $2); }
     |       RANK HEXBYTE    { console.compound(0x46, $2); }
     |       MACSEC HEXBYTE  { console.compound(0x47, $2); }
+    |       MACCAP HEXBYTE  { console.compound(0x31, $2); }
     |       NETNAME bytes   { if ($2.size() >= 2) {
                                 console.compound(0x44, $2); 
                                 } else {
