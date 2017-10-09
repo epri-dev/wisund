@@ -35,6 +35,7 @@ phy         { return token::PHY; }
 panid       { return token::PANID; }
 pansize     { return token::PANSIZE; }
 routecost   { return token::ROUTECOST; }
+useparbs    { return token::USEPARBS; }
 rank        { return token::RANK; }
 netname     { return token::NETNAME; }
 macsec      { return token::MACSEC; }
