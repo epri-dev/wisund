@@ -36,6 +36,7 @@ add_subdirectory(doc)
 if(WITH_DEMO)
     add_definitions(-DDEMO=1)
     add_subdirectory(demo)
+    include_directories(demo)
 endif()
 
 if (WITH_TEST)
@@ -50,5 +51,5 @@ set (CPACK_PACKAGE_VERSION "${wisund_VERSION}")
 set (CPACK_PACKAGE_VENDOR "EPRI")
 
 # this presumes that the build is done in dir named "build"
-set(CPACK_SOURCE_IGNORE_FILES "build/*;*.swp")
+set(CPACK_SOURCE_IGNORE_FILES "build/*;.swp")
 include (CPack)
