@@ -1,9 +1,11 @@
 graph blocks {
     Console [shape=box];
     TunDevice [shape=box];
+    CaptureDevice [shape=box];
     Router [shape=box];
     SerialDevice [shape=box];
     Console -- Router [label="commands" dir=both];
     TunDevice -- Router [label="IPv6" dir=both];
+    CaptureDevice -- Router [label="pcapng" dir=back];
     Router -- SerialDevice [label="commands\nand IPv6" dir=both];
 }

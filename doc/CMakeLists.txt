@@ -4,22 +4,22 @@ cmake_minimum_required(VERSION 3.0)
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
     configure_file(
-        "${testmode_SOURCE_DIR}/doc/doxygen.conf.in"
+        "${wisund_SOURCE_DIR}/doc/doxygen.conf.in"
         "${CMAKE_BINARY_DIR}/doxygen.conf"
         @ONLY
     )
     configure_file(
-        "${testmode_SOURCE_DIR}/doc/hardware.jpg"
+        "${wisund_SOURCE_DIR}/doc/hardware.jpg"
         "${CMAKE_BINARY_DIR}/doc/hardware.jpg"
         COPYONLY
     )
     configure_file(
-        "${testmode_SOURCE_DIR}/doc/epri-logo.jpg"
+        "${wisund_SOURCE_DIR}/doc/epri-logo.jpg"
         "${CMAKE_BINARY_DIR}/doc/epri-logo.jpg"
         COPYONLY
     )
     configure_file(
-        "${testmode_SOURCE_DIR}/doc/header.tex"
+        "${wisund_SOURCE_DIR}/doc/header.tex"
         "${CMAKE_BINARY_DIR}/doc/header.tex"
         COPYONLY
     )
@@ -47,14 +47,14 @@ if(DOXYGEN_FOUND)
     # There must be a better way to do this!
     add_custom_command(
         OUTPUT "${CMAKE_BINARY_DIR}/doc/blocks.svg"
-        COMMAND ${DOXYGEN_DOT_EXECUTABLE} -Tsvg ${testmode_SOURCE_DIR}/doc/blocks.dot -o${CMAKE_BINARY_DIR}/doc/blocks.svg
+        COMMAND ${DOXYGEN_DOT_EXECUTABLE} -Tsvg ${wisund_SOURCE_DIR}/doc/blocks.dot -o${CMAKE_BINARY_DIR}/doc/blocks.svg
         DEPENDS "blocks.dot"
         WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
         COMMENT "Generating drawings using graphviz..." 
     )
     add_custom_command(
         OUTPUT "${CMAKE_BINARY_DIR}/doc/blocks.pdf"
-        COMMAND ${DOXYGEN_DOT_EXECUTABLE} -Tpdf ${testmode_SOURCE_DIR}/doc/blocks.dot -o${CMAKE_BINARY_DIR}/doc/blocks.pdf
+        COMMAND ${DOXYGEN_DOT_EXECUTABLE} -Tpdf ${wisund_SOURCE_DIR}/doc/blocks.dot -o${CMAKE_BINARY_DIR}/doc/blocks.pdf
         DEPENDS "blocks.dot"
         WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
         COMMENT "Generating drawings using graphviz..." 

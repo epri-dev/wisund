@@ -50,4 +50,16 @@ These commands are only available when the node is (or was previously) connected
 > { "radiostats": { "rxcount":6, "fifoerrors":0, "crcerrors":0, "rxinterrupts":6, "lastrxlen":54, "rssi":58, "txinterrupts":640, "spuriousints":0, "txerrors":0, "txpackets":640, "txfifoerr":0, "txchipstat":15 } }
 ### neighbors
 > { "neighbors": [ { "index":0, "validated":1, "timestamp":1736418, "mac":"00:19:59:ff:fe:0f:ff:02"} ] }
+## maccap 01|00
+Enables capture if set to 01, or disables capture if set to 00.  When enabled, sends received packets to capture file.
+## pansize xx
+Needs explanatory text.
+## routecost xx
+Needs explanatory text.
+## useparbs xx
+Needs explanatory text.
+## rank xx
+Needs explanatory text.
+## macsec xx
+Needs explanatory text.
 ### quit

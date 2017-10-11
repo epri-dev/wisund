@@ -2,6 +2,7 @@
  *  \file wisund.cpp
  *  \brief implemenation of WiSUN "daemon"
  */
+#include "wisundConfig.h"
 #include "SafeQueue.h"
 #include "Console.h"
 #include "Router.h"
@@ -46,6 +47,10 @@ int main(int argc, char *argv[])
     int opt = 1;
     while (opt < argc && argv[opt][0] == '-') {
         switch (argv[opt][1]) {
+            case 'V':
+                std::cout << "wisund v" << wisund_VERSION << '\n';
+                return 0;
+                break;
             case 'v':
                 verbose = true;
                 break;
