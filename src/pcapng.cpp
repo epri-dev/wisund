@@ -156,7 +156,6 @@ std::istream &EPB::read(std::istream &in) {
 std::ostream &EPB::write(std::ostream &out, const uint8_t *pkt, std::size_t pktlen) {
     static constexpr uint32_t pad{0};
     std::size_t padsize{pktlen % sizeof pad ? sizeof pad - pktlen % sizeof pad : 0};
-    std::cout << "pktlen = 0x" << std::hex << pktlen << "\npadsize = 0x" << padsize << "\n";
     CapturedLen = OriginalLen = pktlen;
     len += pktlen + padsize;
     out.write(reinterpret_cast<const char *>(this), sizeof *this);
