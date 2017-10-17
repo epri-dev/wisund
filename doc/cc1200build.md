@@ -1,5 +1,5 @@
 # Building the CC1200 firmware  {#cc1200build}
-This document describes how to build the radio portion of this project using TI's Code Composer Studio (CCS) version 6.1 or later.  Because TI's software is built to run under Windows, this portion of the code is built on Windows.  Windows 7 and Windows 10 have both been successfully used, but check TI's documentation for both the latest version and details on which operating systems and versions are supported.  The code is intended to be run on [TI's CC1200 Development Kit](http://www.ti.com/tool/cc1200dk).  The steps are:
+This document describes how to build the radio firmware associated with this project using TI's Code Composer Studio (CCS) version 6.1 or later.  Because TI's software is built to run under Windows, this portion of the code is built on Windows.  Windows 7 and Windows 10 have both been successfully used, but check TI's documentation for both the latest version and details on which operating systems and versions are supported.  The code is intended to be run on [TI's CC1200 Development Kit](http://www.ti.com/tool/cc1200dk).  The steps are:
 
   1. Install the tools
   2. Create the source tree

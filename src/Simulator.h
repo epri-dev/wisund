@@ -120,6 +120,8 @@ public:
     int run(std::istream *in, std::ostream *out);
     /// set or clear verbose flag and return previous state
     bool verbosity(bool verbose);
+    /// dummy setraw exists only to simulate serial device
+    bool setraw(bool rawpackets) { return rawpackets; }
     /// set optional pre-send delay time 
     void sendDelay(std::chrono::duration<float, std::milli> delay); 
 private:

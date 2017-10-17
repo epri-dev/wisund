@@ -97,13 +97,22 @@
  *  \file wisund.cpp
  *  \brief implemenation of WiSUN "daemon"
  */
+
+#ifndef SIM
+#define SIM 0
+#endif 
+
 #include "wisundConfig.h"
 #include "SafeQueue.h"
 #include "Console.h"
+#if SIM
+#include "Simulator.h"
+#else
 #include "Router.h"
 #include "SerialDevice.h"
 #include "TunDevice.h"
 #include "CaptureDevice.h"
+#endif
 #include <asio.hpp>
 #include <iostream>
 #include <fstream>
@@ -113,27 +122,48 @@
 /*
  * The router has a few simple rules.
  *
- * On Windows there is no TUN device so the serial port and
- * console are directly tied together with no routing decisions.
- *
- * On Linux, the rules are:
+ * The rules are:
  *    1. Everything from the Console goes to the serial port
  *    2. Everything from the TUN goes to the serial port
  *    3. If a raw packet comes from the serial port, it goes to the TUN
  *    4. If a capture packet comes from the serial port, it goes to the Capture device
  *    5. All non-raw, non-capture packets from the serial port goes to the Console
+ *
+ * The simulator works the same way as the wisund code except that 
+ * instead of using a real serial port and a real TUN device, both are 
+ * simulated. Because the TUN device for the real winsund code only
+ * has indirect effects, it is omitted entirely from this simulator
+ * and only the radio messages are simulated.
+ * 
+ * For that reason, no Router and no CaptureDevice are required, since the 
+ * Console and Simulator devices are the only two devices.  Messages originating 
+ * from one simply always go to the other.
+ *
  */
+
+#if !SIM
+const std::string name{"wisund"};
+#else
+const std::string name{"wisunsimd"};
+#endif
+
+void usage() {
+    std::cout << "Usage: " << name << " [-V] [-e] [-v] [-r] [-d msdelay] [-s] serialport capfilename\n";
+}
+
 int main(int argc, char *argv[])
 {
     if (argc < 2) {
-        std::cout << "Usage: " << argv[0] << " [-e] [-v] [-r] [-d msdelay] [-s] serialport capfilename\n";
+        usage();
         return 1;
     }
+#if !SIM
     SafeQueue<Message> routerIn;
-    SafeQueue<Message> serialIn;
     SafeQueue<Message> tunIn;
-    SafeQueue<Message> consoleIn;
     SafeQueue<Message> captureIn;
+#endif
+    SafeQueue<Message> serialIn;
+    SafeQueue<Message> consoleIn;
     bool verbose = false;
     bool strict = false;
     bool rawpackets = false;
@@ -143,7 +173,7 @@ int main(int argc, char *argv[])
     while (opt < argc && argv[opt][0] == '-') {
         switch (argv[opt][1]) {
             case 'V':
-                std::cout << "wisund v" << wisund_VERSION << '\n';
+                std::cout << name << " v" << wisund_VERSION << '\n';
                 return 0;
                 break;
             case 'v':
@@ -167,6 +197,11 @@ int main(int argc, char *argv[])
         }
         ++opt;
     }
+#if SIM
+    // these variables are unused by the simulator
+    strict = strict;
+    rawpackets = rawpackets;
+#endif
     if (opt >= argc) {
         std::cout << "Error: no device given\n";
         return 0;
@@ -182,6 +217,10 @@ int main(int argc, char *argv[])
 
     // rule 1: Everything from the Console goes to the serial port
     Console con(consoleIn, serialIn);
+#if SIM
+    // rule 2: Everything from serial port goes to the console
+    Simulator ser(serialIn, consoleIn);
+#else
     // rule 2: Everything from the TUN goes to the serial port
     TunDevice tun(tunIn, serialIn);
     tun.strict(strict);
@@ -191,22 +230,24 @@ int main(int argc, char *argv[])
     Router rtr{routerIn, consoleIn, tunIn, captureIn};
     SerialDevice ser{serialIn, routerIn, serialname, 115200};
     CaptureDevice cap{captureIn};
-
+#endif
     ser.sendDelay(delay);
     ser.verbosity(verbose);
     ser.setraw(rawpackets);
     con.setEcho(echo);
-    std::ofstream capfile(capfilename, std::ios::binary);
     ser.hold();
+#if SIM
+    std::thread serThread{&Simulator::run, &ser, &std::cin, &std::cout};
+#else
+    std::ofstream capfile(capfilename, std::ios::binary);
     tun.hold();
     rtr.hold();
     cap.hold();
-
     std::thread serThread{&SerialDevice::run, &ser, &std::cin, &std::cout};
     std::thread tunThread{&TunDevice::run, &tun, &std::cin, &std::cout};
     std::thread rtrThread{&Router::run, &rtr, &std::cin, &std::cout};
     std::thread capThread{&CaptureDevice::run, &cap, &std::cin, &capfile};
-
+#endif
     asio::io_service ios;
     // IPv4 address, port 5555
     asio::ip::tcp::acceptor acceptor(ios, 
@@ -223,11 +264,13 @@ int main(int argc, char *argv[])
 
     ser.releaseHold();
     serThread.join();  
+#if !SIM
     tun.releaseHold();
     tunThread.join();  
     rtr.releaseHold();
     rtrThread.join();  
     cap.releaseHold();
     capThread.join();  
+#endif
 }
 
