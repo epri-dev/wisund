@@ -102,6 +102,10 @@
 #define SIM 0
 #endif 
 
+#ifndef CLI
+#define CLI 0
+#endif 
+
 #include "wisundConfig.h"
 #include "SafeQueue.h"
 #include "Console.h"
@@ -142,13 +146,28 @@
  */
 
 #if !SIM
-const std::string name{"wisund"};
+#if CLI
+const std::string name{"wisun-cli"};
 #else
+const std::string name{"wisund"};
+#endif
+#else
+#if CLI
+#error "Cannot specify both CLI and SIM simultaneously."
+#endif
 const std::string name{"wisunsimd"};
 #endif
 
 void usage() {
-    std::cout << "Usage: " << name << " [-V] [-e] [-v] [-r] [-d msdelay] [-s] serialport capfilename\n";
+    std::cout << "Usage: " << name << " [-V] [-e] [-v] [-r] [-d msdelay] [-s] serialport capfilename\n"
+        "-V  print version and quit\n"
+        "-e  echo packets\n"
+        "-v  enable verbose mode\n"
+        "-r  raw packets\n"
+        "-d  delay (in milliseconds)\n"
+        "-s  strict packet checking\n"
+        "serialport is the device name of the radio port e.g. /dev/serial0\n"
+        "capfilename is the name of the capture file or fifo; can also be /dev/null\n";
 }
 
 int main(int argc, char *argv[])
@@ -200,7 +219,6 @@ int main(int argc, char *argv[])
 #if SIM
     // these variables are unused by the simulator
     strict = strict;
-    rawpackets = rawpackets;
 #endif
     if (opt >= argc) {
         std::cout << "Error: no device given\n";
@@ -248,6 +266,15 @@ int main(int argc, char *argv[])
     std::thread rtrThread{&Router::run, &rtr, &std::cin, &std::cout};
     std::thread capThread{&CaptureDevice::run, &cap, &std::cin, &capfile};
 #endif
+#if CLI
+    while (!con.getQuitValue()) {
+        con.hold();
+        con.run(&std::cin, &std::cout);
+        if (con.wantReset()) {
+            std::cout << "resetting\n";
+        }
+    }
+#else
     asio::io_service ios;
     // IPv4 address, port 5555
     asio::ip::tcp::acceptor acceptor(ios, 
@@ -261,7 +288,7 @@ int main(int argc, char *argv[])
             std::cout << "resetting\n";
         }
     }
-
+#endif
     ser.releaseHold();
     serThread.join();  
 #if !SIM
