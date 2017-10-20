@@ -1,7 +1,7 @@
 # wisund
 This project is code that runs on a Raspberry Pi and communicates with the EPRI Open-Wi-SUN-Stack.  The Open-Wi-SUN-Stack is a separate project that is an open source reference implementation of the [Wi-SUN Alliance](https://www.wi-sun.org) RF mesh protocol, based on IEEE 802.15.4g.  EPRI's implementation includes a serial port running at 115200 bps to allow programs such as this one to communicate to and through the radio.  Communication to the radio is used to set parameters and control the radio and to interrogate the stack for diagnostic information.  Communication through the radio allows virtually any IPv6 traffic to be sent to other Wi-SUN compliant radios.
 
-## Building the software on the Raspberry Pi  {#pibuild}
+## Building the software on the Raspberry Pi
 This page describes compiling and installing this software on a Raspberry Pi from source.
 
 ### Preparing the Pi
