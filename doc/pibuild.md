@@ -1,7 +1,7 @@
 # Building the software on the Raspberry Pi  {#pibuild}
-This page describes both the installation of the software on a Raspberry Pi if the installer has already been created, and also detailed instructions on how to build it from scratch on the Pi.
+This page describes compiling and installing this software on a Raspberry Pi from source.
 
-## Installing the software 
+### Preparing the Pi
 
 First, obtain and install a Raspberry Pi image on a suitable microSD card.  Instructions and download images are available via <https://www.raspberrypi.org/downloads/raspbian/>.  
 
@@ -19,15 +19,9 @@ If there is a line that says either `enable_uart=0` or `enable_uart=1`, either d
 
 Images that are 2017 or newer only need `uart0=on`.
 
-Now reboot the Pi and copy the `testmode-0.1.1-Linux.sh` file onto the Pi via `ssh` or other means. Execute the shell script as root:
+### Installing the tools
 
-    sudo ./testmode-0.1.1-Linux.sh
-
-Accept the license and the default installation location and the executables will be installed in `testmode-0.1.1-Linux` in a `bin` directory.
-
-## Building the software 
-
-Install the following packages
+With the Pi connected to the internet, execute the following commands to update the Pi's software and to install required packages on the Pi:
 
     sudo raspi-config
     sudo apt-get upgrade
@@ -37,12 +31,64 @@ Install the following packages
     sudo apt-get install gcc-4.8 g++-4.8 bison flex
     sudo apt-get install libasio-dev 
     
-For the unit tests:
+If the unit tests are also desired, this command will also be needed:
 
     sudo apt-get install libcppunit-dev 
 
-For the documentation:
+To build the documentation in both HTML and PDF formats, the following is also needed:
 
     sudo apt-get install doxygen texlive-font-utils graphviz
 
 Note that with the versions of Doxygen and Raspbian available at the moment (December 2016), there is a [problem with Doxygen's support of sqlite3](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=758975) that manifests itself as a large number of warnings when generating the documentation, as well as a sqlite database file which grows without bound.
+
+### Cloning the repository
+The repository for this source code may be cloned directly onto the Pi:
+
+    git clone git@github.com:epri-dev/wisund.git
+
+This will create a directory `wisun` and copy all of the source code there.  
+
+### Running CMake 
+Navigate into that directory (`cd wisund`) and create a new subdirectory called `build` (`mkdir build`) and then navigate into that directory (`cd build`) to run CMake.  If you wish to compile the unit tests, the command is this:
+
+    cmake -DCMAKE_BUILD_TYPE=Release -DWITH_TEST=1 ..
+
+If you don't want the unit tests, use this:
+
+    cmake -DCMAKE_BUILD_TYPE=Release ..
+
+That will identify the locations and versions of all of the compiler and build tools and create a `Makefile`.  
+
+### Building the software
+Once CMake has created the `Makefile`, we run `make` to build the software.  There are a few options that we can use, but the simplest way to build all software is to simply run `make` with no command line parameters:
+
+    make 
+
+To speed things up, you can ask make to build using multiple jobs simultaneously.
+
+    make -j8
+
+This creates 8 jobs that run in parallel, speeding up the process.
+
+### Other targets
+In addition to building the software, we can also run unit tests and build the extensive documentation in both HTML and PDF formats.  To run unit tests (if `-DWITH_TEST=1` was specified when CMake was invoked), use the following:
+
+    make -j8 test
+
+This will run the various test suites, each containing multiple individual unit tests and report the results which should say that 100% of the tests passed. Note that the tests must be built first, which is part of the overall software build process as described in the previous section.
+
+To build the documentation, run:
+
+    make doc   
+
+That builds the HTML version of the documentation only.  If you wish to also make the PDF version of the documentation, use this:
+
+    make pdf
+
+If you wish to create both, `make pdf` will build both the HTML and PDF versions.  The HTML version is in the relative path `doc/html` and a good starting place is `index.html` in that directory.  The PDF version of the documentation is created in `doc/pdf/` and is named `refman.pdf`.
+
+Finally, the software can also be installed on the Pi by using this:
+
+    sudo make install
+
+Note that `root` privileges are required to install the software, hence to use of `sudo`.  There are other possible options to build, most of which are subsets of what has already been shown.  These can all be listed by running `make help`. 
