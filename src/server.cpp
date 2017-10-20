@@ -114,6 +114,25 @@ extern "C" {
 #include <asio.hpp>
 
 #define WEBSOCKET 0
+#ifndef DEMO
+#define DEMO 0
+#define DEMO_WITH_LED_CONTROL 0
+#endif
+#ifndef DEMO_WITH_LED_CONTROL
+#if __arm__
+#define DEMO_WITH_LED_CONTROL 1
+#else
+#define DEMO_WITH_LED_CONTROL 0
+#endif
+#endif
+
+#if DEMO
+std::string distant_end;
+#if DEMO_WITH_LED_CONTROL
+#include "gpio.h"
+GPIO *lamp{nullptr};
+#endif
+#endif
 
 static std::atomic_int done{false};
 
@@ -200,6 +219,80 @@ static void handle_tool_request(struct mg_connection *nc, http_message *hm) {
     }
 }
 
+#if DEMO
+static void sendMsg(const char *msg) {
+    using asio::ip::udp;
+
+    try {
+        asio::io_service io_service;
+        udp::socket socket(io_service, udp::endpoint(udp::v6(), 0));
+        udp::resolver resolver(io_service);
+        udp::endpoint endpoint = *resolver.resolve({udp::v6(), distant_end, "4321"});
+        size_t msg_len = std::strlen(msg);
+        socket.send_to(asio::buffer(msg, msg_len), endpoint);
+    }
+    catch (std::exception& e) {
+        std::cerr << "Exception: " << e.what() << '\n';
+    }
+}
+
+
+static void sendOutage(const std::chrono::time_point<std::chrono::system_clock> &outageStart) {
+    std::time_t tt{std::chrono::system_clock::to_time_t(outageStart)};
+#if 0
+    std::cout << std::put_time(std::localtime(&tt), "O:%T") << '\n';
+#else
+    char temp[100];
+    std::strftime(temp, sizeof(temp), "O:%T", std::localtime(&tt));
+    std::cout << temp << '\n';
+    sendMsg(temp);
+#endif
+}
+
+
+static void sendOutage(
+        const std::chrono::time_point<std::chrono::system_clock> &outageEnd, 
+        const std::chrono::time_point<std::chrono::system_clock> &outageStart)
+{
+    auto duration(std::chrono::duration_cast<std::chrono::seconds>(outageEnd - outageStart));
+    std::time_t tt{std::chrono::system_clock::to_time_t(outageEnd)};
+#if 0
+    std::cout << std::put_time(std::localtime(&tt), "R:%T,D:")
+       << duration.count()
+        << '\n';
+#else
+    char temp[100];
+    std::strftime(temp, sizeof(temp), "R:%T", std::localtime(&tt));
+    std::cout << temp << duration.count() << '\n';
+    sendMsg(temp);
+#endif
+}
+
+
+static void handle_pin_request(struct mg_connection *nc, http_message *hm) {
+    static std::chrono::time_point<std::chrono::system_clock> outageStart;
+    constexpr std::size_t cmdsize{100};
+    char cmd[cmdsize];
+    auto ret = mg_get_http_var(&hm->query_string, "pin", cmd, cmdsize);
+    std::string command = replace_entities(cmd);
+    bool on = command == "on";
+    if (ret > 0) {
+#if DEMO_WITH_LED_CONTROL
+        lamp->operator()(on);
+#endif
+        if (on) {
+            // paradoxically, "on" means outage in this usage
+            outageStart = std::chrono::system_clock::now();
+            sendOutage(outageStart);
+        } else {
+            auto outageEnd = std::chrono::system_clock::now();
+            sendOutage(outageEnd, outageStart);
+        }
+        mg_printf(nc, "%s", "HTTP/1.1 204 OK\r\nContent-Length: 0\r\n\r\n");
+    }
+}
+#endif //DEMO
+
 static void handle_get_cpu_usage(struct mg_connection *nc) {
   // Generate random value, as an example of changing CPU usage
   // Getting real CPU usage depends on the OS.
@@ -239,6 +332,10 @@ class WebServer
                     handle_save(nc, hm);
                 } else if (mg_vcmp(&hm->uri, "/get_diag") == 0) {
                     handle_get_cpu_usage(nc);
+#if DEMO
+                } else if (mg_vcmp(&hm->uri, "/set") == 0) {
+                    handle_pin_request(nc, hm);
+#endif //DEMO
                 } else if (mg_vcmp(&hm->uri, "/tool") == 0) {
                     handle_tool_request(nc, hm);
                 } else {
@@ -317,10 +414,22 @@ void serve(const char *webroot) {
 }
     
 int main(int argc, char *argv[]) {
+#if DEMO
+    if (argc != 3) {
+        std::cout << "Usage: web_server web_root_dir demo_ip\n"
+            "where demo_ip may be a resolvable machine name or IPv6 address\n";
+        return 1;
+    }
+    distant_end = argv[2];
+#if DEMO_WITH_LED_CONTROL
+    lamp = new GPIO{4};
+#endif  //DEMO_WITH_LED_CONTROL
+#else // DEMO
     if (argc != 2) {
         std::cout << "Usage: web_server web_root_dir\n";
         return 1;
     }
+#endif // DEMO
     std::thread web{serve, argv[1]};
     std::string command;
     std::cout << "Enter the word \"quit\" to exit the program and shut down the server\n";
@@ -332,4 +441,7 @@ int main(int argc, char *argv[]) {
     }
     std::cout << "Joining web server thread...\n";
     web.join();
+#if DEMO_WITH_LED_CONTROL
+    delete lamp;
+#endif 
 }

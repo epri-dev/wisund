@@ -12,6 +12,7 @@ else()
 endif()
 
 # options off-by-default that you can enable
+option(WITH_DEMO "Compile with demo features enabled" OFF)
 option(WITH_TEST "Build the test suite" OFF)
 
 # load additional detection for asio
@@ -31,6 +32,12 @@ include_directories("${PROJECT_BINARY_DIR}")
 # wisund sources
 add_subdirectory(src)
 add_subdirectory(doc)
+
+if(WITH_DEMO)
+    add_definitions(-DDEMO=1)
+    add_subdirectory(demo)
+    include_directories(demo)
+endif()
 
 if (WITH_TEST)
     enable_testing()
