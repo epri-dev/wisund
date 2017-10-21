@@ -31,8 +31,7 @@ With the Pi connected to the internet, execute the following commands to update 
     sudo apt-get update
     sudo apt-get upgrade
     sudo apt-get install vim-gnome vim cmake libboost-all-dev
-    sudo apt-get install gcc-4.8 g++-4.8 bison flex
-    sudo apt-get install libasio-dev 
+    sudo apt-get install gcc g++ bison flex libasio-dev
     
 If the unit tests are also desired, this command will also be needed:
 
@@ -40,7 +39,8 @@ If the unit tests are also desired, this command will also be needed:
 
 To build the documentation in both HTML and PDF formats, the following is also needed:
 
-    sudo apt-get install doxygen texlive-font-utils graphviz
+    sudo apt-get install doxygen texlive-latex-base 
+    sudo apt-get texlive-latex-extra texlive-font-utils graphviz
 
 Note that with the versions of Doxygen and Raspbian available at the moment (December 2016), there is a [problem with Doxygen's support of sqlite3](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=758975) that manifests itself as a large number of warnings when generating the documentation, as well as a sqlite database file which grows without bound.
 
