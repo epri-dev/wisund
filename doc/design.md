@@ -18,19 +18,16 @@ Pi pin #|Pi pin name|CC1200 pin name
 10      | UART\_RXD  | Port 5 pin 6
 
 ### Software
-There are several distinct software pieces within this package.  The pieces are named `wisun-cli`, `wisund`, `wiunsimd`, and `web_server`.  Each tool provides a means of interpreting and responding to the defined [commands](@ref commands).
+There are several distinct software pieces within this package.  The pieces are named `wisun-cli`, `wisund`, and `wisunsimd`.  Each tool provides a means of interpreting and responding to the defined [commands](@ref commands).
 
 ## @ref wisun-cli.cpp
 This software provides a command-line text-based interface for interacting with the EPRI Wi-SUN stack.  In addition to conveying commands and displaying the results, this software also takes care of routing the IPv6 packets across the RF link.
 
 ## @ref wisund.cpp
-This software is mostly identical to the `wisun-cli` code except that instead of interacting via text on the command line, this software interacts via text served on TCP/IPv4 port 5555.  All of the same commands are available.  It is intended that this code would normally run on the Raspberry Pi to run the radio software and that either the web interface (via `web_server`) or a direct link, as, for example by using `telnet` on port 5555. 
+This software is mostly identical to the `wisun-cli` code except that instead of interacting via text on the command line, this software interacts via text served on TCP/IPv4 port 5555.  All of the same commands are available.  It is intended that this code would normally run on the Raspberry Pi to run the radio software and that a direct link, as, for example by using `telnet` on port 5555 would be used to control it. 
 
 ## @ref wisunsimd.cpp
 This software is mostly identical to the `wisund` software except for two significant differences.  First, it uses a simulator rather than actually communicating with a radio over the serial port.  Second, since the RF link is simulated, the IPv6 routing portion of the code is omitted from `wisunsimd`
-
-## @ref server.cpp
-As the name suggests, this software is intended to run on the Raspberry Pi and implements a complete web server running on port 8000 with facilities for communicating with `wisund` or `wisunsimd`.  One of those programs must also be running for the web server to operate properly.  All of the [commands](@ref commands) are accessible via the relative path `/tool?cmd=`.  That is, if the server is running on `localhost`, one can request `diag 03` by using the url [http://localhost:8000/tool?cmd=diag 03](http://localhost:8000/tool?cmd=diag 03).
 
 
 ## Building the software and firmware
@@ -79,7 +76,7 @@ Anything received via tun is sent directly to Router; anything received on inter
 The `CaptureDevice` is a write-only device.  All incoming messages are translated into [pcapng](https://github.com/pcapng/pcapng) format and written to the associated output stream (typically a file.)
 
 ### Simulator
-As the name suggests, this device is intended to provide a simulated version of the radio hardware.  The primary purpose for this module is to allow for a simulated test to run on any Linux machine without the need for any additional hardware. This can be useful for performing development on the web pages or server.
+As the name suggests, this device is intended to provide a simulated version of the radio hardware.  The primary purpose for this module is to allow for a simulated test to run on any Linux machine without the need for any additional hardware. This can be useful for performing development on the server.
 
 ## threads
 The program is multithreaded and generally uses two threads per Device (one for transmit and one for receive).  Refer to the source code for details.
