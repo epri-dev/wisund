@@ -48,7 +48,7 @@ public:
         capThread.join();
         }
         int i = 4;
-        auto got{ss.str()};
+        std::string got{ss.str()};
         // find first timestamp
         auto ts1loc = 15*4;
         std::cout << "ts1loc = " << std::hex << ts1loc << '\n';
