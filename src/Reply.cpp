@@ -273,7 +273,7 @@ void decode(const Message &msg, std::ostream &out)
                     }
                     break;
                 case 6:  // DIAG_ID_FH_MY_SEQ    
-                    if (msg.size() != 3u+4*msg[2]) {
+                    if (msg.size() < 3 || msg.size() != 3u+4*msg[2]) {
                         out << "Error: bad diag 6 packet: " << msg << "\n";
                     } else {
                         const uint8_t *ptr = &msg[2];
@@ -288,7 +288,7 @@ void decode(const Message &msg, std::ostream &out)
                     }
                     break;
                 case 7:  // DIAG_ID_FH_NB_SEQ
-                    if (msg.size() != 3u+4*msg[2]) {
+                    if (msg.size() < 3 || msg.size() != 3u+4*msg[2]) {
                         out << "Error: bad diag 7 packet: " << msg << "\n";
                     } else {
                         const uint8_t *ptr = &msg[2];
