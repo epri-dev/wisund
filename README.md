@@ -31,7 +31,7 @@ With the Pi connected to the internet, execute the following commands to update 
     sudo apt-get update
     sudo apt-get upgrade
     sudo apt-get install vim-gnome vim cmake libboost-all-dev
-    sudo apt-get install gcc g++ bison flex libasio-dev
+    sudo apt-get install gcc g++ bison flex libasio-dev gawk
     
 If the unit tests are also desired, this command will also be needed:
 
