@@ -91,12 +91,12 @@ void Device::releaseHold()
     inQ.push(Message{nullptr, 0});
 }
 
-bool Device::wantHold() 
+bool Device::wantHold() const
 { 
     return holdOnRxQueueEmpty; 
 }
 
-void Device::showHoldState() 
+void Device::showHoldState() const
 { 
     std::cout << "State = " << std::boolalpha << holdOnRxQueueEmpty << "\n"; 
 }

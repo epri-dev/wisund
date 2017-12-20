@@ -104,9 +104,9 @@ public:
     /// releases any hold that may have been asserted on this Device
     void releaseHold();
     /// returns the current hold status of this Device
-    bool wantHold();
+    bool wantHold() const;
     /// convenience function to print the state of the hold variable to `std::cout`
-    void showHoldState();
+    void showHoldState() const;
 protected:
     /// If true, the receive will continue even if the input queue is empty
     volatile std::atomic_bool holdOnRxQueueEmpty;
