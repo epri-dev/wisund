@@ -135,7 +135,6 @@ static const std::vector<uint8_t> helpString{helpText.begin(), helpText.end()};
 %}
 %define api.value.type variant
 %define parse.assert
-%expect 1
 
 %token FCHAN TR51CF EXCLUDE PHY PANID LBR NLBR INDEX SETMAC 
 %token STATE DIAG BUILDID NEIGHBORS MAC GETZZ PING LAST RESTART 
@@ -219,11 +218,7 @@ command:    FCHAN bytes     { console.compound(0x01, $2); }
     |       QUIT            { console.quit(); return 0; }
     |       NEWLINE         { }
     |       CHAR            { console.reset(); return 0; }
-    |       errors          { error("unknown command"); }
-    ;
-
-errors:     errors error
-    |   error
+    |       error           { error("unknown command"); }
     ;
 
 %%
