@@ -258,9 +258,17 @@ int main(int argc, char *argv[])
             asio::ip::tcp::endpoint{asio::ip::tcp::v4(), 5555});
     while (!con.getQuitValue()) {
         con.hold();
-        asio::ip::tcp::iostream stream;
-        acceptor.accept(*stream.rdbuf());
-        con.run(&stream, &stream);
+        asio::ip::tcp::iostream iss;
+        asio::ip::tcp::iostream oss;
+        acceptor.accept(*iss.rdbuf());
+        /* 
+         * we set the output stream's basic_socket_streambuf to use the same
+         * underlying socket as the input stream.  Sharing a socket among 
+         * threads is not a problem, but sharing a single asio::ip::tcp::iostream
+         * is.  Doing so leads to data races.
+         */
+        oss.rdbuf()->assign(asio::ip::tcp::v4(), iss.rdbuf()->native_handle());
+        con.run(&iss, &oss);
         if (con.wantReset()) {
             std::cout << "resetting\n";
         }
