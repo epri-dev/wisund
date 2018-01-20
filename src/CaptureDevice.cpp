@@ -105,9 +105,11 @@ int CaptureDevice::run(std::istream *in, std::ostream *out)
         if (m_verbose) {
             std::cout << "CaptureDevice  raw msg: " << m << "\n";
         }
-        if (m.size() > 1) {
+        /* -5 instead of -1 to strip off FCS */
+        // TODO: check FCS?
+        if (m.size() > 5) {
             EPB ebp;
-            ebp.write(*out, &m[1], m.size()-1);
+            ebp.write(*out, &m[1], m.size()-5);
             // flush each packet to allow live update via pipe
             out->flush();
         }
