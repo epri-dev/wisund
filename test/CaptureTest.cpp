@@ -52,9 +52,10 @@ public:
         // find first timestamp
         auto ts1loc = 15*4;
         std::cout << "ts1loc = " << std::hex << ts1loc << '\n';
-        auto ts2loc = 38*4;
+        auto ts2loc = 37*4;
         std::cout << "ts2loc = " << std::hex << ts2loc << '\n';
         // insert fixed timestamps for comparison
+        std::cout << "Got = \n";
         for (auto ch : got) {
             std::cout << "\\x" << std::setw(2) << std::setfill('0') << std::hex << (static_cast<unsigned>(ch) & 0xffu);
             if (--i == 0) {
@@ -65,6 +66,7 @@ public:
         std::cout << '\n';
         got.replace(ts1loc, 8, ts1);
         got.replace(ts2loc, 8, ts2);
+        std::cout << "Adjusted = \n";
         for (auto ch : got) {
             std::cout << "\\x" << std::setw(2) << std::setfill('0') << std::hex << (static_cast<unsigned>(ch) & 0xffu);
             if (--i == 0) {
@@ -73,6 +75,16 @@ public:
             }
         }
         std::cout << '\n';
+        std::cout << "Desired = \n";
+        for (auto ch : desired) {
+            std::cout << "\\x" << std::setw(2) << std::setfill('0') << std::hex << (static_cast<unsigned>(ch) & 0xffu);
+            if (--i == 0) {
+                std::cout << '\n';
+                i = 4;
+            }
+        }
+        std::cout << '\n';
+
         std::cout << "desired len=" << desired.length() << '\n';
         std::cout << "got len=" << got.length() << '\n';
 
@@ -107,12 +119,12 @@ const std::string CaptureTest::desired{
 "\xff\xff\x00\x00" 
 "\x14\x00\x00\x00" 
 "\x06\x00\x00\x00" 
-"\x5c\x00\x00\x00" 
+"\x58\x00\x00\x00" 
 "\x00\x00\x00\x00" 
 "\xd2\x5b\x05\x00" 
 "\x8d\x36\xa3\x37" 
-"\x3c\x00\x00\x00" 
-"\x3c\x00\x00\x00" 
+"\x38\x00\x00\x00" 
+"\x38\x00\x00\x00" 
 "\x31\x01\xe3\xa1" 
 "\xbc\x01\xff\x0f" 
 "\xfe\xff\x59\x19" 
@@ -127,15 +139,14 @@ const std::string CaptureTest::desired{
 "\x49\x2d\x57\x69" 
 "\x53\x55\x4e\x2d" 
 "\x46\x41\x4e\xb4" 
-"\xa1\x0a\x10\xc0" 
-"\x5c\x00\x00\x00" 
+"\x58\x00\x00\x00" 
 "\x06\x00\x00\x00" 
-"\x90\x00\x00\x00" 
+"\x8c\x00\x00\x00" 
 "\x00\x00\x00\x00" 
 "\xd2\x5b\x05\x00" 
 "\x94\x36\xa3\x37" 
-"\x70\x00\x00\x00" 
-"\x70\x00\x00\x00" 
+"\x6c\x00\x00\x00" 
+"\x6c\x00\x00\x00" 
 "\x31\x09\xe3\xa1" 
 "\xbc\x01\xff\x0f" 
 "\xfe\xff\x59\x19" 
@@ -163,9 +174,8 @@ const std::string CaptureTest::desired{
 "\x00\x00\x00\x2e" 
 "\xa2\x2a\x33\x23" 
 "\xe7\x8f\xf4\x34" 
-"\x61\x00\x00\xc0" 
-"\x90\x00\x00\x00"
-,0x11c
+"\x8c\x00\x00\x00"
+,0x114
 };
 
 /*
