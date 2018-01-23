@@ -27,7 +27,7 @@ This software provides a command-line text-based interface for interacting with 
 This software is mostly identical to the `wisun-cli` code except that instead of interacting via text on the command line, this software interacts via text served on TCP/IPv4 port 5555.  All of the same commands are available.  It is intended that this code would normally run on the Raspberry Pi to run the radio software and that a direct link, as, for example by using `telnet` on port 5555 would be used to control it. 
 
 ## @ref wisunsimd.cpp
-This software is mostly identical to the `wisund` software except for two significant differences.  First, it uses a simulator rather than actually communicating with a radio over the serial port.  Second, since the RF link is simulated, the IPv6 routing portion of the code is omitted from `wisunsimd`
+This software is mostly identical to the `wisund` software except for two significant differences.  First, it uses a simulator rather than actually communicating with a radio over the serial port.  Second, since the RF link is simulated, the IPv6 routing portion of the code is omitted from `wisunsimd`.  Also, all of the responses are "canned" static responses.  The sole exception is the `diag 02` command, in which the first data value (the fcie count) is incremented on each invocation.  This is unrealistic in that the radio would never actually operate that way but allows for at least one non-static command so that testing can assure that the responses are not duplicates.
 
 
 ## Building the software and firmware
