@@ -12,7 +12,7 @@ Insert the resulting microSD card into the Raspberry Pi power it up.
 
 Run `raspi-config` as root (`sudo raspi-config`) and do the following things:
 
-under "Advanced Options", choose "SSH" and enable the SSH Server.  Next, also under "Advanced Options", "Serial" disable the login shell via serial.  Optionally, you may also wish to set the locale and expand the filesystem but neither of these are strictly necessary.
+under "Advanced Options", choose "SSH" and enable the SSH Server.  Next, also under "Advanced Options", "Serial" disable the login shell via serial.  Optionally, you may also wish to set the locale and expand the filesystem but neither of these are strictly necessary.  
 
 When you have completed these selections, finish and (if prompted) reboot.  For versions of the Raspbian operating system that are based on images before 2017, edit the file `/boot/config.txt` to add the following line:
 
@@ -20,18 +20,18 @@ When you have completed these selections, finish and (if prompted) reboot.  For 
 
 If there is a line that says either `enable_uart=0` or `enable_uart=1`, either delete the line or comment it out by adding a `#` character to the front of the line.
 
-Images that are 2017 or newer only need `uart0=on`.
+Images that are 2017 or newer only need `uart0=on`.  
+In the 2018 version of `raspi-config`, the "SSH" option has been moved to "Interfacing Options" and no manual editing of the file is required if, within `raspi-config`, the serial port is set to "Hardware enabled" and "Remote shell disabled."
 
 ### Installing the tools
 
 With the Pi connected to the internet, execute the following commands to update the Pi's software and to install required packages on the Pi:
 
-    sudo raspi-config
     sudo apt-get upgrade
     sudo apt-get update
     sudo apt-get upgrade
-    sudo apt-get install vim-gnome vim cmake libboost-all-dev
-    sudo apt-get install gcc g++ bison flex libasio-dev gawk
+    sudo apt-get install vim-gnome vim cmake libboost-all-dev telnet
+    sudo apt-get install gcc g++ bison flex libasio-dev gawk git
     
 If the unit tests are also desired, this command will also be needed:
 
@@ -47,9 +47,9 @@ Note that with the versions of Doxygen and Raspbian available at the moment (Dec
 ### Cloning the repository
 The repository for this source code may be cloned directly onto the Pi:
 
-    git clone git@github.com:epri-dev/wisund.git
+    git clone https://github.com/epri-dev/wisund.git
 
-This will create a directory `wisun` and copy all of the source code there.  
+This will create a directory `wisund` and copy all of the source code there.  
 
 ### Running CMake 
 Navigate into that directory (`cd wisund`) and create a new subdirectory called `build` (`mkdir build`) and then navigate into that directory (`cd build`) to run CMake.  If you wish to compile the unit tests, the command is this:
