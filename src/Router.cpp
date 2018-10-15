@@ -76,7 +76,6 @@
  */
 #include "Router.h"
 #include <iostream>
-#include <cassert>
 
 Router::Router() :
     Device{&outQ}
@@ -84,12 +83,12 @@ Router::Router() :
 
 Router::~Router() = default;
 
-bool Router::rule(Device *in, Device *out)
+bool Router::addRule(Device *in, SinkDevice *out, bool (Message::*pred)() const)
 {
     if (in == out) {
         return false;
     }
-    always[in] = out;
+    rules.emplace_back(routingRule{in, out, pred});
     return true;
 }
 
@@ -101,15 +100,18 @@ int Router::run(std::istream *in, std::ostream *out)
     while (wantHold()) {
         wait_and_pop(m);
         if (m.source) {
-            std::cout << "Got a message from " << m.source << '\n';
-            assert(m.source != nullptr);
-            Device *target = always.at(static_cast<Device *>(m.source));
-            std::cout << "sending it to " << (void *)target << '\n';
-            target->in().push(m);
-            if (m_verbose) {
-                std::cout << "Router pushing msg: " << m << "\n";
-            }
-        } 
+            for (const auto &rule : rules) {
+                if (rule.from == m.source && (rule.pred == nullptr || (m.*(rule.pred))())) {
+                    rule.to->in().push(m);
+                    if (m_verbose) {
+                        std::cout << "Router pushing msg: " << m << "\n";
+                    }
+                    break;
+                }
+            } 
+        } else {
+            throw std::runtime_error("Error: router got message with no source.");
+        }
     }
     return 0;
 }

@@ -79,8 +79,7 @@
  */
 
 #include "Device.h"
-#include <unordered_map>
-#include <utility>
+#include <vector>
 
 /** 
  * \brief class for router device.
@@ -99,8 +98,8 @@ public:
     virtual ~Router();
     /// runs both the receive and transmit handlers in required sequence
     int run(std::istream *in, std::ostream *out);
-    /// adds a rule to the rule set
-    bool rule(Device *in, Device *out);
+    /// adds a rule to the rule set with a predicate
+    bool addRule(Device *in, SinkDevice *out, bool (Message:: *pred)() const = nullptr);
     /// set or clear verbose flag and return previous state
     bool verbosity(bool verbose);
 private:
@@ -108,8 +107,12 @@ private:
     bool m_verbose;
     /// output queue for all messages
     SafeQueue<Message> outQ;
-    using Rule = bool(*)(Message *);
-    std::unordered_map <Device *, Device *> always;
+    struct routingRule {
+        Device *from;
+        SinkDevice *to;
+        bool (Message:: *pred)() const;
+    };
+    std::vector<routingRule> rules;
 };
 
 #endif // ROUTER_H

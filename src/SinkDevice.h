@@ -83,12 +83,12 @@
 #include <atomic>
 
 /**
- * \brief This is the base class for all devices that pass Messages.
+ * \brief This is the base class for all devices that receive Messages.
  *
  */
 class SinkDevice {
 public:
-    /// construct with reference for input queues
+    /// construct with built-in input queue
     SinkDevice();
     /// return reference to input queue  TODO: make this safer
     SafeQueue<Message> &in() { return inQ; }

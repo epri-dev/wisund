@@ -91,7 +91,7 @@
 class CaptureDevice : public SinkDevice 
 {
 public:
-    /// constructor takes one input queue 
+    /// constructor creates default input queue
     CaptureDevice();
     /// destructor is virtual in case class needs to be further derived
     virtual ~CaptureDevice();

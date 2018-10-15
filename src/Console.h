@@ -97,14 +97,12 @@
  */
 class Console : public Device {
 public:
-    /// constructor takes references to input and output queues
+    /// constructor takes reference to output queue
     Console(SafeQueue<Message> &output);
     /// destructor is virtual in case class needs to be further derived
     virtual ~Console();
     /// push a message to the output queue
-    virtual void push(Message m) { m.setSource(this); 
-        std::cout << "Pushing " << m << " from " << m.source << '\n';
-        Device::push(m); } 
+    virtual void push(Message m) { m.setSource(this); Device::push(m); } 
     /// prints passed error message to `std::cerr`
     static void error(std::string &msg);
     /// emits a compound command Message to the output queue

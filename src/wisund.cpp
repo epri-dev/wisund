@@ -214,15 +214,19 @@ int main(int argc, char *argv[])
     CaptureDevice cap{};
 #endif
     // rule 1: Everything from the Console goes to the serial port
-    rtr.rule(&con, &ser);
+    rtr.addRule(&con, &ser);
 #if SIM
     // rule 2: Everything from serial port goes to the console
-    rtr.rule(&ser, &con);
+    rtr.addRule(&ser, &con);
 #else
     // rule 2: Everything from the TUN goes to the serial port
+    rtr.addRule(&tun, &ser);
     // rule 3: raw packets from the serial port go to the TUN
+    rtr.addRule(&ser, &tun, &Message::isRaw);
     // rule 4: If a capture packet comes from the serial port, it goes to the Capture device
+    rtr.addRule(&ser, &cap, &Message::isCap);
     // rule 5: All non-raw, non-capture packets from the serial port goes to the Console
+    rtr.addRule(&ser, &con);
 #endif
     ser.sendDelay(delay);
     ser.verbosity(verbose);

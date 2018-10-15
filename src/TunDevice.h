@@ -85,23 +85,35 @@
 class TunDevice : public Device
 {
 public:
+    /// constructor takes reference to output queue
     TunDevice(SafeQueue<Message> &output);
+    /// destructor is virtual in case class needs to be further derived
     virtual ~TunDevice();
+    /// runs the transmit handler (wrapping messages in SLIP encapsulation before sending)
     int runTx(std::istream *in = &std::cin);
+    /// runs the transmit handler (wrapping messages in SLIP encapsulation before sending)
     int runRx(std::ostream *out = &std::cout);
+    /// runs both the receive and transmit handlers in required sequence
     int run(std::istream *in, std::ostream *out);
+    /// set strict to only allow complete IPv6 messsages with valid Ethertype
     bool strict(bool strict);
+    /// set or clear verbose flag and return previous state
     bool verbosity(bool verbose);
 private:
+    /// start receiving the message
     void startReceive();
 #if 0
     void handleMessage(const asio::error_code &error, std::size_t size);
 #endif
+    // sends a complete message
     size_t send(const Message &msg);
+    /// returns true if message is valid according to setting of m_ipv6only
     bool isCompleteIpV6Msg(const Message& msg) const;
     /// File descriptor for TUN device
     int fd;
+    /// if true, echo packets
     bool m_verbose;
+    /// if true, only allow complete IPv6 messsages with valid Ethertype
     bool m_ipv6only;
 };
 

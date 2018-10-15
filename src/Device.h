@@ -81,41 +81,22 @@
 
 #include "Message.h"
 #include "SafeQueue.h"
+#include "SinkDevice.h"
 #include <atomic>
 
 /**
- * \brief This is the base class for all devices that pass Messages.
+ * \brief This is the base class for all devices that send and receive Messages.
  *
  */
-class Device {
+class Device : public SinkDevice {
 public:
-    /// construct with references for output queue
+    /// construct with pointer for output stream
     Device(SafeQueue<Message> *output);
-    /// return reference to input queue  TODO: make this safer
-    SafeQueue<Message> &in() { return inQ; }
     /// push a message to the output queue
     virtual void push(Message m);
-    /// wait for a message to appear in the input queue and pop it
-    virtual void wait_and_pop(Message &m);
-    /// returns true if the input queue is not empty
-    virtual bool more() { return !inQ.empty(); }
-    /// runs both receive and transmit processing (which could run in different threads)
-    virtual int run(std::istream *in, std::ostream *out) = 0;
-    /// causes the device to hold (keep running) even if the input queue is empty
-    void hold();
-    /// releases any hold that may have been asserted on this Device
-    void releaseHold();
-    /// returns the current hold status of this Device
-    bool wantHold() const;
-    /// convenience function to print the state of the hold variable to `std::cout`
-    void showHoldState() const;
 protected:
-    /// If true, the receive will continue even if the input queue is empty
-    volatile std::atomic_bool holdOnRxQueueEmpty;
-    /// input message queue for this device
-    SafeQueue<Message> inQ;
     /// output message queue for this device
-    SafeQueue<Message> *outQ;
+    SafeQueue<Message> *outQ = nullptr;
 };
 
 #endif // DEVICE_H

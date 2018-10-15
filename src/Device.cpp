@@ -77,35 +77,12 @@
 #include "Device.h"
 
 Device::Device(SafeQueue<Message> *output) :
-        holdOnRxQueueEmpty{false},
-        outQ{output}
+    SinkDevice{},
+    outQ{output}
 {}
-void Device::hold() 
-{ 
-    holdOnRxQueueEmpty = true; 
-}
-void Device::releaseHold() 
-{ 
-    holdOnRxQueueEmpty = false; 
-    inQ.push(Message{nullptr, 0});
-}
-
-bool Device::wantHold() const
-{ 
-    return holdOnRxQueueEmpty; 
-}
-
-void Device::showHoldState() const
-{ 
-    std::cout << "State = " << std::boolalpha << holdOnRxQueueEmpty << "\n"; 
-}
 
 void Device::push(Message m) 
 { 
     if (outQ) outQ->push(m); 
 }
 
-void Device::wait_and_pop(Message &m) 
-{ 
-    inQ.wait_and_pop(m); 
-}

@@ -91,7 +91,7 @@
 class SerialDevice : public Device
 {
 public:
-    /// constructor takes references to input and output queues, serial port and baud rate
+    /// constructor takes references output queue, serial port and baud rate
     SerialDevice(SafeQueue<Message> &output, const char *port = "/dev/ttyACM0", unsigned baud=115200);
     SerialDevice(SafeQueue<Message> &output, const std::string &port = "/dev/ttyACM0", unsigned baud=115200);
     /// destructor is virtual in case class needs to be further derived
