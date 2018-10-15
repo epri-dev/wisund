@@ -84,8 +84,8 @@ static constexpr uint8_t ESC{0xdb};
 static constexpr uint8_t ESC_END{0xdc}; 
 static constexpr uint8_t ESC_ESC{0xdd};
 
-SerialDevice::SerialDevice(SafeQueue<Message> &input, SafeQueue<Message> &output, const char *port, unsigned baud) :
-    Device(input, output),
+SerialDevice::SerialDevice(SafeQueue<Message> &output, const char *port, unsigned baud) :
+    Device(&output),
     m_io(), 
     m_port(m_io, port),
     m_verbose{false},
@@ -95,8 +95,8 @@ SerialDevice::SerialDevice(SafeQueue<Message> &input, SafeQueue<Message> &output
     m_port.set_option(asio::serial_port_base::baud_rate(baud));
 }
 
-SerialDevice::SerialDevice(SafeQueue<Message> &input, SafeQueue<Message> &output, const std::string &port, unsigned baud) :
-    Device(input, output),
+SerialDevice::SerialDevice(SafeQueue<Message> &output, const std::string &port, unsigned baud) :
+    Device(&output),
     m_io(), 
     m_port(m_io, port.c_str()),
     m_verbose{false},
@@ -173,6 +173,7 @@ void SerialDevice::handleMessage(const::asio::error_code &error, std::size_t siz
     std::vector<uint8_t> v(size);
     asio::buffer_copy(asio::buffer(v), buf);
     Message msg{v};
+    msg.setSource(this);
     if (m_verbose) {
         if (m_raw) {
             std::cout << "received: " << SerialDevice::decode(msg) << "\n";
@@ -180,7 +181,9 @@ void SerialDevice::handleMessage(const::asio::error_code &error, std::size_t siz
             std::cout << "received: " << msg << "\n";
         }
     }
-    push(SerialDevice::decode(msg));
+    Message m{SerialDevice::decode(msg)};
+    m.setSource(this);
+    push(m);
     m_data.consume(size);
     if (wantHold()) {
         startReceive();

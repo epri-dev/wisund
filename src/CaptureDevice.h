@@ -92,7 +92,7 @@ class CaptureDevice : public SinkDevice
 {
 public:
     /// constructor takes one input queue 
-    CaptureDevice(SafeQueue<Message> &input);
+    CaptureDevice();
     /// destructor is virtual in case class needs to be further derived
     virtual ~CaptureDevice();
     /// runs both the receive and transmit handlers in required sequence

@@ -89,8 +89,8 @@
 class Simulator : public Device
 {
 public:
-    /// constructor takes references to input and output queues, serial port and baud rate
-    Simulator(SafeQueue<Message> &input, SafeQueue<Message> &output);
+    /// constructor takes reference to output queue
+    Simulator(SafeQueue<Message> &output);
     /// destructor is virtual in case class needs to be further derived
     virtual ~Simulator();
     /// runs both the receive and transmit handlers in required sequence

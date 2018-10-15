@@ -35,10 +35,9 @@ public:
     void capture() {
         std::stringstream ss;
         {
-        SafeQueue<Message> captureIn;
-        CaptureDevice cap{captureIn};
-        captureIn.push(shortMsg);
-        captureIn.push(longMsg);
+        CaptureDevice cap{};
+        cap.in().push(shortMsg);
+        cap.in().push(longMsg);
         cap.verbosity(true);
         cap.hold();
         std::thread capThread{&CaptureDevice::run, &cap, &std::cin, &ss};

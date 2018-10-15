@@ -102,7 +102,10 @@ public:
     bool isRaw() const;
     /// returns true if the vector is capture packet (that is, begins with a 0x31 byte)
     bool isCap() const;
+    /// sets the source of this message
+    void setSource(void *src);
     /// overloaded inserter dumps the Message as a sequence of hex bytes
     friend std::ostream& operator<<(std::ostream &out, const Message &msg);
+    void *source = nullptr;
 };
 #endif // MESSAGE_H

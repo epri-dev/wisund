@@ -89,8 +89,10 @@
  */
 class Device {
 public:
-    /// construct with references for input and output queues
-    Device(SafeQueue<Message> &input, SafeQueue<Message> &output);
+    /// construct with references for output queue
+    Device(SafeQueue<Message> *output);
+    /// return reference to input queue  TODO: make this safer
+    SafeQueue<Message> &in() { return inQ; }
     /// push a message to the output queue
     virtual void push(Message m);
     /// wait for a message to appear in the input queue and pop it
@@ -111,9 +113,9 @@ protected:
     /// If true, the receive will continue even if the input queue is empty
     volatile std::atomic_bool holdOnRxQueueEmpty;
     /// input message queue for this device
-    SafeQueue<Message> &inQ;
+    SafeQueue<Message> inQ;
     /// output message queue for this device
-    SafeQueue<Message> &outQ;
+    SafeQueue<Message> *outQ;
 };
 
 #endif // DEVICE_H

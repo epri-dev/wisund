@@ -76,9 +76,8 @@
  */
 #include "Device.h"
 
-Device::Device(SafeQueue<Message> &input, SafeQueue<Message> &output) :
+Device::Device(SafeQueue<Message> *output) :
         holdOnRxQueueEmpty{false},
-        inQ{input},
         outQ{output}
 {}
 void Device::hold() 
@@ -103,7 +102,7 @@ void Device::showHoldState() const
 
 void Device::push(Message m) 
 { 
-    outQ.push(m); 
+    if (outQ) outQ->push(m); 
 }
 
 void Device::wait_and_pop(Message &m) 

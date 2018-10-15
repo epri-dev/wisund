@@ -78,8 +78,8 @@
 #include "pcapng.h"
 #include <iostream>
 
-CaptureDevice::CaptureDevice(SafeQueue<Message> &input) :
-    SinkDevice{input },
+CaptureDevice::CaptureDevice() :
+    SinkDevice{},
     m_verbose{false}
 {}
 

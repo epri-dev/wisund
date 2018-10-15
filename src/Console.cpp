@@ -84,8 +84,8 @@
 #include <ostream>
 #include <vector>
 
-Console::Console(SafeQueue<Message> &input, SafeQueue<Message> &output) :
-    Device(input, output),
+Console::Console(SafeQueue<Message> &output) :
+    Device(&output),
     trace_scanning{false},
     trace_parsing{false},
     real_quit{false},
@@ -129,6 +129,7 @@ int Console::run(std::istream *in, std::ostream *out) {
 void Console::compound(uint8_t cmd, std::vector<uint8_t> &data)
 {
     Message m{data};
+    m.setSource(this);
     m.insert(m.begin(), cmd);
     m.insert(m.begin(), 0x6);
     push(m);
@@ -136,17 +137,22 @@ void Console::compound(uint8_t cmd, std::vector<uint8_t> &data)
 
 void Console::compound(uint8_t cmd, uint8_t data)
 {
-    push(Message{0x6, cmd, data});
+    Message m{0x6, cmd, data};
+    m.setSource(this);
+    push(m);
 }
 
 void Console::simple(uint8_t cmd)
 {
-    push(Message{0x6, cmd});
+    Message m{0x6, cmd};
+    m.setSource(this);
+    push(m);
 }
 
 void Console::selfInput(const std::vector<uint8_t> &data) 
 {
     Message m{data};
+    m.setSource(this);
     m.insert(m.begin(), 0xED);
     inQ.push(m);
 }

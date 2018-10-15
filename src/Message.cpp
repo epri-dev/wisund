@@ -118,6 +118,7 @@ bool Message::isRaw() const { return size() && front() == 0; }
 
 bool Message::isCap() const { return size() && front() == 0x31; }
 
+void Message::setSource(void *src) { source = src; }
 
 std::ostream& operator<<(std::ostream &out, const Message &msg) {
     for (auto byte : msg) {

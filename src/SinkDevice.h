@@ -89,7 +89,9 @@
 class SinkDevice {
 public:
     /// construct with reference for input queues
-    SinkDevice(SafeQueue<Message> &input);
+    SinkDevice();
+    /// return reference to input queue  TODO: make this safer
+    SafeQueue<Message> &in() { return inQ; }
     /// wait for a message to appear in the input queue and pop it
     virtual void wait_and_pop(Message &m);
     /// returns true if the input queue is not empty
@@ -107,8 +109,7 @@ public:
 protected:
     /// If true, the receive will continue even if the input queue is empty
     volatile std::atomic_bool holdOnRxQueueEmpty;
-    /// input message queue for this device
-    SafeQueue<Message> &inQ;
+    SafeQueue<Message> inQ;
 };
 
 #endif // SINKDEVICE_H

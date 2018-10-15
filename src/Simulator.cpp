@@ -80,8 +80,8 @@
 #include <stdexcept>
 
 /// constructor takes references to input and output queues, serial port and baud rate
-Simulator::Simulator(SafeQueue<Message> &input, SafeQueue<Message> &output) :
-    Device(input, output),
+Simulator::Simulator(SafeQueue<Message> &output) :
+    Device(&output),
     m_verbose{false},
     m_delay{0},
     lastMessage{}
@@ -209,6 +209,7 @@ void Simulator::receive()
     static uint32_t fcie = 600;
     try {
         Message msg{simCmd.at(lastMessage).response};
+        msg.setSource(this);
         if (msg[0] == 0x21 && msg[1] == 2) {
             ++fcie;
             msg[2] = (fcie >> 0) & 0xff;

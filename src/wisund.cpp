@@ -86,10 +86,10 @@
 #include "wisundConfig.h"
 #include "SafeQueue.h"
 #include "Console.h"
+#include "Router.h"
 #if SIM
 #include "Simulator.h"
 #else
-#include "Router.h"
 #include "SerialDevice.h"
 #include "TunDevice.h"
 #include "CaptureDevice.h"
@@ -153,13 +153,6 @@ int main(int argc, char *argv[])
         usage();
         return 1;
     }
-#if !SIM
-    SafeQueue<Message> routerIn;
-    SafeQueue<Message> tunIn;
-    SafeQueue<Message> captureIn;
-#endif
-    SafeQueue<Message> serialIn;
-    SafeQueue<Message> consoleIn;
     bool verbose = false;
     bool strict = false;
     bool rawpackets = false;
@@ -210,21 +203,26 @@ int main(int argc, char *argv[])
     const std::string capfilename{argv[opt++]};
     std::cout << "Opening capture file " << capfilename << "\n";
 
+    Router rtr{};
+    Console con{rtr.in()};
+#if SIM
+    Simulator ser{rtr.in()};
+#else
+    TunDevice tun{rtr.in()};
+    tun.strict(strict);
+    SerialDevice ser{rtr.in(), serialname, 115200};
+    CaptureDevice cap{};
+#endif
     // rule 1: Everything from the Console goes to the serial port
-    Console con(consoleIn, serialIn);
+    rtr.rule(&con, &ser);
 #if SIM
     // rule 2: Everything from serial port goes to the console
-    Simulator ser(serialIn, consoleIn);
+    rtr.rule(&ser, &con);
 #else
     // rule 2: Everything from the TUN goes to the serial port
-    TunDevice tun(tunIn, serialIn);
-    tun.strict(strict);
     // rule 3: raw packets from the serial port go to the TUN
     // rule 4: If a capture packet comes from the serial port, it goes to the Capture device
     // rule 5: All non-raw, non-capture packets from the serial port goes to the Console
-    Router rtr{routerIn, consoleIn, tunIn, captureIn};
-    SerialDevice ser{serialIn, routerIn, serialname, 115200};
-    CaptureDevice cap{captureIn};
 #endif
     ser.sendDelay(delay);
     ser.verbosity(verbose);
@@ -236,13 +234,17 @@ int main(int argc, char *argv[])
 #else
     std::ofstream capfile(capfilename, std::ios::binary);
     tun.hold();
-    rtr.hold();
     cap.hold();
     std::thread serThread{&SerialDevice::run, &ser, &std::cin, &std::cout};
     std::thread tunThread{&TunDevice::run, &tun, &std::cin, &std::cout};
-    std::thread rtrThread{&Router::run, &rtr, &std::cin, &std::cout};
     std::thread capThread{&CaptureDevice::run, &cap, &std::cin, &capfile};
 #endif
+    rtr.hold();
+    std::thread rtrThread{&Router::run, &rtr, &std::cin, &std::cout};
+    std::cout << "Addresses:\nrtr = " << (void *)&rtr
+        << "\ncon = " << (void *)&con
+        << "\nser = " << (void *)&ser
+        << '\n';
 #if CLI
     while (!con.getQuitValue()) {
         con.hold();
@@ -276,11 +278,11 @@ int main(int argc, char *argv[])
 #endif
     ser.releaseHold();
     serThread.join();  
+    rtr.releaseHold();
+    rtrThread.join();  
 #if !SIM
     tun.releaseHold();
     tunThread.join();  
-    rtr.releaseHold();
-    rtrThread.join();  
     cap.releaseHold();
     capThread.join();  
 #endif

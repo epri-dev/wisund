@@ -76,9 +76,8 @@
  */
 #include "SinkDevice.h"
 
-SinkDevice::SinkDevice(SafeQueue<Message> &input) :
-        holdOnRxQueueEmpty{false},
-        inQ{input}
+SinkDevice::SinkDevice() :
+        holdOnRxQueueEmpty{false}
 {}
 void SinkDevice::hold() 
 { 

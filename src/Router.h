@@ -79,35 +79,37 @@
  */
 
 #include "Device.h"
+#include <unordered_map>
+#include <utility>
 
 /** 
  * \brief class for router device.
  *
  * This class receives Messages from its single input queue, but unlike 
- * other Devices, the Router has two output queues; one for raw (IPv6)
- * Messages and the other for all other Messages.  The purpose of the 
- * Router is solely to classify incoming Messages and to place them in
- * the appropriate output queue.
+ * other Devices, the Router may have multiple output queues.  Each 
+ * icoming Message is classified according to the rule set currently in 
+ * place and the Message sent to the corresponding output queue.
  *
  */
 class Router : public Device 
 {
 public:
-    /// constructor takes one input and two output queues 
-    Router(SafeQueue<Message> &input, SafeQueue<Message> &output, SafeQueue<Message> &rawOutput, SafeQueue<Message> &capOutput);
+    Router();
     /// destructor is virtual in case class needs to be further derived
     virtual ~Router();
     /// runs both the receive and transmit handlers in required sequence
     int run(std::istream *in, std::ostream *out);
+    /// adds a rule to the rule set
+    bool rule(Device *in, Device *out);
     /// set or clear verbose flag and return previous state
     bool verbosity(bool verbose);
 private:
-    /// this queue is for raw (IPv6) messages
-    SafeQueue<Message> &rawQ;
-    /// this queue is for captured messages
-    SafeQueue<Message> &capQ;
     /// if true, provide more diagnostic output
     bool m_verbose;
+    /// output queue for all messages
+    SafeQueue<Message> outQ;
+    using Rule = bool(*)(Message *);
+    std::unordered_map <Device *, Device *> always;
 };
 
 #endif // ROUTER_H

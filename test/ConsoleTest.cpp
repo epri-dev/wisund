@@ -46,7 +46,7 @@ public:
         std::stringstream reply;
         CPPUNIT_ASSERT(con != nullptr);
         Message diag2reply{0x21, 0x30, 0x55, 0xfe, 0x45};
-        input.push(diag2reply);
+        con->in().push(diag2reply);
         CPPUNIT_ASSERT(con->runRx(&reply) == 0);
     }
     void testMacReply() {
@@ -54,7 +54,7 @@ public:
         CPPUNIT_ASSERT(con != nullptr);
         Message macReply{0x24, 0x01, 0x02, 0xf3, 0xe4, 0xd5, 0xc6, 0xb7, 0xa8};
         std::string desired{"{ \"mac\":\"01:02:f3:e4:d5:c6:b7:a8\" }\n"};
-        input.push(macReply);
+        con->in().push(macReply);
         CPPUNIT_ASSERT(con->runRx(&reply) == 0);
         CPPUNIT_ASSERT(reply.str() == desired);
     }
@@ -74,7 +74,7 @@ public:
             0x00,0x00};
         std::string desired{R"x({ "iecounters": { "fcie":0, "uttie":95, "rslie":0, "btie":48, "usie":95, "bsie":66, "panie":46, "netnameie":47, "panverie":48, "gtkhashie":48, "mpie":0, "mhdsie":0, "vhie":0, "vpie":0 } }
 )x"};
-        input.push(diag2reply);
+        con->in().push(diag2reply);
         CPPUNIT_ASSERT(con->run(&cmds, &reply) == 0);
         CPPUNIT_ASSERT(reply.str() == desired);
     }
@@ -91,20 +91,20 @@ public:
                 0x00,0x19,0x59,0xff,0xfe,0x0f,0xff,0x03 };
         std::string desired{R"({ "neighbors": [ { "index":0, "validated":1, "timestamp":5112446, "mac":"00:19:59:ff:fe:0f:ff:02"}, { "index":1, "validated":1, "timestamp":5112447, "mac":"00:19:59:ff:fe:0f:ff:03"} ] }
 )"};
-        input.push(neighborsreply);
+        con->in().push(neighborsreply);
         CPPUNIT_ASSERT(con->run(&cmds, &reply) == 0);
         CPPUNIT_ASSERT(reply.str() == desired);
     }
 
     void setUp() {
-        con = new Console(input, output);
+        con = new Console(output);
     }
     void tearDown() {
         delete con;
     }
 private:
     Console *con;
-    SafeQueue<Message> input, output; 
+    SafeQueue<Message> output; 
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ConsoleTest);

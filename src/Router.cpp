@@ -76,15 +76,22 @@
  */
 #include "Router.h"
 #include <iostream>
+#include <cassert>
 
-Router::Router(SafeQueue<Message> &input, SafeQueue<Message> &output, SafeQueue<Message> &rawOutput, SafeQueue<Message> &capOutput) :
-    Device{input, output},
-    rawQ{rawOutput},
-    capQ{capOutput},
-    m_verbose{false}
+Router::Router() :
+    Device{&outQ}
 {}
 
 Router::~Router() = default;
+
+bool Router::rule(Device *in, Device *out)
+{
+    if (in == out) {
+        return false;
+    }
+    always[in] = out;
+    return true;
+}
 
 int Router::run(std::istream *in, std::ostream *out)
 {
@@ -93,22 +100,16 @@ int Router::run(std::istream *in, std::ostream *out)
     Message m{};
     while (wantHold()) {
         wait_and_pop(m);
-        if (m.isRaw()) {
-            if (m_verbose) {
-                std::cout << "Router pushing raw msg: " << m << "\n";
-            }
-            rawQ.push(m);
-        } else if (m.isCap()) {
-            if (m_verbose) {
-                std::cout << "Router pushing capture msg: " << m << "\n";
-            }
-            capQ.push(m);
-        }else {
+        if (m.source) {
+            std::cout << "Got a message from " << m.source << '\n';
+            assert(m.source != nullptr);
+            Device *target = always.at(static_cast<Device *>(m.source));
+            std::cout << "sending it to " << (void *)target << '\n';
+            target->in().push(m);
             if (m_verbose) {
                 std::cout << "Router pushing msg: " << m << "\n";
             }
-            push(m);
-        }
+        } 
     }
     return 0;
 }

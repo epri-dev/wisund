@@ -85,7 +85,7 @@
 class TunDevice : public Device
 {
 public:
-    TunDevice(SafeQueue<Message> &input, SafeQueue<Message> &output);
+    TunDevice(SafeQueue<Message> &output);
     virtual ~TunDevice();
     int runTx(std::istream *in = &std::cin);
     int runRx(std::ostream *out = &std::cout);

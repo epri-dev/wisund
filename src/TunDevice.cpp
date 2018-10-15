@@ -85,8 +85,8 @@
 #include <linux/if.h>
 #include <linux/if_tun.h>
 
-TunDevice::TunDevice(SafeQueue<Message> &input, SafeQueue<Message> &output) :
-    Device(input, output),
+TunDevice::TunDevice(SafeQueue<Message> &output) :
+    Device(&output),
     fd{0},
     m_verbose{false},
     m_ipv6only{true}
@@ -187,6 +187,7 @@ void TunDevice::startReceive()
 {
     fd_set rfds;
     Message msg{};
+    msg.setSource(this);
 
     for (bool partialpkt{true}; partialpkt; partialpkt = msg.size() > 0) {
         // watch just our fd
