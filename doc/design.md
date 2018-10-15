@@ -57,11 +57,14 @@ The tool software is written in object-oriented C++.  The major classes are desc
 ### SafeQueue
 Functioning as a message queue, this class handles the sequential processing and routing of messages.  Must be accessible by multiple threads.  Each interface has its own inbound queue; routing is done by the outbound message handler associated with the device.
 
+### SinkDevice
+`SinkDevice` is an abstract class providing a base for other relevant classes.  Each `SinkDevice` device has a single receive queue and no output queue.
+
 ### Device
-`Device` is an abstract class providing a base for other relevant classes.  Each device has two interfaces; one is the external facing interface that defines it (e.g. serial port, console or tun) and the internal interface which looks the same for all devices.  The internal device interface is a receive message queue.  
+`Device` is an abstract class derived from `SinkDevice` providing a base for other relevant classes.  Each `Device` has an input queue and an output queue. 
 
 ### Router
-This object is at the heart of the application and has three bidirectional ports and one write-only port for seven total I/O ports.  Messages that come in via one port are classified and sent to one (or more) of the other ports based on the arrival port and the contents of the message.
+This object is at the heart of the application.  Like all objects derived from `Device`, the `Router` has a single input queue but also has several output queues. Messages that come into the input queue are classified and sent to one (or more) of the other ports based on the arrival port and the contents of the message.
 
 ### SerialDevice
 Needs to receive serial data, unwrap it (SLIP) and send raw message to Router. For transmit, each received message is wrapped via SLIP and sent.
