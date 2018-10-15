@@ -64,7 +64,7 @@ Functioning as a message queue, this class handles the sequential processing and
 `Device` is an abstract class derived from `SinkDevice` providing a base for other relevant classes.  Each `Device` has an input queue and an output queue. 
 
 ### Router
-This object is at the heart of the application.  Like all objects derived from `Device`, the `Router` has a single input queue but also has several output queues. Messages that come into the input queue are classified and sent to one (or more) of the other ports based on the arrival port and the contents of the message.
+This object is at the heart of the application.  Like all objects derived from `Device`, the `Router` has a single input queue but also has several output queues. Messages that come into the input queue are classified and sent to exactly one of the other ports based on the arrival port and the contents of the message and the rules given to the `Router`.  Rules are given as a triple, `{ from, to, predicate }` where `from` is the source of the message, `to` is the destination, and `predicate` is a function which returns true or false based on the passed message.  Rules are executed in the order defined until a successful rule is found; the first matching rule decides where the message is routed.  If no predicate is defined, it is evaluated as though the predicate is always true.
 
 ### SerialDevice
 Needs to receive serial data, unwrap it (SLIP) and send raw message to Router. For transmit, each received message is wrapped via SLIP and sent.
