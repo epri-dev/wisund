@@ -72,6 +72,7 @@ freshen - does update/upgrade of Linux + all installed software
 install_required - installs the required software for building everything in wisund
 clone_or_refresh - uses git to either clone or refresh the wisund source code
 build_and_install - builds and installs the wisund software
+enable_uart - alters configuration to enable uart0 (requires reboot after)
 "
 }
 
@@ -83,6 +84,7 @@ do
         install_required
         clone_or_refresh
         build_and_install
+        enable_uart
         ;;
     freshen)
         freshen
@@ -95,6 +97,9 @@ do
         ;;
     build_and_install)
         build_and_install
+        ;;
+    enable_uart)
+        enable_uart
         ;;
     help)
         showhelp
