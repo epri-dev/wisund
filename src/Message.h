@@ -102,6 +102,8 @@ public:
     bool isRaw() const;
     /// returns true if the vector is capture packet (that is, begins with a 0x31 byte)
     bool isCap() const;
+    /// returns true if the message is plain (that is, neither raw nor capture
+    bool isPlain() const;
     /// sets the source of this message
     void setSource(void *src);
     /// overloaded inserter dumps the Message as a sequence of hex bytes

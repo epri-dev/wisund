@@ -122,8 +122,11 @@ int SerialDevice::runRx(std::ostream *out)
     out = out;
     Message m{};
     while (wantHold()) {
-        wait_and_pop(m);
-        send(m);
+        // TODO: replace this polling loop with conditional wait
+        m_io.poll();
+        if (try_pop(m)) {
+            send(m);
+        }
     }
     m_port.close();
     return 0;
@@ -131,11 +134,9 @@ int SerialDevice::runRx(std::ostream *out)
 
 int SerialDevice::run(std::istream *in, std::ostream *out)
 {
-    std::thread t1{&SerialDevice::runRx, this, out};
-    int status = runTx(in);
-    m_io.run();
-    t1.join();
-    return status;
+    runTx(in);
+    m_io.poll();
+    return runRx(out);
 }
 
 using iterator = asio::buffers_iterator<asio::streambuf::const_buffers_type>;
@@ -203,6 +204,7 @@ size_t SerialDevice::send(const Message &msg) {
         }
     }
     std::this_thread::sleep_for(m_delay);
+    // TODO: convert this to async_write and ditch the thread?
     return m_port.write_some(asio::buffer(encoded.data(), encoded.size()));
 }
 

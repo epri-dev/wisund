@@ -226,7 +226,7 @@ int main(int argc, char *argv[])
     // rule 4: If a capture packet comes from the serial port, it goes to the Capture device
     rtr.addRule(&ser, &cap, &Message::isCap);
     // rule 5: All non-raw, non-capture packets from the serial port goes to the Console
-    rtr.addRule(&ser, &con);
+    rtr.addRule(&ser, &con, &Message::isPlain);
 #endif
     ser.sendDelay(delay);
     ser.verbosity(verbose);
@@ -245,10 +245,6 @@ int main(int argc, char *argv[])
 #endif
     rtr.hold();
     std::thread rtrThread{&Router::run, &rtr, &std::cin, &std::cout};
-    std::cout << "Addresses:\nrtr = " << (void *)&rtr
-        << "\ncon = " << (void *)&con
-        << "\nser = " << (void *)&ser
-        << '\n';
 #if CLI
     while (!con.getQuitValue()) {
         con.hold();

@@ -99,17 +99,19 @@ int Router::run(std::istream *in, std::ostream *out)
     Message m{};
     while (wantHold()) {
         wait_and_pop(m);
-        if (m.source) {
+        if (m.size() && m.source) {
             for (const auto &rule : rules) {
                 if (rule.from == m.source && (rule.pred == nullptr || (m.*(rule.pred))())) {
                     rule.to->in().push(m);
                     if (m_verbose) {
                         std::cout << "Router pushing msg: " << m << "\n";
                     }
-                    break;
+                    if (rule.pred == nullptr)
+                        break;
                 }
             } 
-        } else {
+        } else if (m.size()) {
+            std::cout << "About to throw error for this: " << m << '\n';
             throw std::runtime_error("Error: router got message with no source.");
         }
     }

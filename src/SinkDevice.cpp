@@ -81,20 +81,20 @@ SinkDevice::SinkDevice() :
 {}
 void SinkDevice::hold() 
 { 
-    holdOnRxQueueEmpty = true; 
+    holdOnRxQueueEmpty.exchange(true); 
 }
 void SinkDevice::releaseHold() 
 { 
-    holdOnRxQueueEmpty = false; 
+    holdOnRxQueueEmpty.exchange(false); 
     inQ.push(Message{nullptr, 0});
 }
 
-bool SinkDevice::wantHold() 
+bool SinkDevice::wantHold() const
 { 
     return holdOnRxQueueEmpty; 
 }
 
-void SinkDevice::showHoldState() 
+void SinkDevice::showHoldState() const
 { 
     std::cout << "State = " << std::boolalpha << holdOnRxQueueEmpty << "\n"; 
 }
@@ -102,4 +102,9 @@ void SinkDevice::showHoldState()
 void SinkDevice::wait_and_pop(Message &m) 
 { 
     inQ.wait_and_pop(m); 
+}
+
+bool SinkDevice::try_pop(Message &m) 
+{ 
+    return inQ.try_pop(m); 
 }

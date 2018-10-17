@@ -94,6 +94,8 @@ public:
     SafeQueue<Message> &in() { return inQ; }
     /// wait for a message to appear in the input queue and pop it
     virtual void wait_and_pop(Message &m);
+    /// returns true and populates passed reference only if the queue is not empty
+    virtual bool try_pop(Message &m);
     /// returns true if the input queue is not empty
     virtual bool more() { return !inQ.empty(); }
     /// runs both receive and transmit processing (which could run in different threads)
@@ -103,9 +105,9 @@ public:
     /// releases any hold that may have been asserted on this SinkDevice
     void releaseHold();
     /// returns the current hold status of this SinkDevice
-    bool wantHold();
+    bool wantHold() const;
     /// convenience function to print the state of the hold variable to `std::cout`
-    void showHoldState();
+    void showHoldState() const;
 protected:
     /// If true, the receive will continue even if the input queue is empty
     volatile std::atomic_bool holdOnRxQueueEmpty;
