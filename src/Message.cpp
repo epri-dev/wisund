@@ -118,7 +118,9 @@ bool Message::isRaw() const { return size() && front() == 0; }
 
 bool Message::isCap() const { return size() && front() == 0x31; }
 
-bool Message::isPlain() const { return !(isRaw() || isCap()); }
+bool Message::isControl() const { return size() && front() == 0xED; }
+
+bool Message::isPlain() const { return !(isRaw() || isCap() || isControl()); }
 
 void Message::setSource(void *src) { source = src; }
 

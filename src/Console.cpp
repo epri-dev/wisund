@@ -126,6 +126,14 @@ int Console::run(std::istream *in, std::ostream *out) {
     return status;
 }
 
+void Console::control(uint8_t cmd, std::vector<uint8_t> &data)
+{
+    Message m{data};
+    m.insert(m.begin(), cmd);
+    m.insert(m.begin(), 0xED);
+    push(m);
+}
+
 void Console::compound(uint8_t cmd, std::vector<uint8_t> &data)
 {
     Message m{data};

@@ -101,14 +101,16 @@
 #include <chrono>
 
 /*
- * The router has a few simple rules.
+ * The router routes packets according to rules that is given.  Each rule
+ * is of the form (source, destination, predicate) where the predicate is 
+ * a member function of the Message class that returns a bool.  
  *
- * The rules are:
- *    1. Everything from the Console goes to the serial port
- *    2. Everything from the TUN goes to the serial port
- *    3. If a raw packet comes from the serial port, it goes to the TUN
- *    4. If a capture packet comes from the serial port, it goes to the Capture device
- *    5. All non-raw, non-capture packets from the serial port goes to the Console
+ * Messages from the console generally go to the serial device and vice-versa
+ * but there are some exceptions for various kinds of other messages.
+ *
+ * In particular, capture packets from the serial device go to the 
+ * capture device and raw packets from the serial device go to the TUN
+ * device.  
  *
  * The simulator works the same way as the wisund code except that 
  * instead of using a real serial port and a real TUN device, both are 
@@ -116,9 +118,8 @@
  * has indirect effects, it is omitted entirely from this simulator
  * and only the radio messages are simulated.
  * 
- * For that reason, no Router and no CaptureDevice are required, since the 
- * Console and Simulator devices are the only two devices.  Messages originating 
- * from one simply always go to the other.
+ * For that reason, no TUN and no CaptureDevice are required, since the 
+ * Console and Simulator devices are the only two devices.  
  *
  */
 
@@ -207,25 +208,26 @@ int main(int argc, char *argv[])
     Console con{rtr.in()};
 #if SIM
     Simulator ser{rtr.in()};
+    // rule 1: Everything from the Console goes to the serial port
+    rtr.addRule(&con, &ser, &Message::isPlain);
+    // rule 2: Everything from serial port goes to the console
+    rtr.addRule(&ser, &con, &Message::isPlain);
 #else
     TunDevice tun{rtr.in()};
     tun.strict(strict);
     SerialDevice ser{rtr.in(), serialname, 115200};
     CaptureDevice cap{};
-#endif
-    // rule 1: Everything from the Console goes to the serial port
-    rtr.addRule(&con, &ser);
-#if SIM
-    // rule 2: Everything from serial port goes to the console
-    rtr.addRule(&ser, &con);
-#else
-    // rule 2: Everything from the TUN goes to the serial port
+    // rule 1: Control messages from the console go to the capture device
+    rtr.addRule(&con, &cap, &Message::isControl);
+    // rule 2: Everything else from the Console goes to the serial port
+    rtr.addRule(&con, &ser, &Message::isPlain);
+    // rule 3: Everything from the TUN goes to the serial port
     rtr.addRule(&tun, &ser);
-    // rule 3: raw packets from the serial port go to the TUN
+    // rule 4: raw packets from the serial port go to the TUN
     rtr.addRule(&ser, &tun, &Message::isRaw);
-    // rule 4: If a capture packet comes from the serial port, it goes to the Capture device
+    // rule 5: If a capture packet comes from the serial port, it goes to the Capture device
     rtr.addRule(&ser, &cap, &Message::isCap);
-    // rule 5: All non-raw, non-capture packets from the serial port goes to the Console
+    // rule 6: All non-raw, non-capture packets from the serial port goes to the Console
     rtr.addRule(&ser, &con, &Message::isPlain);
 #endif
     ser.sendDelay(delay);

@@ -97,10 +97,6 @@ ID      [a-z][a-z0-9]*
         yylval = lval;
 %}
 
-{XDIGIT}{XDIGIT}   { uint8_t val = (0xffu & std::stoi(yytext, 0, 16));
-                yylval->build(val); 
-                return token::HEXBYTE;
-            }
 fchan       { return token::FCHAN; }
 tr51cf      { return token::TR51CF; }
 exclude     { return token::EXCLUDE; }
@@ -112,6 +108,7 @@ useparbs    { return token::USEPARBS; }
 rank        { return token::RANK; }
 netname     { return token::NETNAME; }
 macsec      { return token::MACSEC; }
+capfile     { return token::CAPFILE; }
 lbr         { return token::LBR; }
 nlbr        { return token::NLBR; }
 index       { return token::INDEX; }
@@ -130,6 +127,16 @@ data        { return token::DATA; }
 help        { return token::HELP; }
 pause       { return token::PAUSE; }
 quit|exit   { return token::QUIT; }
+\.          { return token::PERIOD; }
+[/]      { return token::DIVIDER; }
+{ID}        { std::string val{yytext};
+                yylval->build(val); 
+                return token::ID;
+            }
+{XDIGIT}{XDIGIT}   { uint8_t val = (0xffu & std::stoi(yytext, 0, 16));
+                yylval->build(val); 
+                return token::HEXBYTE;
+            }
 
 [ \t\r]+    { } /* ignore whitespace */
 \n          { return token::NEWLINE; }

@@ -102,7 +102,9 @@ public:
     bool isRaw() const;
     /// returns true if the vector is capture packet (that is, begins with a 0x31 byte)
     bool isCap() const;
-    /// returns true if the message is plain (that is, neither raw nor capture
+    /// returns true if the vector is control packet (that is, begins with a 0xED byte)
+    bool isControl() const;
+    /// returns true if the message is plain (that is, not raw, capture or control)
     bool isPlain() const;
     /// sets the source of this message
     void setSource(void *src);

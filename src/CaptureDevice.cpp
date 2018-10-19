@@ -77,6 +77,7 @@
 #include "CaptureDevice.h"
 #include "pcapng.h"
 #include <iostream>
+#include <fstream>
 
 CaptureDevice::CaptureDevice() :
     SinkDevice{},
@@ -105,9 +106,33 @@ int CaptureDevice::run(std::istream *in, std::ostream *out)
         if (m_verbose) {
             std::cout << "CaptureDevice  raw msg: " << m << "\n";
         }
+        // is it a control message?
+        if (m.size() > 1 && m[0] == 0xED) {
+            switch (m[1]) {
+                case 0x01:    // change capture file command
+                    {
+                        std::string filename{m.begin() + 2, m.end()};
+                        std::ofstream newfile{filename};
+                        if (newfile) {
+                            out->flush();
+                            out = &newfile;
+                            createHeader(*out);
+                        }
+                        if (m_verbose) {
+                            std::cout << "Changing to capture file " << filename << '\n';
+                        }
+                    }
+                    break;
+                default:        //  unknown subcommand
+                    if (m_verbose) {
+                        std::cout << "Unknown subcommand\n";
+                    }
+                    break;
+            }
+        }
         /* -5 instead of -1 to strip off FCS */
         // TODO: check FCS?
-        if (m.size() > 5) {
+        else if (m.size() > 5) {
             EPB ebp;
             ebp.write(*out, &m[1], m.size()-5);
             // flush each packet to allow live update via pipe

@@ -124,7 +124,7 @@ static const std::string helpText{
     "Accepted commands:\n"
     "fchan nn rr\ntr51cf\nexclude nn ...\nphy nn\npanid nn\n"
     "pansize nn\nroutecost nn\nuseparbs nn\n" 
-    "macsec nn\nmaccap nn\n" 
+    "macsec nn\nmaccap \ncapfile filename\n" 
     "lbr\nnlbr\nindex nn\nsetmac macaddr\nbuildid\n"
     "commands accepted in LBR or NLBR active state:\n"
     "state\ndiag nn\nneighbors\nmac\nget nn\nping nn\nlast\nrestart\n"
@@ -138,10 +138,14 @@ static const std::vector<uint8_t> helpString{helpText.begin(), helpText.end()};
 
 %token FCHAN TR51CF EXCLUDE PHY PANID LBR NLBR INDEX SETMAC 
 %token STATE DIAG BUILDID NEIGHBORS MAC GETZZ PING LAST RESTART 
-%token DATA HELP QUIT PAUSE
+%token DATA HELP QUIT PAUSE PERIOD CAPFILE
 %token PANSIZE ROUTECOST USEPARBS RANK NETNAME
-%token MACSEC MACCAP
+%token MACSEC MACCAP DIVIDER
+%token <std::string> ID
 %token <uint8_t> HEXBYTE
+%type <std::string> path
+%type <std::string> filename 
+%type <std::string> pathexpr
 %type <std::vector<uint8_t>> bytes
 %token NEWLINE 
 %token <uint8_t> CHAR
@@ -154,6 +158,20 @@ script: script command
 bytes:  bytes HEXBYTE       { $$ = $1; $$.push_back($2); }
     |   HEXBYTE             { $$.push_back($1); }
     ;
+
+path:   pathexpr filename   { $$ = $1 + $2; }
+    ;
+
+pathexpr:   pathexpr PERIOD PERIOD DIVIDER  { $$ = $1; $$ += "../"; }
+    |       pathexpr PERIOD DIVIDER         { $$ = $1; $$ += "./"; }
+    |       pathexpr ID DIVIDER             { $$ = $1; $$ += $2 + "/"; }
+    |       DIVIDER                         { $$ = "/"; }
+    |                                       { $$ = ""; }
+    ;
+
+filename:   ID PERIOD ID    { $$ = $1 + "." + $3; }
+    |       ID              { $$ = $1; }
+    ;
     
 command:    FCHAN bytes     { console.compound(0x01, $2); }
     |       TR51CF          { console.simple(0x02); }
@@ -164,7 +182,8 @@ command:    FCHAN bytes     { console.compound(0x01, $2); }
                                     std::cout << "Error: exclude channels must not have the value of zero (channel numbering starts at 1)\n";
                                 }
                             }
-                                
+    |       CAPFILE path    { std::vector<uint8_t> v{std::begin($2), std::end($2)};
+                                console.control(0x01, v); }
     |       PHY HEXBYTE     { console.compound(0x04, $2); }
     |       PANID bytes     {if ($2.size() == 2) {
                                 console.compound(0x06, $2); 

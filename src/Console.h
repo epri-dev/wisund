@@ -105,6 +105,8 @@ public:
     virtual void push(Message m) { m.setSource(this); Device::push(m); } 
     /// prints passed error message to `std::cerr`
     static void error(std::string &msg);
+    /// emits a control command Message to the output queue
+    void control(uint8_t cmd, std::vector<uint8_t> &data);
     /// emits a compound command Message to the output queue
     void compound(uint8_t cmd, std::vector<uint8_t> &data);
     /// emits a compound command Message to the output queue
