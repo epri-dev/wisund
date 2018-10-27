@@ -95,7 +95,6 @@ bool Router::addRule(Device *in, SinkDevice *out, bool (Message::*pred)() const)
 int Router::run(std::istream *in, std::ostream *out)
 {
     in = in;
-    out = out;
     Message m{};
     while (wantHold()) {
         wait_and_pop(m);
@@ -104,14 +103,14 @@ int Router::run(std::istream *in, std::ostream *out)
                 if (rule.from == m.source && (rule.pred == nullptr || (m.*(rule.pred))())) {
                     rule.to->in().push(m);
                     if (m_verbose) {
-                        std::cout << "Router pushing msg: " << m << "\n";
+                        *out << "Router pushing msg: " << m << "\n";
                     }
                     if (rule.pred == nullptr)
                         break;
                 }
             } 
         } else if (m.size()) {
-            std::cout << "About to throw error for this: " << m << '\n';
+            *out << "About to throw error for this: " << m << '\n';
             throw std::runtime_error("Error: router got message with no source.");
         }
     }

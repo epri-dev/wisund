@@ -42,7 +42,7 @@ public:
         cap.hold();
         std::thread capThread{&CaptureDevice::run, &cap, &std::cin, &ss};
         // allow the capture thread time to process messages
-        std::this_thread::sleep_for(std::chrono::seconds{1});
+        std::this_thread::sleep_for(std::chrono::milliseconds{500});
         cap.releaseHold();
         capThread.join();
         }

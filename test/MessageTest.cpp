@@ -13,6 +13,7 @@
 class MessageTest : public CppUnit::TestFixture {
     CPPUNIT_TEST_SUITE(MessageTest);
     CPPUNIT_TEST(testBasicMessage);
+    CPPUNIT_TEST(capMessage);
     CPPUNIT_TEST_SUITE_END();
 public:
     void testBasicMessage() {
@@ -22,6 +23,11 @@ public:
         CPPUNIT_ASSERT(m2.isRaw() == true);
         CPPUNIT_ASSERT(m2.size() == 3);
         std::cout << "m2 = " << m2 << '\n';
+    }
+    void capMessage() {
+        Message capmsg{0x31, 0x82, 0x82};
+        CPPUNIT_ASSERT(capmsg.isCap());
+        CPPUNIT_ASSERT(capmsg.size() == 3);
     }
     void setUp() {
     }
