@@ -98,18 +98,20 @@ public:
     Message(std::vector<uint8_t> &&v);
     /// append another message to this one
     Message &operator+=(const Message& msg);
-    /// returns true if the vector is raw (that is, begins with a 0x00 byte)
-    bool isRaw() const;
-    /// returns true if the vector is capture packet (that is, begins with a 0x31 byte)
-    bool isCap() const;
-    /// returns true if the vector is control packet (that is, begins with a 0xED byte)
-    bool isControl() const;
-    /// returns true if the message is plain (that is, not raw, capture or control)
-    bool isPlain() const;
     /// sets the source of this message
     void setSource(void *src);
     /// overloaded inserter dumps the Message as a sequence of hex bytes
     friend std::ostream& operator<<(std::ostream &out, const Message &msg);
     void *source = nullptr;
 };
+
+// Freestanding functions
+/// returns true if the Message is raw (that is, begins with a 0x00 byte)
+bool isRaw(const Message &msg);
+/// returns true if the Message is capture packet (that is, begins with a 0x31 byte)
+bool isCap(const Message &msg);
+/// returns true if the Message is control packet (that is, begins with a 0xED byte)
+bool isControl(const Message &msg);
+/// returns true if the Message is plain (that is, not raw, capture or control)
+bool isPlain(const Message &msg);
 #endif // MESSAGE_H

@@ -83,7 +83,7 @@ Router::Router() :
 
 Router::~Router() = default;
 
-bool Router::addRule(Device *in, SinkDevice *out, bool (Message::*pred)() const)
+bool Router::addRule(Device *in, SinkDevice *out, bool (*pred)(const Message&))
 {
     if (in == out) {
         return false;
@@ -100,7 +100,7 @@ int Router::run(std::istream *in, std::ostream *out)
         wait_and_pop(m);
         if (m.size() && m.source) {
             for (const auto &rule : rules) {
-                if (rule.from == m.source && (rule.pred == nullptr || (m.*(rule.pred))())) {
+                if (rule.from == m.source && (rule.pred == nullptr || (rule.pred(m)))) {
                     rule.to->in().push(m);
                     if (m_verbose) {
                         *out << "Router pushing msg: " << m << "\n";

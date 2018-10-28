@@ -209,26 +209,26 @@ int main(int argc, char *argv[])
 #if SIM
     Simulator ser{rtr.in()};
     // rule 1: Everything from the Console goes to the serial port
-    rtr.addRule(&con, &ser, &Message::isPlain);
+    rtr.addRule(&con, &ser, isPlain);
     // rule 2: Everything from serial port goes to the console
-    rtr.addRule(&ser, &con, &Message::isPlain);
+    rtr.addRule(&ser, &con, isPlain);
 #else
     TunDevice tun{rtr.in()};
     tun.strict(strict);
     SerialDevice ser{rtr.in(), serialname, 115200};
     CaptureDevice cap{};
     // rule 1: Control messages from the console go to the capture device
-    rtr.addRule(&con, &cap, &Message::isControl);
+    rtr.addRule(&con, &cap, isControl);
     // rule 2: Everything else from the Console goes to the serial port
-    rtr.addRule(&con, &ser, &Message::isPlain);
+    rtr.addRule(&con, &ser, isPlain);
     // rule 3: Everything from the TUN goes to the serial port
     rtr.addRule(&tun, &ser);
     // rule 4: raw packets from the serial port go to the TUN
-    rtr.addRule(&ser, &tun, &Message::isRaw);
+    rtr.addRule(&ser, &tun, isRaw);
     // rule 5: If a capture packet comes from the serial port, it goes to the Capture device
-    rtr.addRule(&ser, &cap, &Message::isCap);
+    rtr.addRule(&ser, &cap, isCap);
     // rule 6: All non-raw, non-capture packets from the serial port goes to the Console
-    rtr.addRule(&ser, &con, &Message::isPlain);
+    rtr.addRule(&ser, &con, isPlain);
 #endif
     ser.sendDelay(delay);
     ser.verbosity(verbose);

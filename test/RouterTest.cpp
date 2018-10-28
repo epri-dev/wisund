@@ -94,8 +94,8 @@ public:
         TestDevice td1{rtr.in()}; 
         TestDevice td2{rtr.in()};
         TestDevice td3{rtr.in()};
-        rtr.addRule(&td1, &td2, &Message::isCap);
-        rtr.addRule(&td1, &td3, &Message::isPlain);
+        rtr.addRule(&td1, &td2, isCap);
+        rtr.addRule(&td1, &td3, isPlain);
         rtr.hold();
         Message plainmsg{0x61,0x82};
         plainmsg.setSource(&td1);

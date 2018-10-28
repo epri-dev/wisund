@@ -17,16 +17,16 @@ class MessageTest : public CppUnit::TestFixture {
     CPPUNIT_TEST_SUITE_END();
 public:
     void testBasicMessage() {
-        CPPUNIT_ASSERT(m1.isRaw() == false);
+        CPPUNIT_ASSERT(isRaw(m1) == false);
         CPPUNIT_ASSERT(m1.size() == 3);
         std::cout << "m1 = " << m1 << '\n';
-        CPPUNIT_ASSERT(m2.isRaw() == true);
+        CPPUNIT_ASSERT(isRaw(m2) == true);
         CPPUNIT_ASSERT(m2.size() == 3);
         std::cout << "m2 = " << m2 << '\n';
     }
     void capMessage() {
         Message capmsg{0x31, 0x82, 0x82};
-        CPPUNIT_ASSERT(capmsg.isCap());
+        CPPUNIT_ASSERT(isCap(capmsg));
         CPPUNIT_ASSERT(capmsg.size() == 3);
     }
     void setUp() {

@@ -99,7 +99,7 @@ public:
     /// runs both the receive and transmit handlers in required sequence
     int run(std::istream *in, std::ostream *out);
     /// adds a rule to the rule set with a predicate
-    bool addRule(Device *in, SinkDevice *out, bool (Message:: *pred)() const = nullptr);
+    bool addRule(Device *in, SinkDevice *out, bool (*pred)(const Message&) = nullptr);
     /// set or clear verbose flag and return previous state
     bool verbosity(bool verbose);
 private:
@@ -110,7 +110,7 @@ private:
     struct routingRule {
         Device *from;
         SinkDevice *to;
-        bool (Message:: *pred)() const;
+        bool (*pred)(const Message&);
     };
     std::vector<routingRule> rules;
 };

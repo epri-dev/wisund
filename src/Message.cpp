@@ -114,14 +114,6 @@ Message& Message::operator+=(const Message& msg) {
     return *this;
 }
 
-bool Message::isRaw() const { return size() && front() == 0; }
-
-bool Message::isCap() const { return size() && front() == 0x31; }
-
-bool Message::isControl() const { return size() && front() == 0xED; }
-
-bool Message::isPlain() const { return !(isRaw() || isCap() || isControl()); }
-
 void Message::setSource(void *src) { source = src; }
 
 std::ostream& operator<<(std::ostream &out, const Message &msg) {
@@ -131,6 +123,23 @@ std::ostream& operator<<(std::ostream &out, const Message &msg) {
     }
     return out;
 }
+
+bool isRaw(const Message &msg) { 
+    return msg.size() && msg.front() == 0; 
+}
+
+bool isCap(const Message &msg) { 
+    return msg.size() && msg.front() == 0x31; 
+}
+
+bool isControl(const Message &msg) { 
+    return msg.size() && msg.front() == 0xED; 
+}
+
+bool isPlain(const Message &msg) { 
+    return !(isRaw(msg) || isCap(msg) || isControl(msg)); 
+}
+   
 
 #if 0
 int main() {
