@@ -17,6 +17,16 @@ option(WITH_TEST "Build the test suite" OFF)
 # load additional detection for asio
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
+# generate posistion independent code by default
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+# additionally set up stack canaries
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fstack-protector")
+
+# CMake doesn't add -PIE by default for executables (Cmake issue #14983)
+set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pie")
+set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -z now -z relro")
+
 # configure a header file to pass some of the CMake settings
 # to the source code
 configure_file (
